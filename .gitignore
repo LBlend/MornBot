@@ -1,0 +1,15 @@
+*.json
+*.example
+*.pyc
+__pycache__/
+.vscode/
+*.log
+*.mp3
+*.wav
+*.m4a
+*.mp4
+*.webm
+*.gif
+*.png
+*.jpg
+*.flac
