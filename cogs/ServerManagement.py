@@ -31,7 +31,7 @@ class ServerManagement:
 
     @commands.has_permissions(manage_messages=True)
     @commands.command(aliases=["purge", "delete", "slett"])
-    async def prune(self, ctx, number: int):
+    async def prune(self, ctx, antall: int):
         """Sletter de siste antall meldingene du spesifiser\n\nEksmpel: m!prune 10"""
 
         #   Slett bekreftelsesmelding funksjon
@@ -39,8 +39,8 @@ class ServerManagement:
             return botuser.author == self.bot.user
 
         #   Utfør
-        await ctx.message.channel.purge(limit=number+1)
-        test = await ctx.send(f"Slettet {number} meldinger!")
+        await ctx.message.channel.purge(limit=antall+1)
+        await ctx.send(f"Slettet {antall} meldinger!")
         time.sleep(3)
         await ctx.message.channel.purge(check=selfDelete, limit=1)
 

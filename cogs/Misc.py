@@ -74,18 +74,18 @@ class Misc:
         await ctx.send(random.choice(answers))
 
     @commands.command(aliases=["owoify", "uwu"])
-    async def owo(self, ctx, *args):
+    async def owo(self, ctx, *setning):
         """Oversetter teksten din til owo\n\nEksmpel: m!owo jeg elsker pikk!"""
 
-        #   Hent data
+        #   Sjekk for error & Hent data
         try:
-            owoApi = f"https://nekos.life/api/v2/owoify?text={args}"
+            owoApi = f"https://nekos.life/api/v2/owoify?text={setning}"
             data = requests.get(owoApi).json()
+
             owoRaw = str(data["owo"][2:-2])
             owo = owoRaw.replace("', '", " ")
             await ctx.send(owo)
-        
-        #   Error
+
         except:
             await ctx.send("oopsie whoopsie you made a fucky wucky, no text or text over 200")
     
@@ -93,37 +93,38 @@ class Misc:
     async def urbandictionary(self, ctx, *ord):
         """Sjekk definisjonen av et ord\n\nEksmpel: m!urban loli"""
 
-        #   Hent data
+        #   Sjekk for error
         try:
             dataUrl = f"https://api.urbandictionary.com/v0/define?term={ord}"
-            data = requests.get(urbanApi).json()
+            data = requests.get(dataUrl).json()
 
             randomDefinition = random.randint(0, 8)
 
             definitionUrl = data["list"][randomDefinition]["permalink"]
-            word = data["list"][randomDefinition]["word"]
-            submitter = data["list"][randomDefinition]["author"]
 
-            de = data["list"][randomDefinition]["definition"]
-            definition = de.replace("[", "").replace("]", "").replace(";", "")
-            ex = data["list"][randomDefinition]["example"]
-            example = ex.replace("[", "").replace("]", "").replace(";", "")
-
-            thumbsUp = data["list"][randomDefinition]["thumbs_up"]
-            thumbsDown = data["list"][randomDefinition]["thumbs_down"]
-            
-            #   Embed
-            embed = discord.Embed(title=word, color=0x0085ff, url=definitionUrl, description= f"**Definert av:** {submitter}")
-            embed.set_author(name="Urban Dictionary", icon_url="https://a2.mzstatic.com/us/r30/Purple/v4/dd/ef/75/ddef75c7-d26c-ce82-4e3c-9b07ff0871a5/mzl.yvlduoxl.png")
-            embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
-            embed.add_field(name="Definisjon", value=definition)
-            embed.add_field(name="Eksempel", value=example)
-            embed.add_field(name="Vurdering", value=f":thumbsup: {thumbsUp} / :thumbsdown: {thumbsDown}", inline=False)
-            await ctx.send(embed=embed)
-
-        #   Error
         except:
-            await ctx.send("Prøv igjen. Prøv kanskje et annet ord?")
+            await ctx.send("Noe gikk galt\nPrøv kanskje et annet ord?\nSkriv `m!help urban` for hjelp")
+
+        #   Hent restn av data
+        word = data["list"][randomDefinition]["word"]
+        submitter = data["list"][randomDefinition]["author"]
+
+        de = data["list"][randomDefinition]["definition"]
+        definition = de.replace("[", "").replace("]", "").replace(";", "")
+        ex = data["list"][randomDefinition]["example"]
+        example = ex.replace("[", "").replace("]", "").replace(";", "")
+
+        thumbsUp = data["list"][randomDefinition]["thumbs_up"]
+        thumbsDown = data["list"][randomDefinition]["thumbs_down"]
+        
+        #   Embed
+        embed = discord.Embed(title=word, color=0x0085ff, url=definitionUrl, description= f"**Definert av:** {submitter}")
+        embed.set_author(name="Urban Dictionary", icon_url="https://a2.mzstatic.com/us/r30/Purple/v4/dd/ef/75/ddef75c7-d26c-ce82-4e3c-9b07ff0871a5/mzl.yvlduoxl.png")
+        embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
+        embed.add_field(name="Definisjon", value=definition)
+        embed.add_field(name="Eksempel", value=example)
+        embed.add_field(name="Vurdering", value=f":thumbsup: {thumbsUp} / :thumbsdown: {thumbsDown}", inline=False)
+        await ctx.send(embed=embed)
         
 
 def setup(bot):

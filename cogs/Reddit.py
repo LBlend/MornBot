@@ -67,7 +67,7 @@ class Reddit:
                 await ctx.send(embed=embed)
 
             except:
-                await ctx.send("**Kunne ikke hente Reddit post**\n\nPrøv igjen")
+                await ctx.send("**Kunne ikke hente Reddit post**\nPrøv igjen\nSkriv `m!help copypasta` for hjelp")
 
 
 def setup(bot):

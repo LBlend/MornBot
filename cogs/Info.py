@@ -58,7 +58,7 @@ class Info:
         #embed.add_field(name="Oppetid", value=uptime)
         #embed.add_field(name="Ping", value=ping)
         embed.add_field(name="Servere", value=len(self.bot.guilds))
-        embed.add_field(name="Bot Versjon", value="1.0.0 Rewrite")
+        embed.add_field(name="Bot Versjon", value="1.0.1 Rewrite")
         embed.add_field(name="Discord.py Versjon", value=discord.__version__)
         embed.add_field(name="Python Versjon", value=platform.python_version())
         embed.add_field(name="Maskin", value=f"{platform.version()[4:11]}\n{platform.system()} {platform.release()}")

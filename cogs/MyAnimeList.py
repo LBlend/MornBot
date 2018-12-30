@@ -12,11 +12,18 @@ class MyAnimeList:
     async def mal(self, ctx, medium, bruker):
         """Viser informasjon om en profil på MyAnimeList\n\nEksmpel: m!mal anime Thaun_\nEksempel 2: m!mal manga Thaun_"""
 
-        #   Hent data
-        apiUrl = f"https://api.jikan.moe/v3/user/{bruker}"
-        data = requests.get(apiUrl).json()
+        #   Sjekk for error & Hent data
+        try:
+            apiUrl = f"https://api.jikan.moe/v3/user/{bruker}"
+            data = requests.get(apiUrl).json()
 
-        profilepic = data["image_url"]
+            profilepic = data["image_url"]
+
+        except:
+            await ctx.send("Noe gikk galt\nSkriv `m!help mal` for hjelp")
+            return
+
+        #   Hent resten av data
         userurl = data["url"]
         brukernavn = data["username"]
 
@@ -68,6 +75,7 @@ class MyAnimeList:
         
         embed.set_thumbnail(url=profilepic)
         embed.set_footer(text=f'{ctx.message.author.name}#{ctx.message.author.discriminator}', icon_url=ctx.message.author.avatar_url)
+       
         await ctx.send(embed=embed)
 
 

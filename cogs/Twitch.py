@@ -22,15 +22,21 @@ class Twitch:
             config = json.load(f)
             twitchApiKey = config["twitchApiKey"]
 
-        #   Sjekk gyldig bruker/Hent data
-        try:
-            userDataUrl = f"https://api.twitch.tv/kraken/users/{bruker}?client_id={twitchApiKey}"
-            followDataUrl = f"https://api.twitch.tv/kraken/channels/{bruker}/follows?client_id={twitchApiKey}"
-            streamDataUrl = f"https://api.twitch.tv/kraken/streams/{bruker}?client_id={twitchApiKey}"
-            userData = requests.get(userDataUrl).json()
-            followData = requests.get(followDataUrl).json()
-            streamData = requests.get(streamDataUrl).json()
-            profilePic = userData["logo"]
+            #   Sjekk for error
+            try:
+                userDataUrl = f"https://api.twitch.tv/kraken/users/{bruker}?client_id={twitchApiKey}"
+                followDataUrl = f"https://api.twitch.tv/kraken/channels/{bruker}/follows?client_id={twitchApiKey}"
+                streamDataUrl = f"https://api.twitch.tv/kraken/streams/{bruker}?client_id={twitchApiKey}"
+                userData = requests.get(userDataUrl).json()
+                followData = requests.get(followDataUrl).json()
+                streamData = requests.get(streamDataUrl).json()
+
+                profilePic = userData["logo"]
+            except:
+                await ctx.send("Noe gikk galt\nSkriv `m!help twitch` for hjelp")
+                return
+
+            #   Hent resten av data
             username = userData["display_name"]
             name = userData["name"]
             bio = userData["bio"]
@@ -61,9 +67,6 @@ class Twitch:
         
             await ctx.send(embed=embed)
 
-        #   Ugyldig bruker    
-        except:
-            await ctx.send("Kunne ikke finne bruker")
 
 def setup(bot):
     bot.add_cog(Twitch(bot))

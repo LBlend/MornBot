@@ -37,11 +37,18 @@ class osu:
         #   Velg bruker
         osuUser = bruker
 
-        #   Hent data
-        dataurl = f"https://osu.ppy.sh/api/get_user?u={osuUser}&m={gamemode}&k={osuApiKey}"
-        data = requests.get(dataurl).json()
+        #   Sjekk for error
+        try:
+            dataurl = f"https://osu.ppy.sh/api/get_user?u={osuUser}&m={gamemode}&k={osuApiKey}"
+            data = requests.get(dataurl).json()
 
-        userId = data[0]["user_id"]
+            userId = data[0]["user_id"]
+
+        except:
+            await ctx.send("Noe gikk galt\nSkriv `m!help osuprofil` for hjelp")
+            return
+
+        #   Hent resten av data
         userUrl = f"https://osu.ppy.sh/users/{userId}"
         profilePic = f"http://a.ppy.sh/{userId}"
         username = data[0]["username"]
@@ -65,7 +72,7 @@ class osu:
             aRanks = data[0]["count_rank_a"]
             playcount = data[0]["playcount"]
 
-            joinDate = data[0]["join_date"]
+            #joinDate = data[0]["join_date"]
 
             #   Embed
             embed = discord.Embed(title=username, color=0xCC5288, url=userUrl)
