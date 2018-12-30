@@ -148,7 +148,7 @@ class Info:
         embed.add_field(name="ID", value=guild.id)
         embed.add_field(name="Eier", value=f"<@{guild.owner.id}>")
         embed.add_field(name="Region", value=f"{flag} {guild.region}")
-        embed.add_field(name="Server lagd", value=f"{guild_created}\n({since_created} dager siden)")
+        embed.add_field(name="Server lagd", value=f"{guild_created}\n({since_created} dag(er) siden)")
         embed.add_field(name=f"Kanaler ({totalChannels})", value=f"Tekst: {textChannels}\nTale: {voiceChannels}")
         embed.add_field(name=f"Medlemmer ({totalmembers})", value=f"<:online:516328785910431754>Pålogget: **{onlinemembers}**\n<:idle:516328783347843082>Inaktiv: **{idlemembers}**\n<:dnd:516328782844395579>Ikke forstyrr: **{dndmembers}**\n<:offline:516328785407246356>Frakoblet: **{offlinemembers}**")
         embed.add_field(name="Roller", value=roles, inline=False)
@@ -196,8 +196,8 @@ class Info:
         #   Embed
         embed = discord.Embed(color=color, url=bruker.avatar_url)
         #embed.description = f"{bruker.status}"
-        embed.add_field(name="Bruker lagd", value=f"{bruker_created}\n({since_created} dager siden)")
-        embed.add_field(name="Ble med i serveren", value=f"{bruker_joined}\n({since_joined} dager siden)")
+        embed.add_field(name="Bruker lagd", value=f"{bruker_created}\n({since_created} dag(er) siden)")
+        embed.add_field(name="Ble med i serveren", value=f"{bruker_joined}\n({since_joined} dag(er) siden)")
         embed.add_field(name="Roller", value=roles, inline=False)
         embed.set_footer(text=f"Bruker #{memberNumber} | ID: {bruker.id}")
         embed.set_thumbnail(url=bruker.avatar_url)
