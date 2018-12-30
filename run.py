@@ -2,7 +2,6 @@ import discord
 import codecs
 import os
 import json
-from pathlib import Path
 import locale
 from discord.ext import commands
 
@@ -24,13 +23,6 @@ for file in os.listdir("cogs"):
 
 @bot.event
 async def on_ready():
-
-    for guild in bot.guilds:
-        serverDataFile = Path(f"assets/serverdata/{guild.id}.json")
-        if serverDataFile.is_file() == False:
-            with codecs.open(f"assets/serverdata/{guild.id}.json", "w") as f2:
-                json.dump({"name": guild.name, "logChannelId": None}, f2)
-
     print(f'Brukernavn:      {bot.user.name}')
     print(f'ID:              {bot.user.id}')
     print(f'Version:         {discord.__version__}')

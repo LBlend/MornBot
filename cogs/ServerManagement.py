@@ -5,6 +5,7 @@ from discord.ext import commands
 import json
 import codecs
 import time
+from pathlib import Path
 
 class ServerManagement:
     def __init__(self, bot):
@@ -50,17 +51,25 @@ class ServerManagement:
     async def settloggkanal(self, ctx, *, kanal: discord.TextChannel):
         """Setter en kanal som loggkanal\n\nEksmpel: m!settloggkanal #log"""
         
-        #   Last inn serverdata
-        with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r", encoding="utf8") as f:
-            serverdata = json.load(f)
-            serverdata["logChannelId"] = kanal.id
+        #   Sjekk om fil allerede eksisterer
+        serverDataFile = Path(f"./assets/serverdata/{ctx.message.guild.id}.json")
 
-            #   Skriver ny data
-            with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "w", encoding="utf8") as f:
-                f.write(json.dumps(serverdata))
+        if serverDataFile.is_file() == False:
 
-            #   Bekreftelsesmelding
-            await ctx.send(f"Loggkanal satt til <#{str(kanal.id)}>")
+            #   Skriv fil med gitt data
+            with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "w") as f:
+                json.dump({"name": ctx.message.guild.name, "logChannelId": kanal.id}, f)
+
+        else:
+
+            #   Skriv data til eksisterende fil
+            with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r+", encoding="utf8") as f:
+                serverdata = json.load(f)
+                serverdata["logChannelId"] = kanal.id
+                f.seek(0)
+                f.write(json.dumps(serverdata))                
+
+        await ctx.send(f"Loggkanal satt til <#{str(kanal.id)}>")
 
     @commands.guild_only()
     @commands.command(aliases=["logchannel", "logkanal", "loggingchannel"])

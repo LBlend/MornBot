@@ -5,6 +5,8 @@ from discord.ext import commands
 import json
 import codecs
 import sys
+import os
+from pathlib import Path
 
 class DevTools:
     def __init__(self, bot):
@@ -21,6 +23,7 @@ class DevTools:
     async def custommsg(self, ctx, channel: discord.TextChannel=None, *args):
         custommessage = " ".join(args)
         await channel.send(custommessage)
+        await ctx.send(f"Sendte:\n{custommessage}")
 
     @commands.is_owner()
     @commands.command()
@@ -40,6 +43,24 @@ class DevTools:
             embed.set_thumbnail(url=guild.icon_url)
             await ctx.send(embed=embed)
             #await ctx.send("Sorry mac! Æ hør bare på homseungen sin kommando <3")
+
+    @commands.is_owner()
+    @commands.command()
+    async def reload(self, ctx, cog):
+
+        try:
+            for file in os.listdir("cogs"):
+                if file.endswith(".py"):
+                    name = file[:-3]
+                    if name == cog:
+                        try:
+                            self.bot.unload_extension(f"cogs.{name}")
+                        except:
+                            pass
+                        self.bot.load_extension(f"cogs.{name}")
+                        await ctx.send(f"{cog} har blitt lastet inn på nytt")
+        except:
+            await ctx.send(f"{cog} er ikke en cog")
 
 def setup(bot):
     bot.add_cog(DevTools(bot))
