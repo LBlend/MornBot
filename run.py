@@ -25,17 +25,11 @@ for file in os.listdir("cogs"):
 @bot.event
 async def on_ready():
 
-    for user in bot.get_all_members():
-        userDataFile = Path(f"assets/userdata/{user.id}.json")
-        if userDataFile.is_file() == False:
-            with codecs.open(f"assets/userdata/{user.id}.json", "w") as f2:
-                json.dump({"name": f"{user.name}#{user.discriminator}", "dickSize": None}, f2)
-    
     for guild in bot.guilds:
         serverDataFile = Path(f"assets/serverdata/{guild.id}.json")
         if serverDataFile.is_file() == False:
-            with codecs.open(f"assets/serverdata/{guild.id}.json", "w") as f3:
-                json.dump({"name": guild.name, "logChannelId": None}, f3)
+            with codecs.open(f"assets/serverdata/{guild.id}.json", "w") as f2:
+                json.dump({"name": guild.name, "logChannelId": None}, f2)
 
     print(f'Brukernavn:      {bot.user.name}')
     print(f'ID:              {bot.user.id}')

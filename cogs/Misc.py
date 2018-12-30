@@ -2,10 +2,10 @@ import discord
 import asyncio
 from discord.ext import commands
 
-import codecs
 import json
 import requests
 import random
+from hashlib import md5
 
 class Misc:
     def __init__(self, bot):
@@ -42,23 +42,32 @@ class Misc:
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["kukstørrelse", "pikkstørrelse"])
-    async def dicksize(self, ctx):
+    async def dicksize(self, ctx, bruker: discord.Member=None):
         """Se hvor liten pikk du har"""
+        
+        #   Om ingen bruker gitt, sett bruker til author
+        if not bruker:
+            bruker = ctx.message.author
+        
+        userid = bruker.id
 
-        #   Last inn brukerdata
-        with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "r", encoding="utf8") as f:
-            userdata = json.load(f)
-            
-            #   Sjekk om bruker har blitt gitt dicksize
-            if userdata["dickSize"] == None:
-                randomnumber = random.randint(0, 20)
-                userdata["dickSize"] = randomnumber
-                with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "w", encoding="utf8") as f:
-                    f.write(json.dumps(userdata))
-                    
-            #   Send Melding
-            dicksize = userdata["dickSize"]
-            await ctx.send(f"{dicksize} cm")
+        def hashDicksize(userid, upper, lower):
+            dickhash = md5(str(userid).encode("utf-8")).hexdigest()
+            return int(int(dickhash[11:13], 16)*(upper-lower)/255 + lower)
+
+        #   Må jo gi meg selv en stor kuk
+        if bruker.id == 170506717140877312:
+            dicksize = "69"
+        else:
+            dicksize = hashDicksize(userid, 25, 2)
+
+        #   Tegning
+        dickDrawing = "=" * dicksize
+
+        embed = discord.Embed(color=0x0085ff)
+        embed.set_author(name=f"{bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
+        embed.add_field(name="Kukstørrelse", value=f"{dicksize} cm\n8{dickDrawing}D")
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def roll(self, ctx, *args):
@@ -70,7 +79,7 @@ class Misc:
     async def ball8(self, ctx, *args):
         """Svarer på dine dypeste spørsmål\n\nEksmpel: m!8ball er jeg dritt til å lage båtts?"""
 
-        answers = ['Det er sannsynlig', 'Uten tvil', 'Ja', 'Man kan vel si det ja', 'Ehm, tror det er best vi ikke snakker om det jeg :sweat_smile:', 'нет', 'Nei ass', 'Er ikke så sannsynlig', 'I følge mine beregninger... nei']
+        answers = ["Det er sannsynlig", "Uten tvil", "Ja", "Man kan vel si det ja", "Ehm, tror det er best vi ikke snakker om det jeg :sweat_smile:", "нет", "Nei ass", "Er ikke så sannsynlig", "I følge mine beregninger... nei"]
         await ctx.send(random.choice(answers))
 
     @commands.command(aliases=["owoify", "uwu"])
@@ -83,7 +92,7 @@ class Misc:
             data = requests.get(owoApi).json()
 
             owoRaw = str(data["owo"][2:-2])
-            owo = owoRaw.replace("', '", " ")
+            owo = owoRaw.replace("", "", " ")
             await ctx.send(owo)
 
         except:
