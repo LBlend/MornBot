@@ -210,6 +210,31 @@ class Info:
         
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=["invite"])
+    async def inviter(self, ctx):
+        """Inviter meg"""
+
+        #   Embed
+        embed = discord.Embed(color=0xF02B30)
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        embed.add_field(name="Invitasjonslink", value=f"[Klikk her](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot) for å invitere meg til serveren din")
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["githubrepo", "repo", "git"])
+    async def github(self, ctx):
+        """Sender link til Github-repoet mitt"""
+
+        #   Hent Github-link
+        with codecs.open("config.json", "r", encoding="utf8") as f:
+            config = json.load(f)
+            github = config["github"]
+
+            #   Embed
+            embed = discord.Embed(color=0xF02B30)
+            embed.set_thumbnail(url="https://cdn2.iconfinder.com/data/icons/black-white-social-media/64/social_media_logo_github-512.png")
+            embed.add_field(name="Github Repo", value=f"[Klikk her]({github}) for å se den dritt skrevne kildekoden min")
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Info(bot))

@@ -51,7 +51,7 @@ class Vær:
             embed = discord.Embed(title=f":flag_{countryCode}: {byName}, {countryCode.upper()} | {weatherFetchDate} (Norsk Tid)", color=0x0085ff, url=link, description=description)
             embed.add_field(name="Temperatur", value=f"{tempCelcius} °C\n{tempFahrenheit} °F")
             embed.add_field(name="Vind", value=f"{windSpeed} m/s")
-            embed.add_field(name="Luftuktighet", value=f"{humidity}%")
+            embed.add_field(name="Luftfuktighet", value=f"{humidity}%")
             embed.add_field(name="Skyer", value=f"{cloudiness}%")
             embed.add_field(name="Soloppgang (Norsk tid)", value=sunrise)
             embed.add_field(name="Solnedgang (Norsk tid)", value=sunset)
