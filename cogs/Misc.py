@@ -57,7 +57,7 @@ class Misc:
 
         #   Må jo gi meg selv en stor kuk
         if bruker.id == 170506717140877312:
-            dicksize = "69"
+            dicksize = 69
         else:
             dicksize = hashDicksize(userid, 25, 2)
 
