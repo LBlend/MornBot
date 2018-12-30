@@ -47,7 +47,6 @@ class DevTools:
     @commands.is_owner()
     @commands.command()
     async def reload(self, ctx, cog):
-
         try:
             for file in os.listdir("cogs"):
                 if file.endswith(".py"):

@@ -53,15 +53,12 @@ class ServerManagement:
         
         #   Sjekk om fil allerede eksisterer
         serverDataFile = Path(f"./assets/serverdata/{ctx.message.guild.id}.json")
-
         if serverDataFile.is_file() == False:
-
             #   Skriv fil med gitt data
             with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "w") as f:
                 json.dump({"name": ctx.message.guild.name, "logChannelId": kanal.id}, f)
 
         else:
-
             #   Skriv data til eksisterende fil
             with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r+", encoding="utf8") as f:
                 serverdata = json.load(f)
