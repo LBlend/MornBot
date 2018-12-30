@@ -104,6 +104,7 @@ class Misc:
 
         except:
             await ctx.send("Noe gikk galt\nPrøv kanskje et annet ord?\nSkriv `m!help urban` for hjelp")
+            return
 
         #   Hent restn av data
         word = data["list"][randomDefinition]["word"]

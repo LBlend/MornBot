@@ -21,6 +21,7 @@ class Konverter:
             tempCelcius = round((float(tall) - 32) / 9 * 5, 2)
         except:
             await ctx.send("Noe gikk galt\nSkriv `m!help ftc` for hjelp")
+            return
         
         await ctx.send(f"`{tall} °F` = `{tempCelcius} °C`")
     
@@ -37,6 +38,7 @@ class Konverter:
             tempFahrenheit = round((float(tall) * 9) / 5 + 32, 2)
         except:
             await ctx.send("Noe gikk galt\nSkriv `m!help ctf` for hjelp")
+            return
             
         await ctx.send(f"`{tall} °C` = `{tempFahrenheit} °F`")
         
@@ -55,6 +57,7 @@ class Konverter:
             calculatedBMI = round(float(vekt_kg) / float(float(høyde_meter) * float(høyde_meter)), 2)
         except:
             await ctx.send("Noe gikk galt\nSkriv `m!help bmi` for hjelp")
+            return
 
         if calculatedBMI < 18.5:
             await ctx.send(f"Du har en BMI på `{calculatedBMI}`\nDette vil si at du er undervektig. Gå og nyt en burger du :)")
