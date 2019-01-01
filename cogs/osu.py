@@ -12,7 +12,7 @@ class osu:
 
     @commands.command(aliases=["osustats", "osuuser", "osuprofile"])
     async def osuprofil(self, ctx, gamemode, bruker):
-        """Viser info om en osu! profil\n\nEksmpel: m!osuprofil -GN"""
+        """Viser info om en osu! profil\n\nEksmpel: m!osuprofil standard -GN"""
 
         user = ctx.message.author
 
@@ -27,8 +27,6 @@ class osu:
             "ctb": "2",
             "mania": "3"
         }
-
-        gamemode = "0"
 
         #   Sjekk om gyldig gamemode
         if gamemode in gamemodes:
@@ -71,8 +69,7 @@ class osu:
             shRanks = data[0]["count_rank_sh"]
             aRanks = data[0]["count_rank_a"]
             playcount = data[0]["playcount"]
-
-            #joinDate = data[0]["join_date"]
+            joinDate = data[0]["join_date"]
 
             #   Embed
             embed = discord.Embed(title=username, color=0xCC5288, url=userUrl)
@@ -85,60 +82,12 @@ class osu:
             embed.add_field(name="Level", value=level)
             embed.add_field(name="Play Count", value=playcount)
             embed.set_author(name="osu!", icon_url="https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png")
-            embed.set_footer(text=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
-            await ctx.send(embed=embed)
 
-            """
-            @commands.command(aliases=["osubestplays", "osuplays"])
-            async def osubest(self, ctx, gamemode, bruker):
-                with codecs.open("config.json", "r", encoding="utf8") as f:
-                    config = json.load(f)
-                    osuApiKey = config["osuApiKey"]
+            #   Ja, dette er ekte. Ikke klag, det funker 
+            embed.set_footer(text=f"Bruker lagd: {joinDate[8:10]}.{joinDate[5:7]}.{joinDate[:4]} {joinDate[11:]}")
 
-                #   Select gamemode
-                gamemodes = {
-                    "standard": "0",
-                    "taiko": "1",
-                    "ctb": "2",
-                    "mania": "3"
-                }
+            await ctx.send(embed=embed)     
 
-                gamemode = "0"
-                if gamemode in gamemodes:
-                    gamemode = gamemodes[gamemode]
-
-                #   Select user
-                osuUser = bruker
-
-                #   Fetch data
-                dataurl = f"https://osu.ppy.sh/api/get_user_best?u={osuUser}&m={gamemode}&k={osuApiKey}&limit=5"
-                data = requests.get(dataurl).json()
-                
-                for blablabla in data
-                rating = data[number]["rank"]
-                pp = str(round(float(data["pp"])))
-                maxCombo = data["maxcombo"]
-                fc = data["perfect"]
-                date = data["date"]
-                count50 = data["count50"]
-                count100 = data["count100"]
-                katu = data["countkatu"]
-                count300 = data["count300"]
-                geki = data["countgeki"]
-                countMiss = data["countmiss"]     
-                mods
-
-                #   Embed
-                embed = discord.Embed(title=username, color=0xCC5288, url=userUrl)
-                embed.set_thumbnail(url=profilePic)
-                embed.description = f"<:ScoreSSPlus:476372071014727706>{sshRanks} <:ScoreSS:476372071316848640>{ssRanks} <:ScoreSPlus:476372071342145536>{shRanks} <:ScoreS:476372070989692929>{sRanks} <:ScoreA:476372070976978955>{aRanks}"
-                embed.add_field(name="Global Ranking", value=f"#{rank}")
-                embed.set_author(name="osu!", icon_url="https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png")
-                embed.set_footer(text=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
-
-                #   Send Melding
-                await ctx.send(embed=embed)
-                """
 
 def setup(bot):
     bot.add_cog(osu(bot))
