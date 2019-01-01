@@ -92,7 +92,7 @@ class Misc:
             data = requests.get(owoApi).json()
 
             owoRaw = str(data["owo"][2:-2])
-            owo = owoRaw.replace("", "", " ")
+            owo = owoRaw.replace(",", "").replace("'", "")
             await ctx.send(owo)
 
         except:
