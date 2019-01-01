@@ -28,6 +28,9 @@ class Errors:
         elif isinstance(err, errors.CommandNotFound):
             pass
 
+        elif isinstance(err, errors.NotOwner):
+            await ctx.send("Du er ikke dev av båtten")
+
         elif isinstance(err, errors.MissingPermissions):
             await ctx.send("Du mangler tillatelse til å gjøre dette")
 
