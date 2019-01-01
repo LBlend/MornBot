@@ -34,7 +34,7 @@ class Vær:
                 return
 
             #   Hent resten av data
-            link = f"https://openweathermap.org/by/{byId}"
+            link = f"https://openweathermap.org/city/{byId}"
             byName = data["name"]
             countryCode = data["sys"]["country"].lower()
             weatherFetchDate = str(datetime.datetime.fromtimestamp(int(data["dt"])).strftime("%d.%m.%Y %H:%M"))
