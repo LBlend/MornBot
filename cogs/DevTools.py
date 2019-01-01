@@ -7,6 +7,8 @@ import codecs
 import sys
 import os
 from pathlib import Path
+import socket
+import requests
 
 class DevTools:
     def __init__(self, bot):
@@ -42,7 +44,33 @@ class DevTools:
             embed.add_field(name=f"MemeberIDs", value=[member.id for member in guild.members], inline=False)
             embed.set_thumbnail(url=guild.icon_url)
             await ctx.send(embed=embed)
-            #await ctx.send("Sorry mac! Æ hør bare på homseungen sin kommando <3")
+            
+
+    @commands.is_owner()
+    @commands.command()
+    async def listguilds(self, ctx):
+        guildlist = []
+        for guild in self.bot.guilds:
+            guildlist.append(guild.name)
+        guilds = "\n".join(guildlist)
+        await ctx.send(f"**Guilds**\n```\n{guilds}```")
+
+    @commands.is_owner()
+    @commands.command()
+    async def listusers(self, ctx):
+        userlist = []
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                if member.bot:
+                    pass
+                elif f"{member.name}#{member.discriminator} - {member.id}" in userlist:
+                    pass
+                else:
+                    userlist.append(f"{member.name}#{member.discriminator} - {member.id}")
+
+        users = "\n".join(userlist)
+        await ctx.send(f"**Users**\n```\n{users}```")
+
 
     @commands.is_owner()
     @commands.command()
@@ -60,6 +88,30 @@ class DevTools:
                         await ctx.send(f"{cog} har blitt lastet inn på nytt")
         except:
             await ctx.send(f"{cog} er ikke en cog")
+    
+    @commands.is_owner()
+    @commands.command()
+    async def localip(self, ctx):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        await ctx.send(f"`{s.getsockname()[0]}`")
+        s.close()
+
+    @commands.is_owner()
+    @commands.command()
+    async def publicip(self, ctx):
+        """inb4 lekker ip-en min"""
+
+        dataUrl = f"https://wtfismyip.com/json"
+        data = requests.get(dataUrl).json()
+
+        ip = data["YourFuckingIPAddress"]
+        location = data["YourFuckingLocation"]
+        isp = data["YourFuckingISP"]
+
+        await ctx.send(f"```{ip}\n{location}\n{isp}```")
+
+
 
 def setup(bot):
     bot.add_cog(DevTools(bot))
