@@ -27,7 +27,7 @@ class Info:
             website = config["website"]
             github = config["github"]
 
-            dev = self.bot.get_user(devId)
+        dev = self.bot.get_user(devId)
 
         #   Hent oppetid
         now = time.time()
@@ -64,7 +64,7 @@ class Info:
         #   Embed
         embed = discord.Embed(color=0xF02B30, url=website)
         embed.add_field(name="Navn", value=self.bot.user.name)
-        embed.add_field(name="Dev", value=f"<@{dev.id}>")
+        embed.add_field(name="Dev", value=f"<@{dev.id}>\n({dev.name}#{dev.discriminator})")
         embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m")
         embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
         embed.add_field(name="Servere", value=len(self.bot.guilds))
