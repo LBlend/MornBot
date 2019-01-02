@@ -9,6 +9,9 @@ import time
 import platform
 import psutil
 
+#   Sett starttid for oppetid
+start = time.time()
+
 class Info:
     def __init__(self, bot):
         self.bot = bot
@@ -24,7 +27,14 @@ class Info:
             website = config["website"]
             github = config["github"]
 
-        dev = self.bot.get_user(devId)
+            dev = self.bot.get_user(devId)
+
+        #   Hent oppetid
+        now = time.time()
+        difference = int(now - start)
+        minutes = int(difference / 60)
+        hours = int(difference / 3600)
+        days = int(difference / 86400)
 
         #   Ressursforbruk
         cpuPer = round(psutil.cpu_percent(),1)
@@ -55,10 +65,10 @@ class Info:
         embed = discord.Embed(color=0xF02B30, url=website)
         embed.add_field(name="Navn", value=self.bot.user.name)
         embed.add_field(name="Dev", value=f"<@{dev.id}>")
-        #embed.add_field(name="Oppetid", value=uptime)
-        #embed.add_field(name="Ping", value=ping)
+        embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m")
+        embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
         embed.add_field(name="Servere", value=len(self.bot.guilds))
-        embed.add_field(name="Bot Versjon", value="1.0.1 Rewrite")
+        embed.add_field(name="Bot Versjon", value="1.0.2 Rewrite")
         embed.add_field(name="Discord.py Versjon", value=discord.__version__)
         embed.add_field(name="Python Versjon", value=platform.python_version())
         embed.add_field(name="Maskin", value=f"{platform.version()[4:11]}\n{platform.system()} {platform.release()}")
@@ -219,6 +229,24 @@ class Info:
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name="Invitasjonslink", value=f"[Klikk her](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot) for å invitere meg til serveren din")
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def ping(self, ctx):
+        """Sjekk pingen til båtten"""
+
+        await ctx.send(f"{int(self.bot.latency * 1000)}ms")
+
+    @commands.command(aliases=["uptime"])
+    async def oppetid(self, ctx):
+        """Sjekk hvor lenge båtten har kjørt"""
+
+        now = time.time()
+        difference = int(now - start)
+        minutes = int(difference / 60)
+        hours = int(difference / 3600)
+        days = int(difference / 86400)
+
+        await ctx.send(f"{days} dager, {hours} timer og {minutes} minutter")
 
     @commands.command(aliases=["githubrepo", "repo", "git"])
     async def github(self, ctx):
