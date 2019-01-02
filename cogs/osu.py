@@ -14,8 +14,6 @@ class osu:
     async def osuprofil(self, ctx, gamemode, bruker):
         """Viser info om en osu! profil\n\nEksmpel: m!osuprofil standard -GN"""
 
-        user = ctx.message.author
-
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
