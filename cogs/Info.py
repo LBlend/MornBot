@@ -32,25 +32,27 @@ class Info:
         mem = round((psutil.virtual_memory().used / 1000000),1)
 
         #   Medlemstall
-        totalmembers = 0
-        onlinemembers = 0
-        idlemembers = 0
-        dndmembers = 0
-        offlinemembers = 0
+        totalmembers = []
+        onlinemembers = []
+        idlemembers = []
+        dndmembers = []
+        offlinemembers = []
         for guild in self.bot.guilds:
             for member in guild.members:
-                if str(member.status) == "online":
-                    onlinemembers += 1
-                    totalmembers += 1
+                if member.id in totalmembers:
+                    pass
+                elif str(member.status) == "online":
+                    onlinemembers.append(member.id)
+                    totalmembers.append(member.id)
                 elif str(member.status) == "idle":
-                    idlemembers += 1
-                    totalmembers += 1
+                    idlemembers.append(member.id)
+                    totalmembers.append(member.id)
                 elif str(member.status) == "dnd":
-                    dndmembers += 1
-                    totalmembers += 1
+                    dndmembers.append(member.id)
+                    totalmembers.append(member.id)
                 elif str(member.status) == "offline":
-                    offlinemembers += 1
-                    totalmembers += 1
+                    offlinemembers.append(member.id)
+                    totalmembers.append(member.id)
 
         #   Embed
         embed = discord.Embed(color=0xF02B30, url=website)
@@ -64,7 +66,7 @@ class Info:
         embed.add_field(name="Python Versjon", value=platform.python_version())
         embed.add_field(name="Maskin", value=f"{platform.version()[4:11]}\n{platform.system()} {platform.release()}")
         embed.add_field(name="Ressursbruk", value=f"RAM: {mem} MiB\nCPU: {cpuPer}%")
-        embed.add_field(name=f"Brukere ({totalmembers})", value=f"<:online:516328785910431754>{onlinemembers} <:idle:516328783347843082>{idlemembers} <:dnd:516328782844395579>{dndmembers} <:offline:516328785407246356>{offlinemembers}")
+        embed.add_field(name=f"Brukere ({len(totalmembers)})", value=f"<:online:516328785910431754>{len(onlinemembers)} <:idle:516328783347843082>{len(idlemembers)} <:dnd:516328782844395579>{len(dndmembers)} <:offline:516328785407246356>{len(offlinemembers)}")
         embed.add_field(name="Lenker", value=f"[Inviter](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot) | [Nettside]({website}) | [Github]({github})")
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.set_footer(text=f"{dev.name}#{dev.discriminator}", icon_url=dev.avatar_url)
