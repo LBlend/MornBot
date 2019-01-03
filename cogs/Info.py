@@ -9,8 +9,6 @@ import time
 import platform
 import psutil
 
-#   Sett starttid for oppetid
-start = time.time()
 
 class Info:
     def __init__(self, bot):
@@ -28,13 +26,6 @@ class Info:
             github = config["github"]
 
         dev = self.bot.get_user(devId)
-
-        #   Hent oppetid
-        now = time.time()
-        difference = int(now - start)
-        minutes = int(difference / 60)
-        hours = int(difference / 3600)
-        days = int(difference / 86400)
 
         #   Ressursforbruk
         cpuPer = round(psutil.cpu_percent(),1)
@@ -65,7 +56,7 @@ class Info:
         embed = discord.Embed(color=0xF02B30, url=website)
         embed.add_field(name="Navn", value=self.bot.user.name)
         embed.add_field(name="Dev", value=f"<@{dev.id}>\n({dev.name}#{dev.discriminator})")
-        embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m")
+        #embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m")
         embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
         embed.add_field(name="Servere", value=len(self.bot.guilds))
         embed.add_field(name="Bot Versjon", value="1.0.2 Rewrite")
@@ -235,18 +226,6 @@ class Info:
         """Sjekk pingen til båtten"""
 
         await ctx.send(f"{int(self.bot.latency * 1000)}ms")
-
-    @commands.command(aliases=["uptime"])
-    async def oppetid(self, ctx):
-        """Sjekk hvor lenge båtten har kjørt"""
-
-        now = time.time()
-        difference = int(now - start)
-        minutes = int(difference / 60)
-        hours = int(difference / 3600)
-        days = int(difference / 86400)
-
-        await ctx.send(f"{days} dager, {hours} timer og {minutes} minutter")
 
     @commands.command(aliases=["githubrepo", "repo", "git"])
     async def github(self, ctx):
