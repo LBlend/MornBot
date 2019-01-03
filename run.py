@@ -4,6 +4,7 @@ import os
 import json
 import locale
 from discord.ext import commands
+import time
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -23,6 +24,10 @@ for file in os.listdir("cogs"):
 
 @bot.event
 async def on_ready():
+
+    if not hasattr(bot, "uptime"):
+        bot.uptime = time.time()
+
     print(f'Brukernavn:      {bot.user.name}')
     print(f'ID:              {bot.user.id}')
     print(f'Version:         {discord.__version__}')

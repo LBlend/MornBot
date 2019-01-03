@@ -27,6 +27,13 @@ class Info:
 
         dev = self.bot.get_user(devId)
 
+        #   Uptime
+        now = time.time()
+        diff = int(now - self.bot.uptime)
+        days, remainder = divmod(diff, 24 * 60 * 60)
+        hours, remainder = divmod(remainder, 60 * 60)
+        minutes, seconds = divmod(remainder, 60)
+
         #   Ressursforbruk
         cpuPer = round(psutil.cpu_percent(),1)
         mem = round((psutil.virtual_memory().used / 1000000),1)
@@ -58,7 +65,7 @@ class Info:
         embed = discord.Embed(color=0xF02B30, url=website)
         embed.add_field(name="Navn", value=self.bot.user.name)
         embed.add_field(name="Dev", value=f"<@{dev.id}>\n({dev.name}#{dev.discriminator})")
-        #embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m")
+        embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m {seconds}s")
         embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
         embed.add_field(name="Servere", value=len(self.bot.guilds))
         embed.add_field(name="Bot Versjon", value="1.0.2 Rewrite")
@@ -222,6 +229,18 @@ class Info:
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name="Invitasjonslink", value=f"[Klikk her](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot) for å invitere meg til serveren din")
         await ctx.send(embed=embed)
+
+    @commands.command(aliases=["uptime"])
+    async def oppetid(self, ctx):
+        """Sjekk hvor lenge båtten har kjørt"""
+
+        now = time.time()
+        diff = int(now - self.bot.uptime)
+        days, remainder = divmod(diff, 24 * 60 * 60)
+        hours, remainder = divmod(remainder, 60 * 60)
+        minutes, seconds = divmod(remainder, 60)
+
+        await ctx.send(f"{days} dager, {hours} timer, {minutes} minutter og {seconds} sekunder")
 
     @commands.command()
     async def ping(self, ctx):
