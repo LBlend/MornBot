@@ -51,7 +51,7 @@ class DevTools:
             
 
     @commands.is_owner()
-    @commands.command()
+    @commands.command(aliases=["listservers"])
     async def listguilds(self, ctx):
         guildlist = []
         for guild in self.bot.guilds:
@@ -72,8 +72,10 @@ class DevTools:
                 else:
                     userlist.append(f"{member.name}#{member.discriminator} - {member.id}")
 
-        users = "\n".join(userlist)
-        await ctx.send(f"**Users**\n```\n{users}```")
+        while userlist != []:
+            users = "\n".join(userlist[:30])
+            await ctx.send(f"**Users**\n```{users}```")
+            del userlist[:30]
 
 
     @commands.is_owner()
