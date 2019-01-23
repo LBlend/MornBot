@@ -4,3 +4,5 @@ requests
 praw
 psutil
 pathlib
+wordcloud
+matplotlib
