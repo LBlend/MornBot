@@ -220,6 +220,23 @@ class Info:
         
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def avatar(self, ctx, bruker: discord.Member=None):
+        """Viser avataren din"""
+
+        if not bruker:
+            bruker = ctx.message.author
+
+        if str(bruker.color) != "#000000":
+            color = bruker.color
+        else:
+            color = discord.Colour(0x99AAB5)
+
+        #   Embed
+        embed = discord.Embed(color=color, description=f"[Link]({bruker.avatar_url})")
+        embed.set_image(url=bruker.avatar_url)
+        await ctx.send(embed=embed)
+
     @commands.command(aliases=["invite"])
     async def inviter(self, ctx):
         """Inviter meg"""
