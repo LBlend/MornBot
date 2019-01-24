@@ -5,7 +5,7 @@ from discord.ext import commands
 from os import path
 from PIL import Image
 import numpy as np
-from wordcloud import WordCloud
+from wordcloud import WordCloud, ImageColorGenerator
 
 
 class Ordsky:
@@ -13,50 +13,58 @@ class Ordsky:
         self.bot = bot
 
     @commands.command(aliases=["wordcloud", "wc", "sky"])
-    async def ordsky(self, ctx, maskevalg=None, bruker: discord.Member=None):
+    async def ordsky(self, ctx, skyform=None):
         """Generer en ordsky"""
-
-        if not bruker:
-            bruker = ctx.message.author
 
         statusmsg = await ctx.send("Teller ord...")
 
-        with open(f"./assets/ordsky/tekst/{bruker.id}.txt", "w+") as f:
+        #   Søk etter ord
+        with open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt", "w+") as f:
             for channel in ctx.message.guild.text_channels:
-                async for message in channel.history(limit=1500):
-                    if message.author.id == bruker.id:
+                async for message in channel.history(limit=4000):
+                    if message.author.id == ctx.message.author.id:
                         try:
                             f.write(f"{message.content} ")
                         except:
                             pass
                     else:
                         pass
-
-        await statusmsg.edit(content="Genererer ordsky...")
         
-        #   Maskevalg
-        if maskevalg == "ostehøvel":
+        #   Skyform
+        if skyform == "ostehøvel":
             maskbilde = np.array(Image.open(path.join("./assets/ordsky/mask/", "ostmask.png")))
+        elif skyform == "laugh":
+            maskbilde = np.array(Image.open(path.join("./assets/ordsky/mask/", "laughmask.png")))
+
+        elif ctx.message.attachments != [] and skyform == None:
+            try:
+                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
+                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
+            except:
+                await statusmsg.edit(content="Feilet henting av skyform")
+                return
+
         else:
             maskbilde = np.array(Image.open(path.join("./assets/ordsky/mask/", "owomask.png")))
 
         #   Åpne ordtekstfil
-        text = open(path.join("./assets/ordsky/tekst/", f"{bruker.id}.txt")).read()
+        text = open(path.join("./assets/ordsky/tekst/", f"{ctx.message.author.id}.txt")).read()
 
         #   Ordsky innstillinger
-        wc = WordCloud(font_path=None, max_words=2000, mask=maskbilde)
+        wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde)
 
         #   Generer ordsky
         wc.generate(text)
 
-        #   Frequencies
-        #wc.generate_from_frequencies(test, max_font_size=96)
+        #   Fargelegg
+        image_colors = ImageColorGenerator(maskbilde)
+        wc.recolor(color_func=image_colors)
 
         #   Lagre bilde
-        wc.to_file(f"./assets/ordsky/bilde/{bruker.id}.png")
+        wc.to_file(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
 
         #   Send bilde
-        await ctx.send(f"Generert ordsky for <@{bruker.id}>", file=discord.File(f"./assets/ordsky/bilde/{bruker.id}.png"))
+        await ctx.send(f"Generert ordsky for <@{ctx.message.author.id}>", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
 
         await statusmsg.delete()
 
