@@ -82,6 +82,12 @@ class Misc:
         answers = ["Det er sannsynlig", "Uten tvil", "Ja", "Man kan vel si det ja", "Ehm, tror det er best vi ikke snakker om det jeg :sweat_smile:", "нет", "Nei ass", "Er ikke så sannsynlig", "I følge mine beregninger... nei"]
         await ctx.send(random.choice(answers))
 
+    @commands.command(aliases=["reverse"])
+    async def reverser(self, ctx, *, tekst):
+        """Reverserer tekst"""
+
+        await ctx.send(tekst[::-1])
+
     @commands.command(aliases=["owoify", "uwu"])
     async def owo(self, ctx, *setning):
         """Oversetter teksten din til owo\n\nEksmpel: m!owo jeg elsker pikk!"""
