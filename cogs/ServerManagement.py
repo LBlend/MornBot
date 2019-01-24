@@ -35,15 +35,11 @@ class ServerManagement:
     async def prune(self, ctx, antall: int):
         """Sletter de siste antall meldingene du spesifiser\n\nEksmpel: m!prune 10"""
 
-        #   Slett bekreftelsesmelding funksjon
-        def selfDelete(botuser):
-            return botuser.author == self.bot.user
-
         #   Utfør
         await ctx.message.channel.purge(limit=antall+1)
-        await ctx.send(f"Slettet {antall} meldinger!")
-        time.sleep(3)
-        await ctx.message.channel.purge(check=selfDelete, limit=1)
+        statusmsg = await ctx.send(f"Slettet {antall} meldinger!")
+        await asyncio.sleep(3)
+        await statusmsg.delete()
 
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
