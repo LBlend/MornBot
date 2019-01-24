@@ -2,7 +2,7 @@ import discord
 import asyncio
 from discord.ext import commands
 
-from os import path
+import os
 from PIL import Image
 import numpy as np
 from wordcloud import WordCloud, ImageColorGenerator
@@ -14,7 +14,7 @@ class Ordsky:
 
     @commands.command(aliases=["wordcloud", "wc", "sky"])
     async def ordsky(self, ctx, skyform=None):
-        """Generer en ordsky"""
+        """Generer en ordsky\n\nEksempel: m!ordsky ostehøvel\n\nSkyformer:\n"""
 
         statusmsg = await ctx.send("Teller ord...")
 
@@ -32,9 +32,9 @@ class Ordsky:
         
         #   Skyform
         if skyform == "ostehøvel":
-            maskbilde = np.array(Image.open(path.join("./assets/ordsky/mask/", "ostmask.png")))
+            maskbilde = np.array(Image.open("./assets/ordsky/mask/ostmask.png"))
         elif skyform == "laugh":
-            maskbilde = np.array(Image.open(path.join("./assets/ordsky/mask/", "laughmask.png")))
+            maskbilde = np.array(Image.open("./assets/ordsky/mask/laughmask.png"))
 
         elif ctx.message.attachments != [] and skyform == None:
             try:
@@ -45,10 +45,12 @@ class Ordsky:
                 return
 
         else:
-            maskbilde = np.array(Image.open(path.join("./assets/ordsky/mask/", "owomask.png")))
+            maskbilde = np.array(Image.open("./assets/ordsky/mask/owomask.png"))
+
+        await statusmsg.edit(content="Generer Ordsky...")
 
         #   Åpne ordtekstfil
-        text = open(path.join("./assets/ordsky/tekst/", f"{ctx.message.author.id}.txt")).read()
+        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt").read()
 
         #   Ordsky innstillinger
         wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde)
@@ -57,8 +59,9 @@ class Ordsky:
         wc.generate(text)
 
         #   Fargelegg
-        image_colors = ImageColorGenerator(maskbilde)
-        wc.recolor(color_func=image_colors)
+        if  ctx.message.attachments != [] or skyform == "laugh":
+            image_colors = ImageColorGenerator(maskbilde)
+            wc.recolor(color_func=image_colors)
 
         #   Lagre bilde
         wc.to_file(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
@@ -67,6 +70,11 @@ class Ordsky:
         await ctx.send(f"Generert ordsky for <@{ctx.message.author.id}>", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
 
         await statusmsg.delete()
+        
+        try:
+            os.remove(f"./{ctx.message.author.id}_mask.png")
+        except:
+            pass
 
 
 def setup(bot):
