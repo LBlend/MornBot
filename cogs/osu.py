@@ -6,13 +6,17 @@ import codecs
 import json
 import requests
 
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
+
 class osu:
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=["osustats", "osuuser", "osuprofile"])
     async def osuprofil(self, ctx, gamemode, bruker):
-        """Viser info om en osu! profil\n\nEksmpel: m!osuprofil standard -GN"""
+        """Viser info om en osu! profil"""
 
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
@@ -41,7 +45,7 @@ class osu:
             userId = data[0]["user_id"]
 
         except:
-            await ctx.send("Noe gikk galt\nSkriv `m!help osuprofil` for hjelp")
+            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help osuprofil` for hjelp")
             return
 
         #   Hent resten av data

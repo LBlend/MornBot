@@ -2,7 +2,13 @@ import discord
 import asyncio
 from discord.ext import commands
 
+import codecs
+import json
 import requests
+
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
 
 class MyAnimeList:
     def __init__(self, bot):
@@ -10,7 +16,7 @@ class MyAnimeList:
 
     @commands.command(aliases=["myanimelist", "myanimelistprofile", "malprofile"])
     async def mal(self, ctx, medium, bruker):
-        """Viser informasjon om en profil på MyAnimeList\n\nEksmpel: m!mal anime Thaun_\nEksempel 2: m!mal manga Thaun_"""
+        """Viser informasjon om en profil på MyAnimeList"""
 
         #   Sjekk for error & Hent data
         try:
@@ -20,7 +26,7 @@ class MyAnimeList:
             profilepic = data["image_url"]
 
         except:
-            await ctx.send("Noe gikk galt\nSkriv `m!help mal` for hjelp")
+            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help mal` for hjelp")
             return
 
         #   Hent resten av data

@@ -11,7 +11,7 @@ class Interaksjon:
     @commands.guild_only()
     @commands.command(aliases=["pat"])
     async def klapp(self, ctx, bruker: discord.Member):
-        """Klapp en bruker\n\nEksmpel: m!pat 170506717140877312"""
+        """Klapp en bruker"""
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
@@ -32,7 +32,7 @@ class Interaksjon:
     @commands.guild_only()
     @commands.command(aliases=["hug"])
     async def klem(self, ctx, bruker: discord.Member):
-        """Gi en bruker en klem\n\nEksmpel: m!klaqpp 170506717140877312"""
+        """Gi en bruker en klem"""
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
@@ -53,7 +53,7 @@ class Interaksjon:
     @commands.guild_only()
     @commands.command(aliases=["cuddle"])
     async def kos(self, ctx, bruker: discord.Member):
-        """Kos med en bruker\n\nEksmpel: m!kos 170506717140877312"""
+        """Kos med en bruker"""
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
@@ -74,7 +74,7 @@ class Interaksjon:
     @commands.guild_only()
     @commands.command()
     async def poke(self, ctx, bruker: discord.Member):
-        """Poke en bruker\n\nEksmpel: m!poke 170506717140877312"""
+        """Poke en bruker"""
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:

@@ -15,7 +15,7 @@ class ServerManagement:
     @commands.has_permissions(ban_members=True)
     @commands.command(aliases=["spark"])
     async def kick(self, ctx, *, bruker: discord.Member):
-        """Kaster ut en bruker fra serveren\n\nEksmpel: m!kick 170506717140877312"""
+        """Kaster ut en bruker fra serveren"""
 
         await bruker.kick()
         await ctx.send(f"<@{bruker.id}> ble kastet ut av serveren")
@@ -24,7 +24,7 @@ class ServerManagement:
     @commands.has_permissions(ban_members=True)
     @commands.command()
     async def ban(self, ctx, *, bruker: discord.Member):
-        """Utesteng en bruker fra serveren\n\nEksmpel: m!ban 170506717140877312"""
+        """Utesteng en bruker fra serveren"""
 
         #   Utfør
         await bruker.ban()
@@ -33,7 +33,7 @@ class ServerManagement:
     @commands.has_permissions(manage_messages=True)
     @commands.command(aliases=["purge", "delete", "slett"])
     async def prune(self, ctx, antall: int):
-        """Sletter de siste antall meldingene du spesifiser\n\nEksmpel: m!prune 10"""
+        """Sletter de siste antall meldingene du spesifiser"""
 
         #   Utfør
         await ctx.message.channel.purge(limit=antall+1)
@@ -45,7 +45,7 @@ class ServerManagement:
     @commands.has_permissions(manage_guild=True)
     @commands.command(aliases=["setloggkanal", "setlogkanal", "settlogkanal", "setlogchannel", "setlogging", "setloggingchannel"])
     async def settloggkanal(self, ctx, *, kanal: discord.TextChannel):
-        """Setter en kanal som loggkanal\n\nEksmpel: m!settloggkanal #log"""
+        """Setter en kanal som loggkanal"""
         
         #   Sjekk om fil allerede eksisterer
         serverDataFile = Path(f"./assets/serverdata/{ctx.message.guild.id}.json")

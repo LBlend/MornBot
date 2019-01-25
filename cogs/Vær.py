@@ -7,13 +7,17 @@ import json
 import requests
 import datetime
 
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
+
 class Vær:
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=["weather", "forecast", "værmelding", "yr"])
     async def vær(self, ctx, *, by):
-        """Viser været i en valgt by\n\nEksempel: m!vær Moscow"""
+        """Viser været i en valgt by"""
 
         user = ctx.message.author
 
@@ -30,7 +34,7 @@ class Vær:
                 byId = str(data["id"])
 
             except KeyError:
-                await ctx.send("Fant ikke værstasjon. Prøv en annen by\nSkriv `m!help vær` for hjelp")
+                await ctx.send(f"Fant ikke værstasjon. Prøv en annen by\nSkriv `{prefix}help vær` for hjelp")
                 return
 
             #   Hent resten av data

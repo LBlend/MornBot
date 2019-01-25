@@ -2,10 +2,15 @@ import discord
 import asyncio
 from discord.ext import commands
 
+import codecs
 import json
 import requests
 import random
 from hashlib import md5
+
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
 
 class Misc:
     def __init__(self, bot):
@@ -71,13 +76,13 @@ class Misc:
 
     @commands.command()
     async def roll(self, ctx, *args):
-        """Gir deg et tilfeldig tall\n\nEksmpel: m!roll IQ-en min"""
+        """Gir deg et tilfeldig talln"""
 
         await ctx.send(str(random.randint(0, 100)))
 
     @commands.command(name="8ball")
     async def ball8(self, ctx, *args):
-        """Svarer på dine dypeste spørsmål\n\nEksmpel: m!8ball er jeg dritt til å lage båtts?"""
+        """Svarer på dine dypeste spørsmål"""
 
         answers = ["Det er sannsynlig", "Uten tvil", "Ja", "Man kan vel si det ja", "Ehm, tror det er best vi ikke snakker om det jeg :sweat_smile:", "нет", "Nei ass", "Er ikke så sannsynlig", "I følge mine beregninger... nei"]
         await ctx.send(random.choice(answers))
@@ -90,7 +95,7 @@ class Misc:
 
     @commands.command(aliases=["owoify", "uwu"])
     async def owo(self, ctx, *setning):
-        """Oversetter teksten din til owo\n\nEksmpel: m!owo jeg elsker pikk!"""
+        """Oversetter teksten din til owo"""
 
         #   Sjekk for error & Hent data
         try:
@@ -106,7 +111,7 @@ class Misc:
     
     @commands.command(aliases=["urban", "meaning", "mening", "betydning", "dictionary", "ordbok"])
     async def urbandictionary(self, ctx, *ord):
-        """Sjekk definisjonen av et ord\n\nEksmpel: m!urban loli"""
+        """Sjekk definisjonen av et ord"""
 
         #   Sjekk for error
         try:
@@ -118,7 +123,7 @@ class Misc:
             definitionUrl = data["list"][randomDefinition]["permalink"]
 
         except:
-            await ctx.send("Noe gikk galt\nPrøv kanskje et annet ord?\nSkriv `m!help urban` for hjelp")
+            await ctx.send(f"Noe gikk galt\nPrøv kanskje et annet ord?\nSkriv `{prefix}help urban` for hjelp")
             return
 
         #   Hent restn av data

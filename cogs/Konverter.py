@@ -2,7 +2,13 @@ import discord
 import asyncio
 from discord.ext import commands
 
+import codecs
+import json
 import random
+
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
 
 class Konverter:
     def __init__(self, bot):
@@ -10,7 +16,7 @@ class Konverter:
 
     @commands.command(aliases=["fahrenheittocelcius"])
     async def ftc(self, ctx, tall):
-        """Konverterer temperatur fra fahrenheit til celcius\n\nEksmpel: m!ftc 100"""
+        """Konverterer temperatur fra fahrenheit til celcius"""
 
          #   Sjekk riktig bruk av desimaltegn
         if "," in tall:
@@ -20,14 +26,14 @@ class Konverter:
         try:
             tempCelcius = round((float(tall) - 32) / 9 * 5, 2)
         except:
-            await ctx.send("Noe gikk galt\nSkriv `m!help ftc` for hjelp")
+            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help ftc` for hjelp")
             return
         
         await ctx.send(f"`{tall} °F` = `{tempCelcius} °C`")
     
     @commands.command(aliases=["celciustofahrenheit"])
     async def ctf(self, ctx, tall):
-        """Konverterer temperatur fra celcius til fahrenheit\n\nEksmpel: m!ctf 22"""
+        """Konverterer temperatur fra celcius til fahrenheit"""
 
         if "," in tall:
             await ctx.send("Du må bruke `.` istedenfor `,`")
@@ -37,7 +43,7 @@ class Konverter:
         try:
             tempFahrenheit = round((float(tall) * 9) / 5 + 32, 2)
         except:
-            await ctx.send("Noe gikk galt\nSkriv `m!help ctf` for hjelp")
+            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help ctf` for hjelp")
             return
             
         await ctx.send(f"`{tall} °C` = `{tempFahrenheit} °F`")
@@ -45,7 +51,7 @@ class Konverter:
 
     @commands.command()
     async def bmi(self, ctx, vekt_kg, høyde_meter):
-        """Beregner BMIen din\n\nEksmpel: m!bmi 80 1.85"""
+        """Beregner BMIen din"""
 
         #   Sjekk riktig bruk av desimaltegn
         if "," in vekt_kg or "," in høyde_meter:
@@ -56,7 +62,7 @@ class Konverter:
         try:
             calculatedBMI = round(float(vekt_kg) / float(float(høyde_meter) * float(høyde_meter)), 2)
         except:
-            await ctx.send("Noe gikk galt\nSkriv `m!help bmi` for hjelp")
+            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help bmi` for hjelp")
             return
 
         if calculatedBMI < 18.5:

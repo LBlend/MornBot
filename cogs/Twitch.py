@@ -6,6 +6,9 @@ import codecs
 import json
 import requests
 
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
 
 class Twitch:
     def __init__(self, bot):
@@ -13,7 +16,7 @@ class Twitch:
 
     @commands.command(aliases=["twitchuser", "twitchstream"])
     async def twitch(self, ctx, bruker):
-        """Viser informasjon om en Twitch-bruker\n\nEksmpel: m!twitch LBlendLive"""
+        """Viser informasjon om en Twitch-bruker"""
 
         user = ctx.message.author
 
@@ -33,7 +36,7 @@ class Twitch:
 
                 profilePic = userData["logo"]
             except:
-                await ctx.send("Noe gikk galt\nSkriv `m!help twitch` for hjelp")
+                await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help twitch` for hjelp")
                 return
 
             #   Hent resten av data
