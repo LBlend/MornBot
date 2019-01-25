@@ -9,6 +9,9 @@ import time
 import platform
 import psutil
 
+with codecs.open("config.json", "r", encoding="utf8") as f:
+    config = json.load(f)
+    prefix = config["prefix"]
 
 class Info:
     def __init__(self, bot):
@@ -121,6 +124,9 @@ class Info:
         roles.reverse()
         roles = ", ".join(roles)
 
+        if len(roles) > 1024:
+            roles = f"Skriv `{prefix}guildroller` for å se rollene"
+
         #   Kanaler
         textChannels = len(guild.text_channels)
         voiceChannels = len(guild.voice_channels)
@@ -166,11 +172,33 @@ class Info:
         embed.set_author(name=guild.name)
         await ctx.send(embed=embed)
 
+
+    @commands.guild_only()     
+    @commands.command(aliases=["serverroller"])
+    async def guildroller(self, ctx):
+        """Viser rollene i en guild"""
+
+        guild = ctx.message.guild
+
+        roles = []
+        for r in guild.roles:
+            if r.name != "@everyone":
+                roles.append(r.name)
+        if roles == []:
+            roles = ["**Ingen Roller**"]
+        roles.reverse()
+        roles = ", ".join(roles)
+
+        embed = discord.Embed(color=0x0085ff, url=guild.icon_url, description=roles)
+        embed.set_thumbnail(url=guild.icon_url)
+        embed.set_author(name=f"Roller: {guild.name}")
+        await ctx.send(embed=embed)
+
         
     @commands.guild_only()
     @commands.command(aliases=["userinfo", "ui", "bi"])
     async def brukerinfo(self, ctx, *, bruker: discord.Member=None):
-        """Viser info om en bruker\n\nEksmpel: m!brukerinfo 170506717140877312"""
+        """Viser info om en bruker"""
 
         #   Om ingen bruker gitt, sett bruker til author
         if not bruker:
