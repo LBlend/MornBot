@@ -94,6 +94,23 @@ class DevTools:
                         await ctx.send(f"{cog} har blitt lastet inn på nytt")
         except:
             await ctx.send(f"{cog} er ikke en cog")
+
+    @commands.is_owner()
+    @commands.command()
+    async def reloadall(self, ctx):
+        try:
+            for file in os.listdir("cogs"):
+                if file.endswith(".py"):
+                    name = file[:-3]
+                    try:
+                        self.bot.unload_extension(f"cogs.{name}")
+                    except:
+                        pass
+
+                    self.bot.load_extension(f"cogs.{name}")
+            await ctx.send("Reloadet alle cogs!")
+        except:
+            await ctx.send("Error!")
     
     @commands.is_owner()
     @commands.command()
