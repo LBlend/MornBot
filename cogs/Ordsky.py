@@ -12,6 +12,7 @@ class Ordsky:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.cooldown(1, 60, commands.BucketType.guild)
     @commands.command(aliases=["wordcloud", "wc", "sky"])
     async def ordsky(self, ctx, skyform=None):
         """Generer en ordsky\n\nEksempel: m!ordsky ostehøvel\n\nSkyformer:\n"""

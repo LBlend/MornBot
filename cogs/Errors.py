@@ -1,5 +1,6 @@
 import discord
 from discord.ext.commands import errors
+import traceback
 
 class Errors:
     def __init__(self, bot):
@@ -36,6 +37,14 @@ class Errors:
 
         elif isinstance(err, errors.BotMissingPermissions):
             await ctx.send("Jeg mangler tillatelse til å gjøre dette")
+
+        elif isinstance(err, errors.CommandOnCooldown):
+            await ctx.send(f"{ctx.message.author.mention} Kommandoen har nettopp blitt brukt. Prøv igjen om `{err.retry_after:.1f}` sekunder.")
+
+        else:
+            tb = err.__traceback__             
+            traceback.print_tb(tb)             
+            print(err)
 
 def setup(bot):
     bot.add_cog(Errors(bot))
