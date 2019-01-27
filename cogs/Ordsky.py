@@ -17,7 +17,7 @@ class Ordsky:
     async def ordsky(self, ctx, skyform=None):
         """Generer en ordsky"""
 
-        statusmsg = await ctx.send("Teller ord...")
+        statusmsg = await ctx.send(f"{ctx.message.author.mention}\n**Teller ord:** :hourglass:\n**Generer ordsky:** -")
 
         #   Søk etter ord
         with open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt", "w+") as f:
@@ -48,7 +48,7 @@ class Ordsky:
         else:
             maskbilde = np.array(Image.open("./assets/ordsky/mask/owomask.png"))
 
-        await statusmsg.edit(content="Generer Ordsky...")
+        await statusmsg.edit(content=f"{ctx.message.author.mention}\n**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
 
         #   Åpne ordtekstfil
         text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt").read()
@@ -68,7 +68,7 @@ class Ordsky:
         wc.to_file(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
 
         #   Send bilde
-        await ctx.send(f"Generert ordsky for <@{ctx.message.author.id}>", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
+        await ctx.send(f":white_check_mark: Generert ordsky for <@{ctx.message.author.id}>", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
 
         await statusmsg.delete()
         
