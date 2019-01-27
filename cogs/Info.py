@@ -230,6 +230,9 @@ class Info:
         roles.reverse()
         roles = ", ".join(roles)
 
+        if len(roles) > 1024:
+            roles = f"Skriv `{prefix}brukerroller` for å se rollene"
+
         #   Farge
         if str(bruker.color) != "#000000":
             color = bruker.color
@@ -247,9 +250,45 @@ class Info:
 
         #   Kallenavn
         if bruker.display_name == bruker.name:
+            embed.set_author(name=f"Roller: {bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
+        else:
+            embed.set_author(name=f"Roller: {bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url) 
+        
+        await ctx.send(embed=embed)
+
+
+    @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)     
+    @commands.command()
+    async def brukerroller(self, ctx, bruker: discord.Member=None):
+        """Viser rollene til en bruker"""
+
+        if not bruker:
+            bruker = ctx.message.author
+
+        roles = []
+        for r in bruker.roles:
+            if r.name != "@everyone":
+                roles.append(r.name)
+        if roles == []:
+            roles = ["**Ingen Roller**"]
+        roles.reverse()
+        roles = ", ".join(roles)
+
+        #   Farge
+        if str(bruker.color) != "#000000":
+            color = bruker.color
+        else:
+            color = discord.Colour(0x99AAB5)
+
+        embed = discord.Embed(color=color, url=bruker.avatar_url, description=roles)
+        embed.set_thumbnail(url=bruker.avatar_url)
+
+        #   Kallenavn
+        if bruker.display_name == bruker.name:
             embed.set_author(name=f"{bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
         else:
-            embed.set_author(name=f"{bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url) 
+            embed.set_author(name=f"{bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url)
         
         await ctx.send(embed=embed)
 
