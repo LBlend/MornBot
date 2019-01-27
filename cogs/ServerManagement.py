@@ -11,8 +11,10 @@ class ServerManagement:
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.guild_only()
     @commands.has_permissions(ban_members=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["spark"])
     async def kick(self, ctx, *, bruker: discord.Member):
         """Kaster ut en bruker fra serveren"""
@@ -20,8 +22,10 @@ class ServerManagement:
         await bruker.kick()
         await ctx.send(f"<@{bruker.id}> ble kastet ut av serveren")
 
+
     @commands.guild_only()
     @commands.has_permissions(ban_members=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def ban(self, ctx, *, bruker: discord.Member):
         """Utesteng en bruker fra serveren"""
@@ -30,7 +34,9 @@ class ServerManagement:
         await bruker.ban()
         await ctx.send(f"<@{bruker.id}> ble utestengt fra serveren")
 
+
     @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 15, commands.BucketType.guild)
     @commands.command(aliases=["purge", "delete", "slett"])
     async def prune(self, ctx, antall: int):
         """Sletter de siste antall meldingene du spesifiser"""
@@ -41,8 +47,10 @@ class ServerManagement:
         await asyncio.sleep(3)
         await statusmsg.delete()
 
+
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["setloggkanal", "setlogkanal", "settlogkanal", "setlogchannel", "setlogging", "setloggingchannel"])
     async def settloggkanal(self, ctx, *, kanal: discord.TextChannel):
         """Setter en kanal som loggkanal"""
@@ -64,7 +72,9 @@ class ServerManagement:
 
         await ctx.send(f"Loggkanal satt til <#{str(kanal.id)}>")
 
+
     @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["logchannel", "logkanal", "loggingchannel"])
     async def loggkanal(self, ctx):
         """Viser hvilken kanal som er satt som loggkanal på serveren"""

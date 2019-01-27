@@ -14,6 +14,8 @@ class Konverter:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["fahrenheittocelcius"])
     async def ftc(self, ctx, tall):
         """Konverterer temperatur fra fahrenheit til celcius"""
@@ -31,6 +33,8 @@ class Konverter:
         
         await ctx.send(f"`{tall} °F` = `{tempCelcius} °C`")
     
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["celciustofahrenheit"])
     async def ctf(self, ctx, tall):
         """Konverterer temperatur fra celcius til fahrenheit"""
@@ -49,6 +53,7 @@ class Konverter:
         await ctx.send(f"`{tall} °C` = `{tempFahrenheit} °F`")
         
 
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def bmi(self, ctx, vekt_kg, høyde_meter):
         """Beregner BMIen din"""

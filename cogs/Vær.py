@@ -15,6 +15,8 @@ class Vær:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["weather", "forecast", "værmelding", "yr"])
     async def vær(self, ctx, *, by):
         """Viser været i en valgt by"""

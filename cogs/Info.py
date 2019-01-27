@@ -17,6 +17,8 @@ class Info:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["info", "about", "om", "båttinfo"])
     async def botinfo(self, ctx):
         """Viser info om meg"""
@@ -84,6 +86,7 @@ class Info:
 
 
     @commands.guild_only()     
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["serverinfo", "si", "gi"])
     async def guildinfo(self, ctx):
         """Viser info om guilden"""
@@ -173,7 +176,8 @@ class Info:
         await ctx.send(embed=embed)
 
 
-    @commands.guild_only()     
+    @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)     
     @commands.command(aliases=["serverroller"])
     async def guildroller(self, ctx):
         """Viser rollene i en guild"""
@@ -196,6 +200,7 @@ class Info:
 
         
     @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["userinfo", "ui", "bi"])
     async def brukerinfo(self, ctx, *, bruker: discord.Member=None):
         """Viser info om en bruker"""
@@ -248,6 +253,8 @@ class Info:
         
         await ctx.send(embed=embed)
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def avatar(self, ctx, bruker: discord.Member=None):
         """Viser avataren din"""
@@ -265,6 +272,8 @@ class Info:
         embed.set_image(url=bruker.avatar_url)
         await ctx.send(embed=embed)
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["invite"])
     async def inviter(self, ctx):
         """Inviter meg"""
@@ -275,6 +284,8 @@ class Info:
         embed.add_field(name="Invitasjonslink", value=f"[Klikk her](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot) for å invitere meg til serveren din")
         await ctx.send(embed=embed)
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["uptime"])
     async def oppetid(self, ctx):
         """Sjekk hvor lenge båtten har kjørt"""
@@ -287,12 +298,16 @@ class Info:
 
         await ctx.send(f"{days} dager, {hours} timer, {minutes} minutter og {seconds} sekunder")
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def ping(self, ctx):
         """Sjekk pingen til båtten"""
 
         await ctx.send(f"{int(self.bot.latency * 1000)}ms")
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["githubrepo", "repo", "git"])
     async def github(self, ctx):
         """Sender link til Github-repoet mitt"""

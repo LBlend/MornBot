@@ -11,6 +11,8 @@ class Reddit:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["hm", "hmm", "hmmmm"])
     async def hmmm(self, ctx):
         """Sender en tilfeldig post fra /r/hmmm"""
@@ -35,6 +37,7 @@ class Reddit:
             await ctx.send(embed=embed)
 
     
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def copypasta(self, ctx):
         """Sender en tilfeldig copypasta fra /r/copypasta"""

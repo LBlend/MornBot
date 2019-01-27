@@ -14,6 +14,8 @@ class MyAnimeList:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["myanimelist", "myanimelistprofile", "malprofile"])
     async def mal(self, ctx, medium, bruker):
         """Viser informasjon om en profil på MyAnimeList"""

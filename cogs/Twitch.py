@@ -14,6 +14,8 @@ class Twitch:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["twitchuser", "twitchstream"])
     async def twitch(self, ctx, bruker):
         """Viser informasjon om en Twitch-bruker"""

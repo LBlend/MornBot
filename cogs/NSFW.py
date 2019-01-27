@@ -8,6 +8,8 @@ class NSFW:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def hololewd(self, ctx):
         """Sender et lewd bilde av Holo"""
@@ -28,6 +30,8 @@ class NSFW:
         embed.set_image(url=hololewd)
         await ctx.send(embed=embed)
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def holoero(self, ctx):
         """Sender et erotisk bilde av Holo"""

@@ -16,6 +16,8 @@ class Misc:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def smug(self, ctx):
         """Sender et smug bilde"""
@@ -31,6 +33,8 @@ class Misc:
         embed.set_image(url=smug)
         await ctx.send(embed=embed)     
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["voff", "doggo", "dog", "hund", "bikkje"])
     async def woof(self, ctx):
         """Sender en tilfeldig bissevoff"""
@@ -46,6 +50,8 @@ class Misc:
         embed.set_image(url=woof)
         await ctx.send(embed=embed)
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["kukstørrelse", "pikkstørrelse"])
     async def dicksize(self, ctx, bruker: discord.Member=None):
         """Se hvor liten pikk du har"""
@@ -74,12 +80,16 @@ class Misc:
         embed.add_field(name="Kukstørrelse", value=f"{dicksize} cm\n8{dickDrawing}D")
         await ctx.send(embed=embed)
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def roll(self, ctx, *args):
         """Gir deg et tilfeldig talln"""
 
         await ctx.send(str(random.randint(0, 100)))
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(name="8ball")
     async def ball8(self, ctx, *args):
         """Svarer på dine dypeste spørsmål"""
@@ -87,12 +97,16 @@ class Misc:
         answers = ["Det er sannsynlig", "Uten tvil", "Ja", "Man kan vel si det ja", "Ehm, tror det er best vi ikke snakker om det jeg :sweat_smile:", "нет", "Nei ass", "Er ikke så sannsynlig", "I følge mine beregninger... nei"]
         await ctx.send(random.choice(answers))
 
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["reverse"])
     async def reverser(self, ctx, *, tekst):
         """Reverserer tekst"""
 
         await ctx.send(tekst[::-1])
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["owoify", "uwu"])
     async def owo(self, ctx, *setning):
         """Oversetter teksten din til owo"""
@@ -109,6 +123,8 @@ class Misc:
         except:
             await ctx.send("oopsie whoopsie you made a fucky wucky, no text or text over 200")
     
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["urban", "meaning", "mening", "betydning", "dictionary", "ordbok"])
     async def urbandictionary(self, ctx, *ord):
         """Sjekk definisjonen av et ord"""

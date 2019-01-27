@@ -8,7 +8,9 @@ class Interaksjon:
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["pat"])
     async def klapp(self, ctx, bruker: discord.Member):
         """Klapp en bruker"""
@@ -30,6 +32,7 @@ class Interaksjon:
         await ctx.send(embed=embed)
 
     @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["hug"])
     async def klem(self, ctx, bruker: discord.Member):
         """Gi en bruker en klem"""
@@ -51,6 +54,7 @@ class Interaksjon:
         await ctx.send(embed=embed)
 
     @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["cuddle"])
     async def kos(self, ctx, bruker: discord.Member):
         """Kos med en bruker"""
@@ -72,6 +76,7 @@ class Interaksjon:
         await ctx.send(embed=embed)
 
     @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def poke(self, ctx, bruker: discord.Member):
         """Poke en bruker"""

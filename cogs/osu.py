@@ -14,6 +14,8 @@ class osu:
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["osustats", "osuuser", "osuprofile"])
     async def osuprofil(self, ctx, gamemode, bruker):
         """Viser info om en osu! profil"""
