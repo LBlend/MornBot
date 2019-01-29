@@ -311,6 +311,17 @@ class Info:
         embed.set_image(url=bruker.avatar_url)
         await ctx.send(embed=embed)
 
+    
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(aliases=["serverikon", "servericon", "guildicon", "serveravatar", "guildavatar"])
+    async def guildikon(self, ctx):
+        """Viser avataren til serveren du er i"""
+
+        #   Embed
+        embed = discord.Embed(description=f"[Link]({ctx.message.guild.icon_url})")
+        embed.set_image(url=ctx.message.guild.icon_url)
+        await ctx.send(embed=embed)
+
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["invite"])
