@@ -250,9 +250,9 @@ class Info:
 
         #   Kallenavn
         if bruker.display_name == bruker.name:
-            embed.set_author(name=f"Roller: {bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
+            embed.set_author(name=f"{bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
         else:
-            embed.set_author(name=f"Roller: {bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url) 
+            embed.set_author(name=f"{bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url) 
         
         await ctx.send(embed=embed)
 
@@ -286,9 +286,9 @@ class Info:
 
         #   Kallenavn
         if bruker.display_name == bruker.name:
-            embed.set_author(name=f"{bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
+            embed.set_author(name=f"Roller: {bruker.name}#{bruker.discriminator}", icon_url=bruker.avatar_url)
         else:
-            embed.set_author(name=f"{bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url)
+            embed.set_author(name=f"Roller: {bruker.name}#{bruker.discriminator} | {bruker.display_name}", icon_url=bruker.avatar_url)
         
         await ctx.send(embed=embed)
 
