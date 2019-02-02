@@ -14,11 +14,13 @@ class DevTools:
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.is_owner()
     @commands.command()
     async def stopbot(self, ctx):
         await ctx.send("Stopper bot")
         sys.exit("Bot stoppet")
+
 
     @commands.is_owner()
     @commands.command()
@@ -26,6 +28,7 @@ class DevTools:
         custommessage = " ".join(args)
         await channel.send(custommessage)
         await ctx.send(f"Sendte:\n{custommessage}")
+
 
     @commands.is_owner()
     @commands.command()
@@ -58,6 +61,7 @@ class DevTools:
             guildlist.append(guild.name)
         guilds = "\n".join(guildlist)
         await ctx.send(f"**Guilds**\n```\n{guilds}```")
+
 
     @commands.is_owner()
     @commands.command()
@@ -95,6 +99,7 @@ class DevTools:
         except:
             await ctx.send(f"{cog} er ikke en cog")
 
+
     @commands.is_owner()
     @commands.command()
     async def reloadall(self, ctx):
@@ -112,6 +117,7 @@ class DevTools:
         except:
             await ctx.send("Error!")
     
+
     @commands.is_owner()
     @commands.command()
     async def localip(self, ctx):
@@ -119,6 +125,7 @@ class DevTools:
         s.connect(("8.8.8.8", 80))
         await ctx.send(f"`{s.getsockname()[0]}`")
         s.close()
+
 
     @commands.is_owner()
     @commands.command()
