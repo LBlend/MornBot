@@ -12,7 +12,8 @@ class Ordsky:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.cooldown(1, 60, commands.BucketType.guild)
+
+    @commands.cooldown(1, 300, commands.BucketType.user)
     @commands.command(aliases=["wordcloud", "wc", "sky"])
     async def ordsky(self, ctx, skyform=None):
         """Generer en ordsky"""
@@ -20,16 +21,16 @@ class Ordsky:
         statusmsg = await ctx.send(f"{ctx.message.author.mention}\n**Teller ord:** :hourglass:\n**Generer ordsky:** -")
 
         #   Søk etter ord
-        with open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt", "w+") as f:
-            for channel in ctx.message.guild.text_channels:
-                async for message in channel.history(limit=4000):
-                    if message.author.id == ctx.message.author.id:
-                        try:
-                            f.write(f"{message.content} ")
-                        except:
-                            pass
-                    else:
+        text = ""
+        for channel in ctx.message.guild.text_channels:
+            async for message in channel.history(limit=4000):
+                if message.author.id == ctx.message.author.id:
+                    try:
+                        text += f"{message.content} "
+                    except:
                         pass
+                else:
+                    pass         
         
         #   Skyform
         if skyform == "ostehøvel":
@@ -50,9 +51,6 @@ class Ordsky:
 
         await statusmsg.edit(content=f"{ctx.message.author.mention}\n**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
 
-        #   Åpne ordtekstfil
-        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt").read()
-
         #   Ordsky innstillinger
         wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde)
 
@@ -69,7 +67,8 @@ class Ordsky:
 
         #   Send bilde
         await ctx.send(f":white_check_mark: Generert ordsky for <@{ctx.message.author.id}>", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
-
+        
+        #   Cleanup, sletting
         await statusmsg.delete()
         
         try:
