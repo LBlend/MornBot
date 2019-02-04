@@ -19,7 +19,43 @@ class Ordsky:
     async def ordsky(self, ctx, skyform=None):
         """Generer en ordsky"""
 
-        statusmsg = await ctx.send(f"{ctx.message.author.mention}\n**Teller ord:** :hourglass:\n**Generer ordsky:** -")
+        statusmsg = await ctx.send(f"{ctx.message.author.mention}\n**Teller ord:** :hourglass:\n**Generer ordsky:** -")       
+        
+        #   Skyform
+        if skyform == "ostehøvel":
+            maskbilde = np.array(Image.open("./assets/ordsky/mask/ostmask.png"))
+        elif skyform == "laugh":
+            maskbilde = np.array(Image.open("./assets/ordsky/mask/laughmask.png"))
+
+        elif ctx.message.attachments != [] and skyform == None:
+            try:
+                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
+                filesize = os.path.getsize(f"{ctx.message.author.id}_mask.png")
+                if filesize > 2000000:
+                    await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Stoppet!**")
+                    await ctx.send(f"{ctx.message.author.mention} Filen er for stor. Prøv en fil som er mindre enn 5 MiB")
+                    return
+                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
+            except:
+                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Error!**")
+                await ctx.send("Feilet henting av skyform")
+                return
+        elif  ctx.message.attachments == [] and skyform != None:
+            try:
+                urllib.request.urlretrieve(str(skyform), f"{ctx.message.author.id}_mask.png")
+                filesize = os.path.getsize(f"{ctx.message.author.id}_mask.png")
+                if filesize > 2000000:
+                    await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Stoppet!**")
+                    await ctx.send(f"{ctx.message.author.mention} Filen er for stor. Prøv en fil som er mindre enn 5 MiB")
+                    return
+                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
+            except:
+                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Error!**")
+                await ctx.send("Feilet henting av skyform")
+                return
+
+        else:
+            maskbilde = np.array(Image.open("./assets/ordsky/mask/owomask.png"))
 
         #   Søk etter ord
         text = ""
@@ -31,33 +67,7 @@ class Ordsky:
                     except:
                         pass
                 else:
-                    pass         
-        
-        #   Skyform
-        if skyform == "ostehøvel":
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/ostmask.png"))
-        elif skyform == "laugh":
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/laughmask.png"))
-
-        elif ctx.message.attachments != [] and skyform == None:
-            try:
-                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:redTick: **Error!**")
-                await ctx.send("Feilet henting av skyform")
-                return
-        elif  ctx.message.attachments == [] and skyform != None:
-            try:
-                urllib.request.urlretrieve(str(skyform), f"{ctx.message.author.id}_mask.png")
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:redTick: **Error!**")
-                await ctx.send("Feilet henting av skyform")
-                return
-
-        else:
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/owomask.png"))
+                    pass
 
         await statusmsg.edit(content=f"{ctx.message.author.mention}\n**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
 
