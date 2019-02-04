@@ -3,6 +3,7 @@ import asyncio
 from discord.ext import commands
 
 import os
+import urllib.request
 from PIL import Image
 import numpy as np
 from wordcloud import WordCloud, ImageColorGenerator
@@ -43,7 +44,16 @@ class Ordsky:
                 await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
                 maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
             except:
-                await statusmsg.edit(content="Feilet henting av skyform")
+                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:redTick: **Error!**")
+                await ctx.send("Feilet henting av skyform")
+                return
+        elif  ctx.message.attachments == [] and skyform != None:
+            try:
+                urllib.request.urlretrieve(str(skyform), f"{ctx.message.author.id}_mask.png")
+                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
+            except:
+                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:redTick: **Error!**")
+                await ctx.send("Feilet henting av skyform")
                 return
 
         else:
@@ -59,6 +69,9 @@ class Ordsky:
 
         #   Fargelegg
         if  ctx.message.attachments != [] or skyform == "laugh":
+            image_colors = ImageColorGenerator(maskbilde)
+            wc.recolor(color_func=image_colors)
+        elif ctx.message.attachments == [] and skyform != None:
             image_colors = ImageColorGenerator(maskbilde)
             wc.recolor(color_func=image_colors)
 
