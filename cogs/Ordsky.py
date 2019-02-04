@@ -34,6 +34,10 @@ class Ordsky:
                 if filesize > 2000000:
                     await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Stoppet!**")
                     await ctx.send(f"{ctx.message.author.mention} Filen er for stor. Prøv en fil som er mindre enn 2 MiB")
+                    try:
+                        os.remove(f"./{ctx.message.author.id}_mask.png")
+                    except:
+                        pass
                     return
                 maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
             except:
@@ -47,6 +51,10 @@ class Ordsky:
                 if filesize > 2000000:
                     await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Stoppet!**")
                     await ctx.send(f"{ctx.message.author.mention} Filen er for stor. Prøv en fil som er mindre enn 2 MiB")
+                    try:
+                        os.remove(f"./{ctx.message.author.id}_mask.png")
+                    except:
+                        pass
                     return
                 maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
             except:
