@@ -21,6 +21,9 @@ class Vær:
     async def vær(self, ctx, *, by):
         """Viser været i en valgt by"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
@@ -33,7 +36,8 @@ class Vær:
                 byId = str(data["id"])
 
             except KeyError:
-                await ctx.send(f"Fant ikke værstasjon. Prøv en annen by\nSkriv `{prefix}help vær` for hjelp")
+                embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help vær` for hjelp")
+                await statusmsg.edit(embed=embed)
                 return
 
             #   Hent resten av data
@@ -59,7 +63,7 @@ class Vær:
             embed.add_field(name="Soloppgang (Norsk tid)", value=sunrise)
             embed.add_field(name="Solnedgang (Norsk tid)", value=sunset)
             embed.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
-            await ctx.send(embed=embed)
+            await statusmsg.edit(embed=embed)
 
 
 def setup(bot):

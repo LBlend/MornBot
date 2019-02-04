@@ -20,6 +20,9 @@ class MyAnimeList:
     async def mal(self, ctx, medium, bruker):
         """Viser informasjon om en profil på MyAnimeList"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Sjekk for error & Hent data
         try:
             data = requests.get(f"https://api.jikan.moe/v3/user/{bruker}").json()
@@ -27,7 +30,8 @@ class MyAnimeList:
             profilepic = data["image_url"]
 
         except:
-            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help mal` for hjelp")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help mal` for hjelp")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent resten av data
@@ -83,7 +87,7 @@ class MyAnimeList:
         embed.set_thumbnail(url=profilepic)
         embed.set_footer(text=f'{ctx.message.author.name}#{ctx.message.author.discriminator}', icon_url=ctx.message.author.avatar_url)
        
-        await ctx.send(embed=embed)
+        await statusmsg.edit(embed=embed)
 
 
 def setup(bot):

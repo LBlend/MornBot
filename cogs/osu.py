@@ -20,6 +20,9 @@ class osu:
     async def osuprofil(self, ctx, gamemode, bruker):
         """Viser info om en osu! profil"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
@@ -46,7 +49,8 @@ class osu:
             userId = data[0]["user_id"]
 
         except:
-            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help osuprofil` for hjelp")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help osuprofil` for hjelp")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent resten av data
@@ -58,7 +62,8 @@ class osu:
 
         #   Sjekk om bruker har spillt nok
         if rank == "#0":
-            ctx.send("Brukeren har ikke spillt nok")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Brukeren har ikke spillt nok")
+            await statusmsg.edit(embed=embed)
 
         #   Hent data
         else:
@@ -89,7 +94,7 @@ class osu:
             #   Ja, dette er ekte. Ikke klag, det funker 
             embed.set_footer(text=f"Bruker lagd: {joinDate[8:10]}.{joinDate[5:7]}.{joinDate[:4]} {joinDate[11:]}")
 
-            await ctx.send(embed=embed)     
+            await statusmsg.edit(embed=embed)    
 
 
 def setup(bot):

@@ -14,9 +14,13 @@ class NSFW:
     async def hololewd(self, ctx):
         """Sender et lewd bilde av Holo"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Sjekk NSFW
         if not ctx.channel.is_nsfw():
-            await ctx.send("Funker bare i NSFW-kanaler")
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent data
@@ -26,7 +30,7 @@ class NSFW:
         #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.set_image(url=hololewd)
-        await ctx.send(embed=embed)
+        await statusmsg.edit(embed=embed)
 
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -34,9 +38,13 @@ class NSFW:
     async def holoero(self, ctx):
         """Sender et erotisk bilde av Holo"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Sjekk NSFW
         if not ctx.channel.is_nsfw():
-            await ctx.send("Funker bare i NSFW-kanaler")
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent data
@@ -46,7 +54,7 @@ class NSFW:
         #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.set_image(url=holoero)
-        await ctx.send(embed=embed)
+        await statusmsg.edit(embed=embed)
 
 def setup(bot):
     bot.add_cog(NSFW(bot))

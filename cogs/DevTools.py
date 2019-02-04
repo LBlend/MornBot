@@ -18,7 +18,8 @@ class DevTools:
     @commands.is_owner()
     @commands.command()
     async def stopbot(self, ctx):
-        await ctx.send("Stopper bot")
+        embed = discord.Embed(color=0xE67E22, description="Stopper bot...")
+        await ctx.send(embed=embed)
         sys.exit("Bot stoppet")
 
 
@@ -27,7 +28,10 @@ class DevTools:
     async def custommsg(self, ctx, channel: discord.TextChannel=None, *args):
         custommessage = " ".join(args)
         await channel.send(custommessage)
-        await ctx.send(f"Sendte:\n{custommessage}")
+
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Sendte", value=custommessage)
+        await ctx.send(embed=embed)
 
 
     @commands.is_owner()
@@ -60,7 +64,10 @@ class DevTools:
         for guild in self.bot.guilds:
             guildlist.append(guild.name)
         guilds = "\n".join(guildlist)
-        await ctx.send(f"**Guilds**\n```\n{guilds}```")
+
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Guilder", value=guilds)
+        await ctx.send(embed=embed)
 
 
     @commands.is_owner()
@@ -78,7 +85,7 @@ class DevTools:
 
         while userlist != []:
             users = "\n".join(userlist[:30])
-            await ctx.send(f"**Users**\n```{users}```")
+            await ctx.send(f"```{users}```")
             del userlist[:30]
 
 
@@ -95,9 +102,11 @@ class DevTools:
                         except:
                             pass
                         self.bot.load_extension(f"cogs.{name}")
-                        await ctx.send(f"{cog} har blitt lastet inn på nytt")
+                        embed = discord.Embed(color=0xE67E22, description=f"{cog} har blitt lastet inn på nytt! :ok_hand:")
+                        await ctx.send(embed=embed)
         except:
-            await ctx.send(f"{cog} er ikke en cog")
+            embed = discord.Embed(color=0xFF0000, description=f":x: {cog} er ikke en cog")
+            await ctx.send(embed=embed)
 
 
     @commands.is_owner()
@@ -113,9 +122,12 @@ class DevTools:
                         pass
 
                     self.bot.load_extension(f"cogs.{name}")
-            await ctx.send("Reloadet alle cogs!")
+
+            embed = discord.Embed(color=0xE67E22, description="Reloadet alle cogs! :ok_hand:")
+            await ctx.send(embed=embed)
         except:
-            await ctx.send("Error!")
+            embed = discord.Embed(color=0xFF0000, description=":x: Error!")
+            await ctx.send(embed=embed)
     
 
     @commands.is_owner()
@@ -123,7 +135,9 @@ class DevTools:
     async def localip(self, ctx):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
-        await ctx.send(f"`{s.getsockname()[0]}`")
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Lokal ip", value=s.getsockname()[0])
+        await ctx.send(embed=embed)
         s.close()
 
 
@@ -138,7 +152,9 @@ class DevTools:
         location = data["YourFuckingLocation"]
         isp = data["YourFuckingISP"]
 
-        await ctx.send(f"```{ip}\n{location}\n{isp}```")
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Public ip", value=f"{ip}\n{location}\n{isp}")
+        await ctx.send(embed=embed)
 
 
 

@@ -67,7 +67,7 @@ class Info:
                     totalmembers.append(member.id)
 
         #   Embed
-        embed = discord.Embed(color=0xF02B30, url=website)
+        embed = discord.Embed(color=0xE67E22, url=website)
         embed.add_field(name="Navn", value=self.bot.user.name)
         embed.add_field(name="Dev", value=f"{dev.mention}\n({dev.name}#{dev.discriminator})")
         embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m {seconds}s")
@@ -315,10 +315,10 @@ class Info:
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["serverikon", "servericon", "guildicon", "serveravatar", "guildavatar"])
     async def guildikon(self, ctx):
-        """Viser avataren til serveren du er i"""
+        """Viser ikonet til serveren du er i"""
 
         #   Embed
-        embed = discord.Embed(description=f"[Link]({ctx.message.guild.icon_url})")
+        embed = discord.Embed(color=0x0085ff, description=f"[Link]({ctx.message.guild.icon_url})")
         embed.set_image(url=ctx.message.guild.icon_url)
         await ctx.send(embed=embed)
 
@@ -329,7 +329,7 @@ class Info:
         """Inviter meg"""
 
         #   Embed
-        embed = discord.Embed(color=0xF02B30)
+        embed = discord.Embed(color=0x0085ff)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name="Invitasjonslink", value=f"[Klikk her](https://discordapp.com/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot) for å invitere meg til serveren din")
         await ctx.send(embed=embed)
@@ -346,15 +346,18 @@ class Info:
         hours, remainder = divmod(remainder, 60 * 60)
         minutes, seconds = divmod(remainder, 60)
 
-        await ctx.send(f"{days} dager, {hours} timer, {minutes} minutter og {seconds} sekunder")
+        embed = discord.Embed(color=0x0085ff)
+        embed.add_field(name="Oppetid", value=f"{days} dager, {hours} timer, {minutes} minutter, {seconds} sekunder")
+        await ctx.send(embed=embed)
 
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def ping(self, ctx):
         """Sjekk pingen til båtten"""
-
-        await ctx.send(f"{int(self.bot.latency * 1000)}ms")
+        embed = discord.Embed(color=0x0085ff)
+        embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
+        await ctx.send(embed=embed)
 
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -368,7 +371,7 @@ class Info:
             github = config["github"]
 
             #   Embed
-            embed = discord.Embed(color=0xF02B30)
+            embed = discord.Embed(color=0x0085ff)
             embed.set_thumbnail(url="https://cdn2.iconfinder.com/data/icons/black-white-social-media/64/social_media_logo_github-512.png")
             embed.add_field(name="Github Repo", value=f"[Klikk her]({github}) for å se den dritt skrevne kildekoden min")
             await ctx.send(embed=embed)

@@ -20,6 +20,9 @@ class Twitch:
     async def twitch(self, ctx, bruker):
         """Viser informasjon om en Twitch-bruker"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
@@ -33,7 +36,8 @@ class Twitch:
 
                 profilePic = userData["logo"]
             except:
-                await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help twitch` for hjelp")
+                embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help twitch` for hjelp")
+                await statusmsg.edit(embed=embed)
                 return
 
             #   Hent resten av data
@@ -65,7 +69,7 @@ class Twitch:
             except:
                 pass
         
-            await ctx.send(embed=embed)
+            await statusmsg.edit(embed=embed)
 
 
 def setup(bot):

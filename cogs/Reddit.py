@@ -21,6 +21,9 @@ class Reddit:
     @commands.command(aliases=["hm", "hmm", "hmmmm"])
     async def hmmm(self, ctx):
         """Sender en tilfeldig post fra /r/hmmm"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
     
         reddit = praw.Reddit(client_id=redditId, client_secret=redditSecret, user_agent="MornBot")
 
@@ -31,15 +34,18 @@ class Reddit:
         submission = posts[random_post_number]
 
         #   Embed
-        embed = discord.Embed(title="Tilfeldig post fra /r/hmmm", url=submission.url, color=0xfaff00)
+        embed = discord.Embed(title="Tilfeldig post fra /r/hmmm", url=submission.url, color=0x0085ff)
         embed.set_image(url=submission.url)
-        await ctx.send(embed=embed)
+        await statusmsg.edit(embed=embed)
 
     
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def copypasta(self, ctx):
         """Sender en tilfeldig copypasta fra /r/copypasta"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
 
         reddit = praw.Reddit(client_id=redditId, client_secret=redditSecret, user_agent="MornBot")
         
@@ -57,13 +63,14 @@ class Reddit:
                     break
 
             #   Embed
-            embed = discord.Embed(title=submission.title, url=submission.url, color=0xfaff00)
+            embed = discord.Embed(title=submission.title, url=submission.url, color=0x0085ff)
             redditor = submission.author
             embed.add_field(name=f"Postet av: {redditor}", value=submission.selftext, inline=False)
-            await ctx.send(embed=embed)
+            await statusmsg.edit(embed=embed)
 
         except:
-            await ctx.send("**Kunne ikke hente Reddit post**\nPrøv igjen")
+            embed = discord.Embed(color=0xFF0000, description=f":x: **Kunne ikke hente Reddit post**\n\nPrøv igjen")
+            await statusmsg.edit(embed=embed)
 
 
 def setup(bot):

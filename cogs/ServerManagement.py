@@ -86,10 +86,13 @@ class ServerManagement:
 
             #   Sjekk om loggkanal eksisterer
             if logChannelId == None:
-                await ctx.send("Du har ikke satt en loggkanal enda.")
+                embed = discord.Embed(color=0xFF0000, description=":x: Du har ikke satt en loggkanal enda")
+                await ctx.send(embed=embed)
             else:
                 kanal = self.bot.get_channel(logChannelId)
-                await ctx.send(f"Loggkanalen for denne serveren er {kanal.mention}")
+                embed = discord.Embed(color=0x0085ff)
+                embed.add_field(name="Loggkanal", value=kanal.mention)
+                await ctx.send(embed=embed)
         
 
 def setup(bot):

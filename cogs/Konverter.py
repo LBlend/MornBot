@@ -22,16 +22,20 @@ class Konverter:
 
          #   Sjekk riktig bruk av desimaltegn
         if "," in tall:
-            await ctx.send("Du må bruke `.` istedenfor `,`")
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
+            await ctx.send(embed=embed)
             return
 
         try:
             tempCelcius = round((float(tall) - 32) / 9 * 5, 2)
         except:
-            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help ftc` for hjelp")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help ftc` for hjelp")
+            await ctx.send(embed=embed)
             return
         
-        await ctx.send(f"`{tall} °F` = `{tempCelcius} °C`")
+        embed = discord.Embed(color=0x0085ff)
+        embed.add_field(name="Fahrenheit til Celcius", value=f"`{tall} °F` = `{tempCelcius} °C`")
+        await ctx.send(embed=embed)
     
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -40,17 +44,21 @@ class Konverter:
         """Konverterer temperatur fra celcius til fahrenheit"""
 
         if "," in tall:
-            await ctx.send("Du må bruke `.` istedenfor `,`")
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
+            await ctx.send(embed=embed)
             return
 
         #   Regn ut
         try:
             tempFahrenheit = round((float(tall) * 9) / 5 + 32, 2)
         except:
-            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help ctf` for hjelp")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help ctf` for hjelp")
+            await ctx.send(embed=embed)
             return
-            
-        await ctx.send(f"`{tall} °C` = `{tempFahrenheit} °F`")
+        
+        embed = discord.Embed(color=0x0085ff)
+        embed.add_field(name="Celcius til Fahrenheit", value=f"`{tall} °C` = `{tempFahrenheit} °F`")
+        await ctx.send(embed=embed)
         
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -60,22 +68,28 @@ class Konverter:
 
         #   Sjekk riktig bruk av desimaltegn
         if "," in vekt_kg or "," in høyde_meter:
-            await ctx.send("Du må bruke `.` istedenfor `,`")
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
+            await ctx.send(embed=embed)
             return
 
         #   Regn ut
         try:
             calculatedBMI = round(float(vekt_kg) / float(float(høyde_meter) * float(høyde_meter)), 2)
         except:
-            await ctx.send(f"Noe gikk galt\nSkriv `{prefix}help bmi` for hjelp")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help bmi` for hjelp")
+            await ctx.send(embed=embed)
             return
 
+        embed = discord.Embed(color=0x0085ff)
         if calculatedBMI < 18.5:
-            await ctx.send(f"Du har en BMI på `{calculatedBMI}`\nDette vil si at du er undervektig. Gå og nyt en burger du :)")
+            txt = "Dette vil si at du er undervektig. Gå og nyt en burger du :)"
         elif calculatedBMI > 25:
-            await ctx.send(f"Du har en BMI på `{calculatedBMI}`\nDette vil si at du er overvektig. Få ræva i gir istedenfor å sitte på Discord!")
+            txt = "Dette vil si at du er overvektig. Få ræva i gir istedenfor å sitte på Discord!"
         else:
-            await ctx.send(f"Du har en BMI på `{calculatedBMI}`\nDette er en sunn BMI. Bra Jobba!")
+            txt = "Dette er en sunn BMI. Bra Jobba!"
+        
+        embed.add_field(name="BMI", value=f"`{calculatedBMI}`\n{txt}")
+        await ctx.send(embed=embed)
         
 
 def setup(bot):

@@ -22,6 +22,9 @@ class Misc:
     async def smug(self, ctx):
         """Sender et smug bilde"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/smug").json()
         smug = data["url"]
@@ -29,13 +32,16 @@ class Misc:
         #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.set_image(url=smug)
-        await ctx.send(embed=embed)     
+        await statusmsg.edit(embed=embed)     
 
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["voff", "doggo", "dog", "hund", "bikkje"])
     async def woof(self, ctx):
         """Sender en tilfeldig bissevoff"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
 
         #   Hent data
         woofData = requests.get("https://nekos.life/api/v2/img/woof").json()
@@ -44,7 +50,7 @@ class Misc:
         #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.set_image(url=woof)
-        await ctx.send(embed=embed)
+        await statusmsg.edit(embed=embed)
 
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -103,7 +109,9 @@ class Misc:
     async def reverser(self, ctx, *, tekst):
         """Reverserer tekst"""
 
-        await ctx.send(tekst[::-1])
+        embed = discord.Embed(color=0x0085ff)
+        embed.add_field(name="Reversert tekst", value=tekst[::-1])
+        await ctx.send(embed=embed)
 
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -111,22 +119,32 @@ class Misc:
     async def owo(self, ctx, *setning):
         """Oversetter teksten din til owo"""
 
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
         #   Sjekk for error & Hent data
         try:
             data = requests.get(f"https://nekos.life/api/v2/owoify?text={setning}").json()
 
             owoRaw = str(data["owo"][2:-2])
             owo = owoRaw.replace(",", "").replace("'", "")
-            await ctx.send(owo)
+
+            embed = discord.Embed(color=0x0085ff)
+            embed.add_field(name="OwO", value=owo)
+            await statusmsg.edit(embed=embed)
 
         except:
-            await ctx.send("oopsie whoopsie you made a fucky wucky, no text or text over 200")
+            embed = discord.Embed(color=0xFF0000, description=":x: oopsie whoopsie you made a fucky wucky, no text or text over 200")
+            await statusmsg.edit(embed=embed)
     
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["urban", "meaning", "mening", "betydning", "dictionary", "ordbok"])
     async def urbandictionary(self, ctx, *ord):
         """Sjekk definisjonen av et ord"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
 
         #   Sjekk for error
         try:
@@ -137,7 +155,8 @@ class Misc:
             definitionUrl = data["list"][randomDefinition]["permalink"]
 
         except:
-            await ctx.send(f"Noe gikk galt\nPrøv kanskje et annet ord?\nSkriv `{prefix}help urban` for hjelp")
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help urban` for hjelp")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent restn av data
@@ -159,7 +178,7 @@ class Misc:
         embed.add_field(name="Definisjon", value=definition)
         embed.add_field(name="Eksempel", value=example)
         embed.add_field(name="Vurdering", value=f":thumbsup: {thumbsUp} / :thumbsdown: {thumbsDown}", inline=False)
-        await ctx.send(embed=embed)
+        await statusmsg.edit(embed=embed)
         
 
 def setup(bot):

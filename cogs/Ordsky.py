@@ -19,7 +19,8 @@ class Ordsky:
     async def ordsky(self, ctx, skyform=None):
         """Generer en ordsky"""
 
-        statusmsg = await ctx.send(f"{ctx.message.author.mention}\n**Teller ord:** :hourglass:\n**Generer ordsky:** -")       
+        embed = discord.Embed(description="**Teller ord:** :hourglass:\n**Generer ordsky:** -")
+        statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)
         
         #   Skyform
         if skyform == "ostehøvel":
@@ -32,8 +33,8 @@ class Ordsky:
                 await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
                 filesize = os.path.getsize(f"{ctx.message.author.id}_mask.png")
                 if filesize > 2000000:
-                    await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Stoppet!**")
-                    await ctx.send(f"{ctx.message.author.mention} Filen er for stor. Prøv en fil som er mindre enn 2 MiB")
+                    embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn 2 MiB")
+                    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
                     try:
                         os.remove(f"./{ctx.message.author.id}_mask.png")
                     except:
@@ -41,16 +42,16 @@ class Ordsky:
                     return
                 maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
             except:
-                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Error!**")
-                await ctx.send("Feilet henting av skyform")
+                embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFeilet henting av skyform")
+                await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
                 return
         elif  ctx.message.attachments == [] and skyform != None:
             try:
                 urllib.request.urlretrieve(str(skyform), f"{ctx.message.author.id}_mask.png")
                 filesize = os.path.getsize(f"{ctx.message.author.id}_mask.png")
                 if filesize > 2000000:
-                    await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Stoppet!**")
-                    await ctx.send(f"{ctx.message.author.mention} Filen er for stor. Prøv en fil som er mindre enn 2 MiB")
+                    embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn 2 MiB")
+                    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
                     try:
                         os.remove(f"./{ctx.message.author.id}_mask.png")
                     except:
@@ -58,8 +59,8 @@ class Ordsky:
                     return
                 maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
             except:
-                await statusmsg.edit(content=f"{ctx.message.author.mention}\n:x: **Error!**")
-                await ctx.send("Feilet henting av skyform")
+                embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFeilet henting av skyform")
+                await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
                 return
 
         else:
@@ -77,7 +78,9 @@ class Ordsky:
                 else:
                     pass
 
-        await statusmsg.edit(content=f"{ctx.message.author.mention}\n**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
+        await statusmsg.edit(content=ctx.message.author.mention)
+        embed = discord.Embed(description="**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
+        await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
         #   Ordsky innstillinger
         wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde)
@@ -98,7 +101,7 @@ class Ordsky:
 
         #   Send bilde
         await ctx.send(f":white_check_mark: Generert ordsky for {ctx.message.author.mention}", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
-        
+
         #   Cleanup, sletting
         await statusmsg.delete()
         

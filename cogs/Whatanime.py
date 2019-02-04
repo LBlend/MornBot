@@ -22,8 +22,7 @@ class Whatanime:
         """Finner ut hvilken anime et skjermbilde er tatt fra"""
 
         #   Statusmelding
-        embed = discord.Embed()
-        embed.description = "Finner saus... :mag_right:"
+        embed = discord.Embed(description="Finner saus... :mag_right:")
         statusmsg = await ctx.send(embed=embed)
 
         #   Hent bilde
@@ -33,7 +32,8 @@ class Whatanime:
             try:
                 urllib.request.urlretrieve(str(bilde), f"{ctx.message.author.id}_trace.png")
             except:
-                await ctx.send(f"{ctx.message.author.mention} Henting av bilde feilet")
+                embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
+                await ctx.send(content=ctx.message.author.mention, embed=embed)
                 return
 
         #   Sjekk størrelse, compression
@@ -49,9 +49,8 @@ class Whatanime:
             #   Dobbelsjekk
             newFilesize = os.path.getsize(f"{ctx.message.author.id}_trace.png")
             if newFilesize > 1000000:
-                embed = discord.Embed(color=0xF02B30)
-                embed.description = ":x: Filen er for stor. Prøv med en mindre fil"
-                await statusmsg.edit(embed=embed)
+                embed = discord.Embed(color=0xFF0000, description=":x: Filen er for stor. Prøv med en mindre fil")
+                await ctx.send(content=ctx.message.author.mention, embed=embed)
                 os.remove(f"{ctx.message.author.id}_trace.png")
                 return
 
@@ -93,9 +92,8 @@ class Whatanime:
             await statusmsg.edit(embed=embed)
 
         except:
-            embed = discord.Embed(color=0xF02B30)
-            embed.description = f":x: Fant ingen saus :("
-            await statusmsg.edit(embed=embed)
+            embed = discord.Embed(color=0xFF0000, description=":x: Fant ingen saus :(")
+            await ctx.send(content=ctx.message.author.mention, embed=embed)
 
         #   Cleanup
         os.remove(f"{ctx.message.author.id}_trace.png")
@@ -108,7 +106,9 @@ class Whatanime:
         limit = data["limit"]
         limit_ttl = data["limit_ttl"]
 
-        await ctx.send(f"{limit} requests\n{limit_ttl} sekunder til resettelse")
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Limits", value=f"{limit} requests\n{limit_ttl} sekunder til resettelse")
+        await ctx.send(embed=embed)
 
 
 
