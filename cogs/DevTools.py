@@ -38,7 +38,7 @@ class DevTools:
                 embed = discord.Embed(color=0xF02B30)
                 embed.add_field(name="Name", value=guild.name)
                 embed.add_field(name="ID", value=guild.id)
-                embed.add_field(name="Owner", value=f"<@{guild.owner.id}>")
+                embed.add_field(name="Owner", value=guild.owner.mention)
                 embed.add_field(name="Region", value=guild.region)
                 embed.add_field(name="Creation date", value=guild.created_at)
                 embed.add_field(name=f"Channels ({len(guild.channels)})", value=[channel.name for channel in guild.channels], inline=False)
@@ -132,8 +132,7 @@ class DevTools:
     async def publicip(self, ctx):
         """inb4 lekker ip-en min"""
 
-        dataUrl = f"https://wtfismyip.com/json"
-        data = requests.get(dataUrl).json()
+        data = requests.get("https://wtfismyip.com/json").json()
 
         ip = data["YourFuckingIPAddress"]
         location = data["YourFuckingLocation"]

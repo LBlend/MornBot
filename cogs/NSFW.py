@@ -20,13 +20,11 @@ class NSFW:
             return
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/hololewd"
-        data = requests.get(apiUrl).json()
+        data = requests.get("https://nekos.life/api/v2/img/hololewd").json()
         hololewd = data["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = "Holo"
         embed.set_image(url=hololewd)
         await ctx.send(embed=embed)
 
@@ -42,13 +40,11 @@ class NSFW:
             return
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/holoero"
-        data = requests.get(apiUrl).json()
+        data = requests.get("https://nekos.life/api/v2/img/holoero").json()
         holoero = data["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = "Holo"
         embed.set_image(url=holoero)
         await ctx.send(embed=embed)
 

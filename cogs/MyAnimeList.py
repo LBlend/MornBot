@@ -22,8 +22,7 @@ class MyAnimeList:
 
         #   Sjekk for error & Hent data
         try:
-            apiUrl = f"https://api.jikan.moe/v3/user/{bruker}"
-            data = requests.get(apiUrl).json()
+            data = requests.get(f"https://api.jikan.moe/v3/user/{bruker}").json()
 
             profilepic = data["image_url"]
 

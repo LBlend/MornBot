@@ -69,7 +69,7 @@ class Info:
         #   Embed
         embed = discord.Embed(color=0xF02B30, url=website)
         embed.add_field(name="Navn", value=self.bot.user.name)
-        embed.add_field(name="Dev", value=f"<@{dev.id}>\n({dev.name}#{dev.discriminator})")
+        embed.add_field(name="Dev", value=f"{dev.mention}\n({dev.name}#{dev.discriminator})")
         embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m {seconds}s")
         embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
         embed.add_field(name="Servere", value=len(self.bot.guilds))
@@ -165,7 +165,7 @@ class Info:
         #   Embed
         embed = discord.Embed(color=0x0085ff, url=guild.icon_url)
         embed.add_field(name="ID", value=guild.id)
-        embed.add_field(name="Eier", value=f"<@{guild.owner.id}>")
+        embed.add_field(name="Eier", value=guild.owner.mention)
         embed.add_field(name="Region", value=f"{flag} {guild.region}")
         embed.add_field(name="Server lagd", value=f"{guild_created}\n{since_created} dag(er) siden")
         embed.add_field(name=f"Kanaler ({totalChannels})", value=f"Tekst: {textChannels}\nTale: {voiceChannels}")

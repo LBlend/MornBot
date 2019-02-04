@@ -21,13 +21,12 @@ class Interaksjon:
             return
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/pat"
-        data = requests.get(apiUrl).json()
+        data = requests.get("https://nekos.life/api/v2/img/pat").json()
         patGif = data["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = f"<@{ctx.message.author.id}> klappet <@{bruker.id}>"
+        embed.description = f"{ctx.message.author.mention} klappet {bruker.mention}"
         embed.set_image(url=patGif)
         await ctx.send(embed=embed)
 
@@ -43,13 +42,12 @@ class Interaksjon:
             return
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/hug"
-        data = requests.get(apiUrl).json()
+        data = requests.get("https://nekos.life/api/v2/img/hug").json()
         hugGif = data["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = f"<@{ctx.message.author.id}> ga <@{bruker.id}> en klem"
+        embed.description = f"{ctx.message.author.mention} ga {bruker.mention} en klem"
         embed.set_image(url=hugGif)
         await ctx.send(embed=embed)
 
@@ -65,13 +63,12 @@ class Interaksjon:
             return
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/cuddle"
-        data = requests.get(apiUrl).json()
+        data = requests.get("https://nekos.life/api/v2/img/cuddle").json()
         cuddleGif = data["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = f"<@{ctx.message.author.id}> ga <@{bruker.id}> en klem"
+        embed.description = f"{ctx.message.author.mention} ga {bruker.mention} en klem"
         embed.set_image(url=cuddleGif)
         await ctx.send(embed=embed)
 
@@ -93,7 +90,7 @@ class Interaksjon:
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = f"<@{ctx.message.author.id}> poket <@{bruker.id}>"
+        embed.description = f"{ctx.message.author.mention} poket {bruker.mention}"
         embed.set_image(url=pokeGif)
         await ctx.send(embed=embed)
 

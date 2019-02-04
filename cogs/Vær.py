@@ -21,8 +21,6 @@ class Vær:
     async def vær(self, ctx, *, by):
         """Viser været i en valgt by"""
 
-        user = ctx.message.author
-
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
@@ -30,8 +28,7 @@ class Vær:
 
             #   Sjekk for error
             try:
-                dataUrl = f"http://api.openweathermap.org/data/2.5/weather?appid={openweathermapApiKey}&q={by}"
-                data = requests.get(dataUrl).json()
+                data = requests.get(f"http://api.openweathermap.org/data/2.5/weather?appid={openweathermapApiKey}&q={by}").json()
 
                 byId = str(data["id"])
 
@@ -61,7 +58,7 @@ class Vær:
             embed.add_field(name="Skyer", value=f"{cloudiness}%")
             embed.add_field(name="Soloppgang (Norsk tid)", value=sunrise)
             embed.add_field(name="Solnedgang (Norsk tid)", value=sunset)
-            embed.set_author(name=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
+            embed.set_author(name=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
             await ctx.send(embed=embed)
 
 

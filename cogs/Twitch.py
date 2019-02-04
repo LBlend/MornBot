@@ -20,8 +20,6 @@ class Twitch:
     async def twitch(self, ctx, bruker):
         """Viser informasjon om en Twitch-bruker"""
 
-        user = ctx.message.author
-
         #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
@@ -29,12 +27,9 @@ class Twitch:
 
             #   Sjekk for error
             try:
-                userDataUrl = f"https://api.twitch.tv/kraken/users/{bruker}?client_id={twitchApiKey}"
-                followDataUrl = f"https://api.twitch.tv/kraken/channels/{bruker}/follows?client_id={twitchApiKey}"
-                streamDataUrl = f"https://api.twitch.tv/kraken/streams/{bruker}?client_id={twitchApiKey}"
-                userData = requests.get(userDataUrl).json()
-                followData = requests.get(followDataUrl).json()
-                streamData = requests.get(streamDataUrl).json()
+                userData = requests.get(f"https://api.twitch.tv/kraken/users/{bruker}?client_id={twitchApiKey}").json()
+                followData = requests.get(f"https://api.twitch.tv/kraken/channels/{bruker}/follows?client_id={twitchApiKey}").json()
+                streamData = requests.get(f"https://api.twitch.tv/kraken/streams/{bruker}?client_id={twitchApiKey}").json()
 
                 profilePic = userData["logo"]
             except:
@@ -57,7 +52,7 @@ class Twitch:
             embed.add_field(name="Følgere", value=str(followers))
             embed.add_field(name="Bruker lagd", value=creationDateFormatted)
             embed.set_author(name="Twitch", icon_url="http://www.gamergiving.org/wp-content/uploads/2016/03/twitch11.png")
-            embed.set_footer(text=f"{user.name}#{user.discriminator}", icon_url=user.avatar_url)
+            embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
 
             #   Sjekk om bruker sender direkte
             try:

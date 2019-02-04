@@ -41,8 +41,7 @@ class osu:
 
         #   Sjekk for error
         try:
-            dataurl = f"https://osu.ppy.sh/api/get_user?u={osuUser}&m={gamemode}&k={osuApiKey}"
-            data = requests.get(dataurl).json()
+            data = requests.get(f"https://osu.ppy.sh/api/get_user?u={osuUser}&m={gamemode}&k={osuApiKey}").json()
 
             userId = data[0]["user_id"]
 

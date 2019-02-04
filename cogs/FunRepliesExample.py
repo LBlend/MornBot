@@ -14,10 +14,10 @@ class FunReplies:
             await message.channel.send("Morn")
 
         elif message.content.lower().startswith("no u"):
-            await message.channel.send(f"no u <@{message.author.id}>")
+            await message.channel.send(f"no u {message.author.mention}")
 
         elif message.content.lower() == "nei du":
-            await message.channel.send(f"nei du <@{message.author.id}>")
+            await message.channel.send(f"nei du {message.author.mention}")
 
 def setup(bot):
     n = FunReplies(bot)

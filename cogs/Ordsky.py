@@ -97,7 +97,7 @@ class Ordsky:
         wc.to_file(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
 
         #   Send bilde
-        await ctx.send(f":white_check_mark: Generert ordsky for <@{ctx.message.author.id}>", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
+        await ctx.send(f":white_check_mark: Generert ordsky for {ctx.message.author.mention}", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
         
         #   Cleanup, sletting
         await statusmsg.delete()

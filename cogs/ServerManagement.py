@@ -20,7 +20,7 @@ class ServerManagement:
         """Kaster ut en bruker fra serveren"""
 
         await bruker.kick()
-        await ctx.send(f"<@{bruker.id}> ble kastet ut av serveren")
+        await ctx.send(f"<@{bruker.id}> ({bruker.name}#{bruker.discriminator}) ble kastet ut av serveren")
 
 
     @commands.guild_only()
@@ -32,7 +32,7 @@ class ServerManagement:
 
         #   Utfør
         await bruker.ban()
-        await ctx.send(f"<@{bruker.id}> ble utestengt fra serveren")
+        await ctx.send(f"<@{bruker.id}> ({bruker.name}#{bruker.discriminator}) ble utestengt fra serveren")
 
 
     @commands.has_permissions(manage_messages=True)
@@ -70,7 +70,7 @@ class ServerManagement:
                 f.seek(0)
                 f.write(json.dumps(serverdata))                
 
-        await ctx.send(f"Loggkanal satt til <#{str(kanal.id)}>")
+        await ctx.send(f"Loggkanal satt til {kanal.mention}")
 
 
     @commands.guild_only()
@@ -88,7 +88,8 @@ class ServerManagement:
             if logChannelId == None:
                 await ctx.send("Du har ikke satt en loggkanal enda.")
             else:
-                await ctx.send(f"Loggkanalen for denne serveren er <#{str(logChannelId)}>")
+                kanal = self.bot.get_channel(logChannelId)
+                await ctx.send(f"Loggkanalen for denne serveren er {kanal.mention}")
         
 
 def setup(bot):

@@ -23,13 +23,11 @@ class Misc:
         """Sender et smug bilde"""
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/smug"
-        data = requests.get(apiUrl).json()
+        data = requests.get("https://nekos.life/api/v2/img/smug").json()
         smug = data["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = "Smug"
         embed.set_image(url=smug)
         await ctx.send(embed=embed)     
 
@@ -40,13 +38,11 @@ class Misc:
         """Sender en tilfeldig bissevoff"""
 
         #   Hent data
-        apiUrl = "https://nekos.life/api/v2/img/woof"
-        woofData = requests.get(apiUrl).json()
+        woofData = requests.get("https://nekos.life/api/v2/img/woof").json()
         woof = woofData["url"]
 
         #   Embed
         embed = discord.Embed(color=0x0085ff)
-        embed.description = "Voff"
         embed.set_image(url=woof)
         await ctx.send(embed=embed)
 
@@ -94,6 +90,10 @@ class Misc:
     async def ball8(self, ctx, *args):
         """Svarer på dine dypeste spørsmål"""
 
+        if not "?" in ctx.message.content:
+            await ctx.send("Du må stille meg et spørsmål da dømdøm!")
+            return
+
         answers = ["Det er sannsynlig", "Uten tvil", "Ja", "Man kan vel si det ja", "Ehm, tror det er best vi ikke snakker om det jeg :sweat_smile:", "нет", "Nei ass", "Er ikke så sannsynlig", "I følge mine beregninger... nei"]
         await ctx.send(random.choice(answers))
 
@@ -113,8 +113,7 @@ class Misc:
 
         #   Sjekk for error & Hent data
         try:
-            owoApi = f"https://nekos.life/api/v2/owoify?text={setning}"
-            data = requests.get(owoApi).json()
+            data = requests.get(f"https://nekos.life/api/v2/owoify?text={setning}").json()
 
             owoRaw = str(data["owo"][2:-2])
             owo = owoRaw.replace(",", "").replace("'", "")
@@ -131,8 +130,7 @@ class Misc:
 
         #   Sjekk for error
         try:
-            dataUrl = f"https://api.urbandictionary.com/v0/define?term={ord}"
-            data = requests.get(dataUrl).json()
+            data = requests.get(f"https://api.urbandictionary.com/v0/define?term={ord}").json()
 
             randomDefinition = random.randint(0, 8)
 
