@@ -34,6 +34,7 @@ class Whatanime:
             except:
                 embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
                 await ctx.send(content=ctx.message.author.mention, embed=embed)
+                await statusmsg.delete()
                 return
 
         #   Sjekk størrelse, compression
@@ -51,15 +52,32 @@ class Whatanime:
             if newFilesize > 1000000:
                 embed = discord.Embed(color=0xFF0000, description=":x: Filen er for stor. Prøv med en mindre fil")
                 await ctx.send(content=ctx.message.author.mention, embed=embed)
+                await statusmsg.delete()
                 os.remove(f"{ctx.message.author.id}_trace.png")
                 return
 
         #   POST
         with open(f"{ctx.message.author.id}_trace.png", "rb") as f:
             base = base64.standard_b64encode(f.read())
-            data = requests.post("https://trace.moe/api/search", data={'image': base}).json()    
+            try:
+                data = requests.post("https://trace.moe/api/search", data={'image': base}).json()
+            except:
+                embed = discord.Embed(color=0xFF0000, description=":x: Error!\n\nEn fiks for dette er på vei. I mellomtiden, prøv å sende bilde via en annen link eller i et annet filformat")
+                await ctx.send(content=ctx.message.author.mention, embed=embed)
+                await statusmsg.delete()
+                os.remove(f"{ctx.message.author.id}_trace.png")
+                return
 
-        #   Hent data
+        #   Sjekk likhet
+        similarity = data["docs"][0]["similarity"]
+        if similarity < 0.85:
+            embed = discord.Embed(color=0xF1C40F, description=":exclamation: Saus ble funnet, men grunnet lav likhetsprosent, er det høy sannsynlighet for at dette ikke er riktig saus. Vennligst prøv et annet bilde")
+            await ctx.send(content=ctx.message.author.mention, embed=embed)
+            await statusmsg.delete()
+            os.remove(f"{ctx.message.author.id}_trace.png")
+            return
+
+        #   Hent resten av data
         anilistId = data["docs"][0]["anilist_id"]
         malId = data["docs"][0]["mal_id"]
         romajiTitle = data["docs"][0]["title_romaji"]
@@ -67,7 +85,6 @@ class Whatanime:
         englishTitle = data["docs"][0]["title_english"]
         episode = data["docs"][0]["episode"]
         time = int(data["docs"][0]["at"])
-        similarity = data["docs"][0]["similarity"]
 
         malData = requests.get(f"https://api.jikan.moe/v3/anime/{malId}/pictures").json()
         thumbnail = malData["pictures"][0]["small"]
@@ -89,11 +106,13 @@ class Whatanime:
             embed.add_field(name="Likhet %", value=f"{similarity_percent}%")
             embed.add_field(name="Lenker", value=f"[MAL](https://myanimelist.net/anime/{malId}) | [Anilist](https://anilist.co/anime/{anilistId})")
 
-            await statusmsg.edit(embed=embed)
+            await ctx.send(content=ctx.message.author.mention, embed=embed)
+            await statusmsg.delete()
 
         except:
             embed = discord.Embed(color=0xFF0000, description=":x: Fant ingen saus :(")
             await ctx.send(content=ctx.message.author.mention, embed=embed)
+            await statusmsg.delete()
 
         #   Cleanup
         os.remove(f"{ctx.message.author.id}_trace.png")
