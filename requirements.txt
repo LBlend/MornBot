@@ -3,6 +3,6 @@ asyncio
 requests
 praw
 psutil
-pathlib
 wordcloud
 matplotlib
+pillow
