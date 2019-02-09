@@ -149,10 +149,7 @@ class Misc:
         #   Sjekk for error
         try:
             data = requests.get(f"https://api.urbandictionary.com/v0/define?term={ord}").json()
-
-            randomDefinition = random.randint(0, 8)
-
-            definitionUrl = data["list"][randomDefinition]["permalink"]
+            definitionUrl = data["list"][0]["permalink"]
 
         except:
             embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help urban` for hjelp")
@@ -160,16 +157,16 @@ class Misc:
             return
 
         #   Hent restn av data
-        word = data["list"][randomDefinition]["word"]
-        submitter = data["list"][randomDefinition]["author"]
+        word = data["list"][0]["word"]
+        submitter = data["list"][0]["author"]
 
-        de = data["list"][randomDefinition]["definition"]
+        de = data["list"][0]["definition"]
         definition = de.replace("[", "").replace("]", "").replace(";", "")
-        ex = data["list"][randomDefinition]["example"]
+        ex = data["list"][0]["example"]
         example = ex.replace("[", "").replace("]", "").replace(";", "")
 
-        thumbsUp = data["list"][randomDefinition]["thumbs_up"]
-        thumbsDown = data["list"][randomDefinition]["thumbs_down"]
+        thumbsUp = data["list"][0]["thumbs_up"]
+        thumbsDown = data["list"][0]["thumbs_down"]
         
         #   Embed
         embed = discord.Embed(title=word, color=0x0085ff, url=definitionUrl, description= f"**Definert av:** {submitter}")
