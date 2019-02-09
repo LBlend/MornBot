@@ -6,9 +6,19 @@ import codecs
 import json
 import requests
 
+
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
+    osuApiKey = config["osuApiKey"]
+
+gamemodes = {
+    "standard": "0",
+    "taiko": "1",
+    "ctb": "2",
+    "mania": "3"
+}
+
 
 class osu:
     def __init__(self, bot):
@@ -23,21 +33,11 @@ class osu:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent API key
-        with codecs.open("config.json", "r", encoding="utf8") as f:
-            config = json.load(f)
-            osuApiKey = config["osuApiKey"]
-
-        gamemodes = {
-            "standard": "0",
-            "taiko": "1",
-            "ctb": "2",
-            "mania": "3"
-        }
-
         #   Sjekk om gyldig gamemode
         if gamemode in gamemodes:
             gamemode = gamemodes[gamemode]
+        else:
+            gamemode = "0"
 
         #   Velg bruker
         osuUser = bruker
