@@ -159,9 +159,9 @@ class Ordsky:
 
         #   Søk etter ord
         """NEEDS TO BE REWRITTEN. TEMPORARY SOLUTION"""
-        userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt")
+        userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.server.id}.txt")
         if userMessages.is_file() == False:
-            with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt", "a+") as f:
+            with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.server.id}.txt", "a+") as f:
                 for channel in ctx.message.guild.text_channels:
                     async for message in channel.history(limit=4000):
                         if message.author.id == ctx.message.author.id:
@@ -173,7 +173,7 @@ class Ordsky:
                             pass
 
         else:
-            with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt", "a+") as f:
+            with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.server.id}.txt", "a+") as f:
                 for channel in ctx.message.guild.text_channels:
                     async for message in channel.history(limit=300):
                         if message.author.id == ctx.message.author.id:
@@ -184,7 +184,7 @@ class Ordsky:
                         else:
                             pass
 
-        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt").read()
+        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.server.id}.txt").read()
 
         await statusmsg.edit(content=ctx.message.author.mention)
         embed = discord.Embed(description="**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
@@ -215,6 +215,10 @@ class Ordsky:
         
         try:
             os.remove(f"./{ctx.message.author.id}_mask.png")
+        except:
+            pass
+        try:
+            os.remove(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
         except:
             pass
 
