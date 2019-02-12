@@ -86,7 +86,7 @@ class Misc:
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def roll(self, ctx, *args):
-        """Gir deg et tilfeldig talln"""
+        """Gir deg et tilfeldig tall"""
 
         await ctx.send(str(random.randint(0, 100)))
 
