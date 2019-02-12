@@ -20,7 +20,8 @@ class Interaksjon:
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
-            await statusmsg.edit(content="Jeg vet du er ensom, men du kan ikke klapppe deg selv")
+            embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke klappe deg selv")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent data
@@ -44,7 +45,8 @@ class Interaksjon:
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
-            await statusmsg.edit(content="Jeg vet du er ensom, men du kan ikke klemme deg selv")
+            embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke klemme deg selv")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent data
@@ -68,7 +70,8 @@ class Interaksjon:
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
-            await statusmsg.edit(content="Jeg vet du er ensom, men du kan ikke kose med deg selv")
+            embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke kose med deg selv")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent data
@@ -92,7 +95,8 @@ class Interaksjon:
 
         #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
-            await statusmsg.edit(content="Jeg vet du er ensom, men du kan ikke poke deg selv")
+            embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke poke deg selv")
+            await statusmsg.edit(embed=embed)
             return
 
         #   Hent data
