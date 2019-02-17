@@ -91,6 +91,25 @@ class DevTools:
 
     @commands.is_owner()
     @commands.command()
+    async def unload(self, ctx, cog):
+        try:
+            for file in os.listdir("cogs"):
+                if file.endswith(".py"):
+                    name = file[:-3]
+                    if name == cog:
+                        try:
+                            self.bot.unload_extension(f"cogs.{name}")
+                        except:
+                            pass
+                        embed = discord.Embed(color=0xE67E22, description=f"{cog} har blitt unloadet! :ok_hand:")
+                        await ctx.send(embed=embed)
+        except:
+            embed = discord.Embed(color=0xFF0000, description=f":x: {cog} er ikke en cog")
+            await ctx.send(embed=embed)
+
+
+    @commands.is_owner()
+    @commands.command()
     async def reload(self, ctx, cog):
         try:
             for file in os.listdir("cogs"):
