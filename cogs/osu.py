@@ -27,7 +27,7 @@ class osu:
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=["osustats", "osuuser", "osuprofile"])
-    async def osuprofil(self, ctx, gamemode, bruker):
+    async def osuprofil(self, ctx, bruker, gamemode=None):
         """Viser info om en osu! profil"""
 
         embed = discord.Embed(description="Laster...")
