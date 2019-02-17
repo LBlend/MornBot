@@ -15,7 +15,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     prefix = config["prefix"]
     presence = config["presence"]
 
-bot = commands.Bot(command_prefix=prefix, prefix=prefix, case_insensitive=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), prefix=prefix, case_insensitive=True)
 
 for file in os.listdir("cogs"):
     if file.endswith(".py"):
