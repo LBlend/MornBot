@@ -52,6 +52,29 @@ class Misc:
         embed.set_image(url=woof)
         await statusmsg.edit(embed=embed)
 
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=["bakgrunn"])
+    async def wallpaper(self, ctx):
+        """Sender et tilfeldig bakgrunnsbilde (NSFW)"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
+        #   Sjekk NSFW
+        if not ctx.channel.is_nsfw():
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
+            await statusmsg.edit(embed=embed)
+            return
+
+        #   Hent data
+        data = requests.get("https://nekos.life/api/v2/img/wallpaper").json()
+        wallpaper = data["url"]
+
+        #   Embed
+        embed = discord.Embed(color=0x0085ff)
+        embed.set_image(url=wallpaper)
+        await statusmsg.edit(embed=embed)
+
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["kukstørrelse", "pikkstørrelse"])
