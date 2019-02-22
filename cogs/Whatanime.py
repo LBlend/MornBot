@@ -92,7 +92,7 @@ class Whatanime:
             try:
                 data = requests.post("https://trace.moe/api/search", data={'image': base}).json()
             except:
-                embed = discord.Embed(color=0xFF0000, description=":x: Error!\n\nEn fiks for dette er på vei. I mellomtiden, prøv å sende bilde via en annen link eller i et annet filformat")
+                embed = discord.Embed(color=0xF1C40F, description=":exclamation: Ingen saus ble funnet")
                 await ctx.send(content=ctx.message.author.mention, embed=embed)
                 await statusmsg.delete()
                 os.remove(f"./assets/{ctx.message.author.id}_trace.png")
