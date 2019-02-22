@@ -6,15 +6,24 @@ import codecs
 import json
 from pathlib import Path
 import os
-import urllib.request
+import urllib
+import requests
 from PIL import Image
 import numpy as np
 from wordcloud import WordCloud, ImageColorGenerator
 
-
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
+
+async def fileFetchFail(ctx, statusmsg):
+    embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
+    await ctx.send(content=ctx.message.author.mention, embed=embed)
+    await statusmsg.delete()
+
+async def fileTooBig(ctx, statusmsg, fileSize):
+    embed = discord.Embed(color=0xFF0000, description=f":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn {fileSize}")
+    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
 
 class Ordsky:
@@ -43,6 +52,7 @@ class Ordsky:
         
         embed = discord.Embed(color=0x0085ff, description=f":white_check_mark: Samtykke registrert!")
         await ctx.send(embed=embed)
+
 
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command(aliases=["ingensamtykke", "noconsent"])
@@ -87,9 +97,10 @@ class Ordsky:
 
     @commands.cooldown(1, 150, commands.BucketType.user)
     @commands.command(aliases=["wordcloud", "wc", "sky"])
-    async def ordsky(self, ctx, skyform=None):
+    async def ordsky(self, ctx, bilde=None):
         """Generer en ordsky"""
 
+        #   Sjekk samtykke
         userDataFile = Path(f"./assets/userdata/{ctx.message.author.id}.json")
         if userDataFile.is_file() == False:
             with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "w") as f:
@@ -105,52 +116,48 @@ class Ordsky:
             self.bot.get_command("ordsky").reset_cooldown(ctx)
             return
 
-
+        #   Statusmelding
         embed = discord.Embed(description="**Teller ord:** :hourglass:\n**Generer ordsky:** -")
-        statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)
-        
-        #   Skyform
-        if skyform == "ostehøvel":
+        statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)  
+
+        #   Hent bilde
+        if bilde == "ostehøvel":
             maskbilde = np.array(Image.open("./assets/ordsky/mask/ostmask.png"))
-        elif skyform == "laugh":
+        elif bilde == "laugh":
             maskbilde = np.array(Image.open("./assets/ordsky/mask/laughmask.png"))
 
-        elif ctx.message.attachments != [] and skyform == None:
-            try:
-                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
-                filesize = os.path.getsize(f"{ctx.message.author.id}_mask.png")
-                if filesize > 2000000:
-                    embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn 2 MiB")
-                    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-                    try:
-                        os.remove(f"./{ctx.message.author.id}_mask.png")
-                    except:
-                        pass
-                    self.bot.get_command("ordsky").reset_cooldown(ctx)
-                    return
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFeilet henting av skyform")
-                await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+        elif ctx.message.attachments != [] and bilde == None:
+            if ctx.message.attachments[0].size() > 2000000:
+                await fileTooBig(ctx, statusmsg, fileSize="2 MiB")
                 self.bot.get_command("ordsky").reset_cooldown(ctx)
                 return
-        elif  ctx.message.attachments == [] and skyform != None:
             try:
-                urllib.request.urlretrieve(str(skyform), f"{ctx.message.author.id}_mask.png")
-                filesize = os.path.getsize(f"{ctx.message.author.id}_mask.png")
-                if filesize > 2000000:
-                    embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn 2 MiB")
-                    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-                    try:
-                        os.remove(f"./{ctx.message.author.id}_mask.png")
-                    except:
-                        pass
-                    self.bot.get_command("ordsky").reset_cooldown(ctx)
-                    return
+                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
                 maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
             except:
-                embed = discord.Embed(color=0xFF0000, description=":x: **Stoppet!**\n\nFeilet henting av skyform")
-                await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+                await fileFetchFail(ctx, statusmsg)
+                self.bot.get_command("ordsky").reset_cooldown(ctx)
+                return
+
+        elif ctx.message.attachments == [] and bilde != None:
+            try:
+                linkedFile = requests.get(str(bilde))
+                linkedFileSize = len(linkedFile.content)
+            except:
+                await fileFetchFail(ctx, statusmsg)
+                self.bot.get_command("ordsky").reset_cooldown(ctx)
+                return               
+
+            if linkedFileSize > 2000000:
+                await fileTooBig(ctx, statusmsg, fileSize="2 MiB")
+                self.bot.get_command("ordsky").reset_cooldown(ctx)
+                return
+
+            try:
+                urllib.request.urlretrieve(str(bilde), f"{ctx.message.author.id}_mask.png")
+                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
+            except:
+                await fileFetchFail(ctx, statusmsg)
                 self.bot.get_command("ordsky").reset_cooldown(ctx)
                 return
 
@@ -197,10 +204,10 @@ class Ordsky:
         wc.generate(text)
 
         #   Fargelegg
-        if  ctx.message.attachments != [] or skyform == "laugh":
+        if  ctx.message.attachments != [] or bilde == "laugh":
             image_colors = ImageColorGenerator(maskbilde)
             wc.recolor(color_func=image_colors)
-        elif ctx.message.attachments == [] and skyform != None:
+        elif ctx.message.attachments == [] and bilde != None:
             image_colors = ImageColorGenerator(maskbilde)
             wc.recolor(color_func=image_colors)
 

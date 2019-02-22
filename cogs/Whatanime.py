@@ -10,11 +10,22 @@ from datetime import timedelta
 import PIL
 from PIL import Image
 
+async def fileFetchFail(ctx, statusmsg):
+    embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
+    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+
+async def fileTooBig(ctx, statusmsg, fileSize):
+    embed = discord.Embed(color=0xFF0000, description=f":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre")
+    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+
+async def noFile(ctx, statusmsg):
+    embed = discord.Embed(color=0xF1C40F, description=f":exclamation: Du må gi meg et bilde")
+    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+
 
 class Whatanime:
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.command(aliases=["anime", "ani", "source", "saus", "sauce"])
@@ -26,38 +37,57 @@ class Whatanime:
         statusmsg = await ctx.send(embed=embed)
 
         #   Hent bilde
-        if ctx.message.attachments != []:
-            await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_trace.png")
-        else:
+        if ctx.message.attachments != [] and bilde == None:
+            if ctx.message.attachments[0].size > 8000000:
+                await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
+                return
             try:
-                urllib.request.urlretrieve(str(bilde), f"{ctx.message.author.id}_trace.png")
+                await ctx.message.attachments[0].save(fp=f"./assets/{ctx.message.author.id}_trace.png")
             except:
-                embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
-                await ctx.send(content=ctx.message.author.mention, embed=embed)
-                await statusmsg.delete()
+                await fileFetchFail(ctx, statusmsg)
+                return
+        
+        elif ctx.message.attachments == [] and bilde != None:
+            try:
+                linkedFile = requests.get(str(bilde))
+                linkedFileSize = len(linkedFile.content)
+            except:
+                await fileFetchFail(ctx, statusmsg)
                 return
 
+            if linkedFileSize > 8000000:
+                await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
+                return
+
+            try:
+                urllib.request.urlretrieve(str(bilde), f"./assets/{ctx.message.author.id}_trace.png")
+            except:
+                await fileFetchFail(ctx, statusmsg)
+                return
+
+        else:
+            await noFile(ctx, statusmsg)
+            return
+
         #   Sjekk størrelse, compression
-        filesize = os.path.getsize(f"{ctx.message.author.id}_trace.png")
+        filesize = os.path.getsize(f"./assets/{ctx.message.author.id}_trace.png")
         if filesize > 1000000:
             basewidth = 300
-            img = Image.open(f"{ctx.message.author.id}_trace.png")
+            img = Image.open(f"./assets/{ctx.message.author.id}_trace.png")
             wpercent = (basewidth / float(img.size[0]))
             hsize = int((float(img.size[1]) * float(wpercent)))
             img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-            img.save(f"{ctx.message.author.id}_trace.png")
+            img.save(f"./assets/{ctx.message.author.id}_trace.png")
 
             #   Dobbelsjekk
-            newFilesize = os.path.getsize(f"{ctx.message.author.id}_trace.png")
+            newFilesize = os.path.getsize(f"./assets/{ctx.message.author.id}_trace.png")
             if newFilesize > 1000000:
-                embed = discord.Embed(color=0xFF0000, description=":x: Filen er for stor. Prøv med en mindre fil")
-                await ctx.send(content=ctx.message.author.mention, embed=embed)
-                await statusmsg.delete()
-                os.remove(f"{ctx.message.author.id}_trace.png")
+                await fileTooBig(ctx, statusmsg, fileSize=None)
+                os.remove(f"./assets/{ctx.message.author.id}_trace.png")
                 return
 
         #   POST
-        with open(f"{ctx.message.author.id}_trace.png", "rb") as f:
+        with open(f"./assets/{ctx.message.author.id}_trace.png", "rb") as f:
             base = base64.standard_b64encode(f.read())
             try:
                 data = requests.post("https://trace.moe/api/search", data={'image': base}).json()
@@ -65,7 +95,7 @@ class Whatanime:
                 embed = discord.Embed(color=0xFF0000, description=":x: Error!\n\nEn fiks for dette er på vei. I mellomtiden, prøv å sende bilde via en annen link eller i et annet filformat")
                 await ctx.send(content=ctx.message.author.mention, embed=embed)
                 await statusmsg.delete()
-                os.remove(f"{ctx.message.author.id}_trace.png")
+                os.remove(f"./assets/{ctx.message.author.id}_trace.png")
                 return
 
         #   Sjekk likhet
@@ -74,7 +104,7 @@ class Whatanime:
             embed = discord.Embed(color=0xF1C40F, description=":exclamation: Saus ble funnet, men grunnet lav likhetsprosent, er det høy sannsynlighet for at dette ikke er riktig saus. Vennligst prøv et annet bilde")
             await ctx.send(content=ctx.message.author.mention, embed=embed)
             await statusmsg.delete()
-            os.remove(f"{ctx.message.author.id}_trace.png")
+            os.remove(f"./assets/{ctx.message.author.id}_trace.png")
             return
 
         #   Hent resten av data
@@ -115,7 +145,7 @@ class Whatanime:
             await statusmsg.delete()
 
         #   Cleanup
-        os.remove(f"{ctx.message.author.id}_trace.png")
+        os.remove(f"./assets/{ctx.message.author.id}_trace.png")
 
 
     @commands.is_owner()
