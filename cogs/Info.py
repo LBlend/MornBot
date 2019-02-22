@@ -7,6 +7,7 @@ import json
 import datetime
 import time
 import platform
+import os
 import psutil
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
@@ -40,8 +41,9 @@ class Info:
         minutes, seconds = divmod(remainder, 60)
 
         #   Ressursforbruk
-        cpuPer = round(psutil.cpu_percent(),1)
-        mem = round((psutil.virtual_memory().used / 1000000),1)
+        process = psutil.Process(os.getpid())
+        mem = round(process.memory_info().rss / 1000000, 1)
+        cpuPer = process.cpu_percent()
 
         #   Medlemstall
         totalmembers = []
