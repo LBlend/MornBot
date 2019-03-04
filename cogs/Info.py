@@ -70,12 +70,10 @@ class Info:
 
         #   Embed
         embed = discord.Embed(color=0xE67E22, url=website)
-        embed.add_field(name="Navn", value=self.bot.user.name)
         embed.add_field(name="Dev", value=f"{dev.mention}\n({dev.name}#{dev.discriminator})")
         embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m {seconds}s")
         embed.add_field(name="Ping", value=f"{int(self.bot.latency * 1000)}ms")
         embed.add_field(name="Servere", value=len(self.bot.guilds))
-        embed.add_field(name="Bot Versjon", value="1.0.2 Rewrite")
         embed.add_field(name="Discord.py Versjon", value=discord.__version__)
         embed.add_field(name="Python Versjon", value=platform.python_version())
         embed.add_field(name="Maskin", value=f"{platform.version()[4:11]}\n{platform.system()} {platform.release()}")
