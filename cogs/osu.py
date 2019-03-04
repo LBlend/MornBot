@@ -5,6 +5,7 @@ from discord.ext import commands
 import codecs
 import json
 import requests
+import urllib.parse
 
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
@@ -44,7 +45,8 @@ class osu:
 
         #   Sjekk for error
         try:
-            data = requests.get(f"https://osu.ppy.sh/api/get_user?u={osuUser}&m={gamemode}&k={osuApiKey}").json()
+            url = "https://osu.ppy.sh/api/get_user?" + urllib.parse.urlencode({"u": osuUser, "m": gamemode, "k": osuApiKey})
+            data = requests.get(url).json()
 
             userId = data[0]["user_id"]
 

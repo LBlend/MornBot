@@ -6,6 +6,7 @@ import codecs
 import json
 import requests
 import datetime
+import urllib.parse
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
@@ -31,7 +32,8 @@ class Vær:
 
             #   Sjekk for error
             try:
-                data = requests.get(f"http://api.openweathermap.org/data/2.5/weather?appid={openweathermapApiKey}&q={by}").json()
+                url = "http://api.openweathermap.org/data/2.5/weather?" + urllib.parse.urlencode({"appid": openweathermapApiKey, "q": by})
+                data = requests.get(url).json()
 
                 byId = str(data["id"])
 
