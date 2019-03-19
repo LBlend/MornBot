@@ -55,13 +55,13 @@ class MyAnimeList:
             vurdering = data["anime_stats"]["mean_score"]
 
             #   Embed
-            embed.add_field(name="Gjenomsnittlig vurdering", value=str(vurdering))
-            embed.add_field(name="Antall dager sett", value=str(dagersett))
-            embed.add_field(name="Antall episoder sett", value=str(episodersett))
-            embed.add_field(name="Antall animer sett", value=str(completed))
-            embed.add_field(name="Ser på nå", value=str(watching), inline=False)
-            embed.add_field(name="Planlegger å se", value=str(planned), inline=False)
-            embed.add_field(name="Dropped", value=str(dropped), inline=False)
+            embed.add_field(name="Gjenomsnittlig vurdering", value=vurdering)
+            embed.add_field(name="Antall dager sett", value=dagersett)
+            embed.add_field(name="Antall episoder sett", value=episodersett)
+            embed.add_field(name="Antall animer sett", value=completed)
+            embed.add_field(name="Ser på nå", value=watching, inline=False)
+            embed.add_field(name="Planlegger å se", value=planned, inline=False)
+            embed.add_field(name="Dropped", value=dropped, inline=False)
         
         #   Sjekk medium
         elif medium == "manga":
@@ -76,13 +76,13 @@ class MyAnimeList:
             vurdering = data["manga_stats"]["mean_score"]
 
             #   Embed
-            embed.add_field(name="Gjenomsnittlig vurdering", value=str(vurdering), inline=True)
-            embed.add_field(name="Antall dager lest", value=str(dagerlest), inline=True)
-            embed.add_field(name="Antall volumer lest", value=str(volumesread), inline=True)
-            embed.add_field(name="Antall mangar lest", value=str(completed), inline=True)
-            embed.add_field(name="Leser nå", value=str(reading), inline=False)
-            embed.add_field(name="Planlegger å lese", value=str(planned), inline=False)
-            embed.add_field(name="Dropped", value=str(dropped), inline=False)
+            embed.add_field(name="Gjenomsnittlig vurdering", value=vurdering, inline=True)
+            embed.add_field(name="Antall dager lest", value=dagerlest, inline=True)
+            embed.add_field(name="Antall volumer lest", value=volumesread, inline=True)
+            embed.add_field(name="Antall mangar lest", value=completed, inline=True)
+            embed.add_field(name="Leser nå", value=reading, inline=False)
+            embed.add_field(name="Planlegger å lese", value=planned, inline=False)
+            embed.add_field(name="Droppet", value=dropped, inline=False)
         
         embed.set_thumbnail(url=profilepic)
         embed.set_footer(text=f'{ctx.message.author.name}#{ctx.message.author.discriminator}', icon_url=ctx.message.author.avatar_url)
