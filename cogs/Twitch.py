@@ -62,8 +62,10 @@ class Twitch:
             try:
                 streamName = streamData["stream"]["channel"]["status"]
                 streamGame = streamData["stream"]["game"]
+                streamPhoto = streamData["stream"]["preview"]["large"]
                 views = str(streamData["stream"]["viewers"])
                 embed.add_field(name=":red_circle: Sender direkte nå", value=f"**Antall som ser på:**\n{views}\n\n**Tittel:**\n{streamName}\n\n**Spill:**\n{streamGame}", inline=False)
+                embed.set_image(url=streamPhoto)
             
             #   Sender ikke direkte
             except:
