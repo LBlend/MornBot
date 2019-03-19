@@ -5,10 +5,14 @@ from discord.ext import commands
 import codecs
 import json
 import random
+import urllib.parse
+import requests
+from datetime import datetime
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
+    ksoftAuthentication = config["ksoftAuthentication"]
 
 class Konverter:
     def __init__(self, bot):
@@ -33,8 +37,7 @@ class Konverter:
             await ctx.send(embed=embed)
             return
         
-        embed = discord.Embed(color=0x0085ff)
-        embed.add_field(name="Fahrenheit til Celcius", value=f"`{tall} °F` = `{tempCelcius} °C`")
+        embed = discord.Embed(color=0x0085ff, description=f"`{tall} °F` :arrow_right: `{tempCelcius} °C`")
         await ctx.send(embed=embed)
     
 
@@ -56,8 +59,7 @@ class Konverter:
             await ctx.send(embed=embed)
             return
         
-        embed = discord.Embed(color=0x0085ff)
-        embed.add_field(name="Celcius til Fahrenheit", value=f"`{tall} °C` = `{tempFahrenheit} °F`")
+        embed = discord.Embed(color=0x0085ff, description=f"`{tall} °C` :arrow_right: `{tempFahrenheit} °F`")
         await ctx.send(embed=embed)
         
 
@@ -90,7 +92,34 @@ class Konverter:
         
         embed.add_field(name="BMI", value=f"`{calculatedBMI}`\n{txt}")
         await ctx.send(embed=embed)
+
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=["penger", "money", "currency"])
+    async def valuta(self, ctx, til_valuta, verdi, fra_valuta):
+        """Se hvor mye noe er verdt i en annen valuta"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
+        #   Sjekk riktig bruk av desimaltegn
+        if "," in verdi:
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
+            await ctx.send(embed=embed)
+            return
         
+        try:
+            data = requests.get("https://api.ksoft.si/kumo/currency", headers={"Authorization":"Bearer " + ksoftAuthentication}, params={"from": fra_valuta, "to": til_valuta, "value": float(verdi)}).json()
+            value = data["pretty"]
+
+            embed = discord.Embed(color=0x0085ff, description=f"`{verdi} {fra_valuta.upper()}` :arrow_right: `{value}`", timestamp=datetime.utcnow())
+            await statusmsg.edit(embed=embed)
+
+        except:
+            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help valuta` for hjelp")
+            await statusmsg.edit(embed=embed)
+            return
+
 
 def setup(bot):
     bot.add_cog(Konverter(bot))
