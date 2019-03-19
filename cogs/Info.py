@@ -294,6 +294,62 @@ class Info:
 
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(alises=["roleinfo"])
+    async def rolleinfo(self, ctx, *, rolle: discord.Role):
+        """Viser info om en rolle"""
+
+        if rolle.name == "@everyone":
+            embed = discord.Embed(color=0xFF0000, description=f":x: Skriv inn en annen rolle enn @everyone")
+            await ctx.send(embed=embed)
+            return
+
+        #   Farge
+        if str(rolle.color) != "#000000":
+            color = rolle.color
+        else:
+            color = discord.Colour(0x99AAB5)
+
+        #   Nevnbar
+        if rolle.mentionable is True:
+            mentionable = "Ja"
+        else:
+            mentionable = "Nei"
+
+        #   Seperat
+        if rolle.hoist is True:
+            hoisted = "Ja"
+        else:
+            hoisted = "Nei"
+
+        #   Laget den
+        creationDate = rolle.created_at.strftime("%d %b %Y %H:%M")
+        since_created = (ctx.message.created_at - rolle.created_at).days
+
+        #   Medlememr med rollen
+        medlemmer = []
+        for m in rolle.members:
+            medlemmer.append(m.mention)
+        if medlemmer == []:
+            medlemmer = ["**Ingen Medlemmer**"]
+        medlemmer = " ".join(medlemmer)
+
+        if len(medlemmer) > 1024:
+            medlemmer = "For mange medlemmer for å vise her"
+
+        #   Embed
+        embed = discord.Embed(description=f"{rolle.mention}\n**ID:** {rolle.id}", color=color)
+        embed.add_field(name="Antall med rollen", value=len(rolle.members))
+        embed.add_field(name="Fargekode", value=str(rolle.color))
+        embed.add_field(name="Laget den", value=f"{creationDate}\n{since_created} dag(er) siden")
+        embed.add_field(name="Posisjon", value=rolle.position)
+        embed.add_field(name="Nevnbar", value=mentionable)
+        embed.add_field(name="Vises separat i medlemsliste", value=hoisted)
+        embed.add_field(name="Brukere med rollen", value=medlemmer, inline=False)
+        embed.set_footer(text=rolle.guild.name, icon_url=rolle.guild.icon_url)
+        await ctx.send(embed=embed)
+
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def avatar(self, ctx, bruker: discord.Member=None):
         """Viser avataren din"""
