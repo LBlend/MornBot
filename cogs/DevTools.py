@@ -176,6 +176,39 @@ class DevTools:
         await ctx.send(embed=embed)
 
 
+    @commands.is_owner()
+    @commands.command()
+    async def changepresence(self, ctx, activityType, message, *statusType):
+
+        activities = {
+            "playing": 0,
+            "listening": 2,
+            "watching": 3
+        }
+        if activityType in activities:
+            activityType = activities[activityType]
+        else:
+            activityType = 0
+
+        statusTypes = {
+            "online": discord.Status.online,
+            "dnd": discord.Status.dnd,
+            "idle": discord.Status.idle,
+            "offline": discord.Status.offline
+        }
+        if statusType in statusTypes:
+            statusType = statusTypes[statusType]
+
+        if not statusType:
+            statusType = statusTypes["online"]
+        try:
+            await self.bot.change_presence(status=statusType, activity=discord.Activity(type=activityType, name=message))
+            embed = discord.Embed(color=0xE67E22, description="Endret Presence! :ok_hand:")
+            await ctx.send(embed=embed)
+        except:
+            embed = discord.Embed(color=0xFF0000, description=":x: Error!")
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(DevTools(bot))
