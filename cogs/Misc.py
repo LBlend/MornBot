@@ -7,6 +7,9 @@ import json
 import requests
 import random
 from hashlib import md5
+from bs4 import BeautifulSoup
+from datetime import datetime
+import re
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
@@ -132,33 +135,44 @@ class Misc:
     async def reverser(self, ctx, *, tekst):
         """Reverserer tekst"""
 
-        embed = discord.Embed(color=0x0085ff)
-        embed.add_field(name="Reversert tekst", value=tekst[::-1])
-        await ctx.send(embed=embed)
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
+        if tekst is None or len(tekst) >= 1000:
+            embed = discord.Embed(color=0xFF0000, description=":x: Teksten er enten for lang eller så har du ikke gitt noe tekst")
+            await statusmsg.edit(embed=embed)
+            return
+
+        embed = discord.Embed(color=0x0085ff, description=tekst[::-1])
+        embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
+        await statusmsg.edit(embed=embed)
 
 
-    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=["owoify", "uwu"])
-    async def owo(self, ctx, *setning):
+    async def owo(self, ctx, *tekst):
         """Oversetter teksten din til owo"""
 
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sjekk for error & Hent data
-        try:
-            data = requests.get(f"https://nekos.life/api/v2/owoify?text={setning}").json()
-
-            owoRaw = str(data["owo"][2:-2])
-            owo = owoRaw.replace(",", "").replace("'", "")
-
-            embed = discord.Embed(color=0x0085ff)
-            embed.add_field(name="OwO", value=owo)
+        if not tekst or len(tekst) >= 1000:
+            embed = discord.Embed(color=0xFF0000, description=":x: oopsie whoopsie you made a fucky wucky. Teksten er enten for lang eller så har du ikke gitt noe tekst")
             await statusmsg.edit(embed=embed)
+            return
 
-        except:
-            embed = discord.Embed(color=0xFF0000, description=":x: oopsie whoopsie you made a fucky wucky, no text or text over 200")
-            await statusmsg.edit(embed=embed)
+        tekst = re.sub("'|,", "", str(tekst))
+        tekst = re.sub("r|l", "w", tekst)
+        tekst = re.sub("R|L", "W", tekst)
+        tekst = re.sub("n[aeiou]", "ny", tekst)
+        tekst = re.sub("N[aeiou]", "Ny", tekst)
+        tekst = re.sub("N[AEIOU]", "Ny", tekst)
+        tekst = re.sub("ove", "uv", tekst)
+        #tekst = re.sub("!", " (・`ω´・)", tekst) #https://kaomoji.moe/
+
+        embed = discord.Embed(color=0x0085ff, description=tekst[1:-1])
+        embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
+        await statusmsg.edit(embed=embed)
     
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -198,7 +212,123 @@ class Misc:
         embed.add_field(name="Definisjon", value=definition)
         embed.add_field(name="Eksempel", value=example)
         embed.add_field(name="Vurdering", value=f":thumbsup: {thumbsUp} / :thumbsdown: {thumbsDown}", inline=False)
+        embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
         await statusmsg.edit(embed=embed)
+
+    
+    @commands.cooldown(1, 10, commands.BucketType.guild)
+    @commands.command(aliases=["isitdown", "checksite"])
+    async def isitup(self, ctx, nettside: str):
+        """Sjekk om en nettside er oppe"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
+        data = requests.get(f"https://isitup.org/{nettside}")
+        scrapedData = BeautifulSoup(data.text, "html.parser")
+        status = scrapedData.find("p").get_text()
+        nettside = scrapedData.find(class_="domain").get_text()
+        nettsideLink = scrapedData.find(class_="domain")["href"]
+
+        embed = discord.Embed(title=nettside.capitalize(), url=nettsideLink, timestamp=datetime.utcnow())
+
+        if status[-6:] == "is up.":
+            status = "Oppe!"
+            ping = scrapedData.find(class_="smaller").get_text()
+            pinglist = []
+            for i in ping.split():
+                if i.isdigit():
+                    pinglist.append(i)
+            embed.add_field(name="Ping", value=f"{pinglist[0]} ms")
+            embed.color = 0x2ECC71
+        else:
+            status = "Nede!"
+            embed.color = 0xff0000
+
+        embed.add_field(name="Status", value=status)
+        await statusmsg.edit(embed=embed)
+
+    
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(aliases=["clapify"])
+    async def klappifiser(self, ctx, *tekst):
+        """Klapppifiserer teksten din"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
+        if not tekst or len(tekst) >= 1000:
+            embed = discord.Embed(color=0xFF0000, description=":x: Teksten er enten for lang eller så har du ikke gitt noe tekst")
+            await statusmsg.edit(embed=embed)
+            return
+
+        tekst = re.sub("'|,", "", str(tekst).upper())
+        tekst = re.sub(" ", "👏", tekst)
+
+        embed = discord.Embed(color=0x0085ff, description=f"👏**{tekst[1:-1]}**👏")
+        embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
+        await statusmsg.edit(embed=embed)
+
+
+    @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(aliases=["video"])
+    async def videochat(self, ctx):
+        """Få link til videochat"""
+
+        try:
+            voiceChannelId = ctx.author.voice.channel.id
+        except:
+            embed = discord.Embed(color=0xFF0000, description=":x: Du må være koblet til en talekanal")
+            await ctx.send(embed=embed)
+            return
+
+        link = f"https://canary.discordapp.com/channels/{ctx.guild.id}/{voiceChannelId}"
+        embed = discord.Embed(color=0x0085ff, title=f"Videochat: {ctx.author.voice.channel.name}", description=f"[Trykk her for å bli med i videochat]({link})")
+        await ctx.send(embed=embed)
+
+    
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=["timezone", "tid", "tidssone", "klokken"])
+    async def klokka(self, ctx, kontinent, by):
+        """Se hvor mye klokka er i et bestemt område"""
+
+        embed = discord.Embed(description="Laster...")
+        statusmsg = await ctx.send(embed=embed)
+
+        try:
+            data = requests.get(f"http://worldtimeapi.org/api/timezone/{kontinent.capitalize()}/{by.capitalize()}").json()
+            timezone = data["timezone"]
+        except:
+            embed = discord.Embed(color=0xFF0000, description=f":x: Fant ikke sted\n\nSkriv `{prefix}help klokka` for hjelp")
+            await statusmsg.edit(embed=embed)
+            return
+
+        timezone = re.split("/", timezone)
+        localTimezone = data["abbreviation"]
+        utcTimezone = data["utc_offset"]
+        norwayTime = datetime.now().strftime("%H:%M\n%d.%m.%Y")
+
+        time = data["datetime"]
+        timeFormatted = f"{time[11:16]}\n{time[8:10]}.{time[5:7]}.{time[:4]}"
+
+        daylightSavings = data["dst"]
+        if daylightSavings is False:
+            daylightSavings = "Nei"
+        else:
+            daylightSavings = "Ja"
+
+        #   Embed
+        embed = discord.Embed(title=f"Klokka i {timezone[1]}", color=0x0085ff, timestamp=datetime.utcnow())
+        embed.add_field(name="Klokka", value=timeFormatted)
+        embed.add_field(name="Klokka i Norge", value=norwayTime)
+        embed.add_field(name="Sommertid", value=daylightSavings)
+        embed.add_field(name="UTC tidssone", value=utcTimezone)
+        embed.add_field(name="Standard tidssone for sted", value=localTimezone)
+        embed.set_footer(text="Klokka i din tidssone ->")
+        
+        await statusmsg.edit(embed=embed)
+ 
         
 
 def setup(bot):
