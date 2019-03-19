@@ -17,7 +17,7 @@ async def fileTooBig(ctx, statusmsg, fileSize):
     await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
 async def noFile(ctx, statusmsg):
-    embed = discord.Embed(color=0xF1C40F, description=f":exclamation: nDu må gi meg et bilde")
+    embed = discord.Embed(color=0xF1C40F, description=f":exclamation: Du må gi meg et bilde")
     await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
 
