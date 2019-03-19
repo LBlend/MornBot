@@ -2,12 +2,14 @@
     "token": "",
     "prefix": "m!",
     "presence": "m!help",
+    "presenceActivity": "playing",
     "devId": 170506717140877312,
     "website": "http://lblend.com/",
     "github": "https://github.com/LBlend",
     "openweathermapApiKey": "",
     "osuApiKey": "",
     "twitchApiKey": "",
+    "ksoftAuthentication": "",
     "redditId": "",
     "redditSecret": ""
 }

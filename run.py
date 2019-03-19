@@ -14,6 +14,17 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     token = config["token"]
     prefix = config["prefix"]
     presence = config["presence"]
+    activityType = config["presenceActivity"]
+
+activities = {
+"playing": 0,
+"listening": 2,
+"watching": 3
+}
+if activityType.lower() in activities:
+    activityType = activities[activityType]
+else:
+    activityType = 0
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), prefix=prefix, case_insensitive=True)
 
@@ -32,6 +43,6 @@ async def on_ready():
     print(f'ID:              {bot.user.id}')
     print(f'Version:         {discord.__version__}')
     print('...................................................................\n')
-    await bot.change_presence(activity=discord.Activity(type=3, name=presence), status=discord.Status.online)
+    await bot.change_presence(activity=discord.Activity(type=activityType, name=presence), status=discord.Status.online)
 
 bot.run(token, bot=True, reconnect=True)
