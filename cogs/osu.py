@@ -21,7 +21,7 @@ gamemodes = {
 }
 
 
-class osu:
+class osu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -34,16 +34,13 @@ class osu:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sjekk om gyldig gamemode
         if gamemode in gamemodes:
             gamemode = gamemodes[gamemode]
         else:
             gamemode = "0"
 
-        #   Velg bruker
         osuUser = bruker
 
-        #   Sjekk for error
         try:
             url = "https://osu.ppy.sh/api/get_user?" + urllib.parse.urlencode({"u": osuUser, "m": gamemode, "k": osuApiKey})
             data = requests.get(url).json()
@@ -55,19 +52,16 @@ class osu:
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent resten av data
         userUrl = f"https://osu.ppy.sh/users/{userId}"
         profilePic = f"http://a.ppy.sh/{userId}"
         username = data[0]["username"]
         level = str(round(float(data[0]["level"]), 2))
         rank = data[0]["pp_rank"]
 
-        #   Sjekk om bruker har spillt nok
         if rank == "#0":
             embed = discord.Embed(color=0xFF0000, description=f":x: Brukeren har ikke spillt nok")
             await statusmsg.edit(embed=embed)
 
-        #   Hent data
         else:
             countryrank = data[0]["pp_country_rank"]
             country = data[0]["country"]
@@ -81,7 +75,6 @@ class osu:
             playcount = data[0]["playcount"]
             joinDate = data[0]["join_date"]
 
-            #   Embed
             embed = discord.Embed(title=username, color=0xCC5288, url=userUrl)
             embed.set_thumbnail(url=profilePic)
             embed.description = f"<:ScoreSSPlus:476372071014727706>{sshRanks} <:ScoreSS:476372071316848640>{ssRanks} <:ScoreSPlus:476372071342145536>{shRanks} <:ScoreS:476372070989692929>{sRanks} <:ScoreA:476372070976978955>{aRanks}"

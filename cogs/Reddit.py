@@ -12,7 +12,7 @@ with codecs.open("./config.json", "r", encoding="utf8") as f:
     redditId = config["redditId"]
     redditSecret = config["redditSecret"]
 
-class Reddit:
+class Reddit(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -27,13 +27,11 @@ class Reddit:
     
         reddit = praw.Reddit(client_id=redditId, client_secret=redditSecret, user_agent="MornBot")
 
-        #   Hent data
         sub = reddit.subreddit("hmmm")
         posts = [post for post in sub.hot(limit=100)]
         random_post_number = random.randint(0, 100)
         submission = posts[random_post_number]
 
-        #   Embed
         embed = discord.Embed(title="Tilfeldig post fra /r/hmmm", url=submission.url, color=0x0085ff)
         embed.set_image(url=submission.url)
         await statusmsg.edit(embed=embed)
@@ -49,7 +47,6 @@ class Reddit:
 
         reddit = praw.Reddit(client_id=redditId, client_secret=redditSecret, user_agent="MornBot")
         
-        #   Hent data
         try:
             sub = reddit.subreddit("copypasta")
             posts = [post for post in sub.hot(limit=50)]
@@ -62,7 +59,6 @@ class Reddit:
                     submission = posts[random_post_number]
                     break
 
-            #   Embed
             embed = discord.Embed(title=submission.title, url=submission.url, color=0x0085ff)
             redditor = submission.author
             embed.add_field(name=f"Postet av: {redditor}", value=submission.selftext, inline=False)

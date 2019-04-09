@@ -4,7 +4,7 @@ from discord.ext import commands
 
 import requests
 
-class Interaksjon:
+class Interaksjon(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -18,17 +18,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke klappe deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/pat").json()
         patGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} klappet {bruker.mention}"
         embed.set_image(url=patGif)
@@ -43,17 +40,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke klemme deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/hug").json()
         hugGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} ga {bruker.mention} en klem"
         embed.set_image(url=hugGif)
@@ -68,17 +62,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke kose med deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/cuddle").json()
         cuddleGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} ga {bruker.mention} en klem"
         embed.set_image(url=cuddleGif)
@@ -93,17 +84,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke poke deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/poke").json()
         pokeGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} poket {bruker.mention}"
         embed.set_image(url=pokeGif)
@@ -118,17 +106,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke kysse deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/kiss").json()
         kissGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} kysset {bruker.mention}"
         embed.set_image(url=kissGif)
@@ -143,17 +128,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
-        if bruker.id == ctx.message.author.id:
+         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke kile deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/tickle").json()
         tickleGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} kilte {bruker.mention}"
         embed.set_image(url=tickleGif)
@@ -168,17 +150,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du har lav selvtillit, men du kan ikke kalle deg selv en BAKA")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/baka").json()
         bakaGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{bruker.mention} er en BAKA"
         embed.set_image(url=bakaGif)
@@ -193,7 +172,6 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sjekk NSFW
         if not ctx.channel.is_nsfw():
             embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
             await statusmsg.edit(embed=embed)
@@ -202,11 +180,9 @@ class Interaksjon:
         if not bruker:
             bruker = ctx.message.author
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/spank").json()
         spankGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} pisket {bruker.mention}"
         embed.set_image(url=spankGif)
@@ -221,17 +197,14 @@ class Interaksjon:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sett bruker til forfatter om ikke arg blir gitt
         if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Vi er imot selvskading. Ikke klask deg selv")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/slap").json()
         slapGif = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.description = f"{ctx.message.author.mention} klasket {bruker.mention}"
         embed.set_image(url=slapGif)

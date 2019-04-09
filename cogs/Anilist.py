@@ -11,7 +11,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-class Anilist:
+class Anilist(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -24,7 +24,6 @@ class Anilist:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   GraphQL 
         query = '''
         query ($name: String) {
         User (name: $name) {
@@ -53,7 +52,6 @@ class Anilist:
             "name": bruker
         }
 
-        #   POST
         try:
             data = requests.post("https://graphql.anilist.co", json={"query": query, "variables": variables}).json()
             userUrl = data["data"]["User"]["siteUrl"]
@@ -62,7 +60,6 @@ class Anilist:
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         userName = data["data"]["User"]["name"]
         profilePic = data["data"]["User"]["avatar"]["medium"]
         rating = data["data"]["User"]["stats"]["animeListScores"]["meanScore"]
@@ -90,7 +87,6 @@ class Anilist:
         else:
             color = 0x3db4f2
         
-        #   Embed
         embed = discord.Embed(title=userName, color=color, url=userUrl)
         embed.set_author(name="Anilist", icon_url="https://avatars3.githubusercontent.com/u/18018524?s=200&v=4")
         embed.set_thumbnail(url=profilePic)

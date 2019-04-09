@@ -10,7 +10,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-class MyAnimeList:
+class MyAnimeList(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,29 +23,21 @@ class MyAnimeList:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sjekk for error & Hent data
         try:
             data = requests.get(f"https://api.jikan.moe/v3/user/{bruker}").json()
-
             profilepic = data["image_url"]
-
         except:
             embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help mal` for hjelp")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent resten av data
         userurl = data["url"]
         brukernavn = data["username"]
 
-        #   Embed
         embed = discord.Embed(title=brukernavn, color=0x2B4FA5, url=userurl)
         embed.set_author(name="MyAnimeList", icon_url="https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png")
         
-        #   Sjekk medium
         if medium == "anime":
-
-            #   Hent data
             dagersett = data["anime_stats"]["days_watched"]
             episodersett = data["anime_stats"]["episodes_watched"]
             completed = data["anime_stats"]["completed"]
@@ -54,7 +46,6 @@ class MyAnimeList:
             planned = data["anime_stats"]["plan_to_watch"]
             vurdering = data["anime_stats"]["mean_score"]
 
-            #   Embed
             embed.add_field(name="Gjenomsnittlig vurdering", value=vurdering)
             embed.add_field(name="Antall dager sett", value=dagersett)
             embed.add_field(name="Antall episoder sett", value=episodersett)
@@ -63,10 +54,7 @@ class MyAnimeList:
             embed.add_field(name="Planlegger å se", value=planned, inline=False)
             embed.add_field(name="Dropped", value=dropped, inline=False)
         
-        #   Sjekk medium
         elif medium == "manga":
-            
-            #   Hent data
             dagerlest = data["manga_stats"]["days_read"]
             volumesread = data["manga_stats"]["volumes_read"]
             completed = data["manga_stats"]["completed"]
@@ -75,7 +63,6 @@ class MyAnimeList:
             planned = data["manga_stats"]["plan_to_read"]
             vurdering = data["manga_stats"]["mean_score"]
 
-            #   Embed
             embed.add_field(name="Gjenomsnittlig vurdering", value=vurdering, inline=True)
             embed.add_field(name="Antall dager lest", value=dagerlest, inline=True)
             embed.add_field(name="Antall volumer lest", value=volumesread, inline=True)

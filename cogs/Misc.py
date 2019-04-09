@@ -15,7 +15,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-class Misc:
+class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,11 +28,9 @@ class Misc:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/smug").json()
         smug = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.set_image(url=smug)
         await statusmsg.edit(embed=embed)     
@@ -46,7 +44,6 @@ class Misc:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent data
         woofData = requests.get("https://nekos.life/api/v2/img/woof").json()
         woof = woofData["url"]
 
@@ -63,17 +60,14 @@ class Misc:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sjekk NSFW
         if not ctx.channel.is_nsfw():
             embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
             await statusmsg.edit(embed=embed)
             return
 
-        #   Hent data
         data = requests.get("https://nekos.life/api/v2/img/wallpaper").json()
         wallpaper = data["url"]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff)
         embed.set_image(url=wallpaper)
         await statusmsg.edit(embed=embed)

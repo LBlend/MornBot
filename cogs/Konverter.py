@@ -14,7 +14,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     prefix = config["prefix"]
     ksoftAuthentication = config["ksoftAuthentication"]
 
-class Konverter:
+class Konverter(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -24,7 +24,6 @@ class Konverter:
     async def ftc(self, ctx, tall):
         """Konverterer temperatur fra fahrenheit til celcius"""
 
-         #   Sjekk riktig bruk av desimaltegn
         if "," in tall:
             embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
             await ctx.send(embed=embed)
@@ -51,7 +50,6 @@ class Konverter:
             await ctx.send(embed=embed)
             return
 
-        #   Regn ut
         try:
             tempFahrenheit = round((float(tall) * 9) / 5 + 32, 2)
         except:
@@ -68,13 +66,11 @@ class Konverter:
     async def bmi(self, ctx, vekt_kg, høyde_meter):
         """Beregner BMIen din"""
 
-        #   Sjekk riktig bruk av desimaltegn
         if "," in vekt_kg or "," in høyde_meter:
             embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
             await ctx.send(embed=embed)
             return
 
-        #   Regn ut
         try:
             calculatedBMI = round(float(vekt_kg) / float(float(høyde_meter) * float(høyde_meter)), 2)
         except:
@@ -102,7 +98,6 @@ class Konverter:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Sjekk riktig bruk av desimaltegn
         if "," in verdi:
             embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
             await ctx.send(embed=embed)

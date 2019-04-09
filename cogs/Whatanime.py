@@ -23,7 +23,7 @@ async def noFile(ctx, statusmsg):
     await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
 
-class Whatanime:
+class Whatanime(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,11 +32,9 @@ class Whatanime:
     async def whatanime(self, ctx, bilde=None):
         """Finner ut hvilken anime et skjermbilde er tatt fra"""
 
-        #   Statusmelding
         embed = discord.Embed(description="Finner saus... :mag_right:")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent bilde
         if ctx.message.attachments != [] and bilde == None:
             if ctx.message.attachments[0].size > 8000000:
                 await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
@@ -69,7 +67,6 @@ class Whatanime:
             await noFile(ctx, statusmsg)
             return
 
-        #   Sjekk størrelse, compression
         filesize = os.path.getsize(f"./assets/{ctx.message.author.id}_trace.png")
         if filesize > 1000000:
             basewidth = 300
@@ -79,14 +76,12 @@ class Whatanime:
             img = img.resize((basewidth, hsize), Image.ANTIALIAS)
             img.save(f"./assets/{ctx.message.author.id}_trace.png")
 
-            #   Dobbelsjekk
             newFilesize = os.path.getsize(f"./assets/{ctx.message.author.id}_trace.png")
             if newFilesize > 1000000:
                 await fileTooBig(ctx, statusmsg, fileSize=None)
                 os.remove(f"./assets/{ctx.message.author.id}_trace.png")
                 return
 
-        #   POST
         with open(f"./assets/{ctx.message.author.id}_trace.png", "rb") as f:
             base = base64.standard_b64encode(f.read())
             try:
@@ -98,7 +93,6 @@ class Whatanime:
                 os.remove(f"./assets/{ctx.message.author.id}_trace.png")
                 return
 
-        #   Sjekk likhet
         similarity = data["docs"][0]["similarity"]
         if similarity < 0.85:
             embed = discord.Embed(color=0xF1C40F, description=":exclamation: Saus ble funnet, men grunnet lav likhetsprosent, er det høy sannsynlighet for at dette ikke er riktig saus. Vennligst prøv et annet bilde")
@@ -107,7 +101,6 @@ class Whatanime:
             os.remove(f"./assets/{ctx.message.author.id}_trace.png")
             return
 
-        #   Hent resten av data
         anilistId = data["docs"][0]["anilist_id"]
         malId = data["docs"][0]["mal_id"]
         romajiTitle = data["docs"][0]["title_romaji"]
@@ -119,13 +112,11 @@ class Whatanime:
         malData = requests.get(f"https://api.jikan.moe/v3/anime/{malId}/pictures").json()
         thumbnail = malData["pictures"][0]["small"]
 
-        #   Konverter
         similarity_percent = round(similarity * 100, 2)
         formattedTime = timedelta(seconds=time)
         if episode == "":
             episode = "0 (Film)"
 
-        #   Embed
         try:
             embed = discord.Embed(title=romajiTitle, color=0x0085ff, url=f"https://anilist.co/anime/{anilistId}")
             embed.set_thumbnail(url=thumbnail)
@@ -144,7 +135,6 @@ class Whatanime:
             await ctx.send(content=ctx.message.author.mention, embed=embed)
             await statusmsg.delete()
 
-        #   Cleanup
         os.remove(f"./assets/{ctx.message.author.id}_trace.png")
 
 

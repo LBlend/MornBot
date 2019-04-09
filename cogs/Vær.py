@@ -12,7 +12,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-class Vær:
+class Vær(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -25,12 +25,10 @@ class Vær:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
             openweathermapApiKey = config["openweathermapApiKey"]
 
-            #   Sjekk for error
             try:
                 url = "http://api.openweathermap.org/data/2.5/weather?" + urllib.parse.urlencode({"appid": openweathermapApiKey, "q": by})
                 data = requests.get(url).json()
@@ -42,7 +40,6 @@ class Vær:
                 await statusmsg.edit(embed=embed)
                 return
 
-            #   Hent resten av data
             link = f"https://openweathermap.org/city/{byId}"
             byName = data["name"]
             countryCode = data["sys"]["country"].lower()
@@ -57,7 +54,6 @@ class Vær:
             sunset = datetime.fromtimestamp(data["sys"]["sunset"]).strftime("%H:%M")
             nowTime = datetime.now().strftime("%d.%m.%Y %H:%M")
 
-            #   Embed
             embed = discord.Embed(title=f":flag_{countryCode}: {byName}, {countryCode.upper()} | {weatherFetchDate} (Norsk Tid)", color=0x0085ff, url=link, description=description)
             embed.set_author(name="OpenWeatherMap", icon_url="https://pbs.twimg.com/profile_images/720298646630084608/wb7LSoAc_400x400.jpg")
             embed.add_field(name="Temperatur", value=f"{tempCelcius} °C\n{tempFahrenheit} °F")

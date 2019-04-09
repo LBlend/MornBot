@@ -10,7 +10,7 @@ with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-class Twitch:
+class Twitch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,12 +23,10 @@ class Twitch:
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent API key
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
             twitchApiKey = config["twitchApiKey"]
 
-            #   Sjekk for error
             try:
                 userData = requests.get(f"https://api.twitch.tv/kraken/users/{bruker}?client_id={twitchApiKey}").json()
                 followData = requests.get(f"https://api.twitch.tv/kraken/channels/{bruker}/follows?client_id={twitchApiKey}").json()
@@ -40,7 +38,6 @@ class Twitch:
                 await statusmsg.edit(embed=embed)
                 return
 
-            #   Hent resten av data
             username = userData["display_name"]
             name = userData["name"]
             bio = userData["bio"]
@@ -49,7 +46,6 @@ class Twitch:
             userUrl = f"https://twitch.tv/{name}"
             followers = str(followData["_total"])
 
-            #   Embed
             embed = discord.Embed(title=username, color=0x392E5C, url=userUrl)
             embed.set_thumbnail(url=profilePic)
             embed.add_field(name="Bio", value=bio, inline=False)
@@ -58,7 +54,6 @@ class Twitch:
             embed.set_author(name="Twitch", icon_url="http://www.gamergiving.org/wp-content/uploads/2016/03/twitch11.png")
             embed.set_footer(text=f"{ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
 
-            #   Sjekk om bruker sender direkte
             try:
                 streamName = streamData["stream"]["channel"]["status"]
                 streamGame = streamData["stream"]["game"]
@@ -66,8 +61,6 @@ class Twitch:
                 views = str(streamData["stream"]["viewers"])
                 embed.add_field(name=":red_circle: Sender direkte nå", value=f"**Antall som ser på:**\n{views}\n\n**Tittel:**\n{streamName}\n\n**Spill:**\n{streamGame}", inline=False)
                 embed.set_image(url=streamPhoto)
-            
-            #   Sender ikke direkte
             except:
                 pass
         

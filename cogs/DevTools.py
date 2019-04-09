@@ -10,7 +10,7 @@ from pathlib import Path
 import socket
 import requests
 
-class DevTools:
+class DevTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -177,6 +177,7 @@ class DevTools:
 
 
     @commands.is_owner()
+    @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.command()
     async def changepresence(self, ctx, activityType, message, *statusType):
 
@@ -209,6 +210,37 @@ class DevTools:
             embed = discord.Embed(color=0xFF0000, description=":x: Error!")
             await ctx.send(embed=embed)
 
+    @commands.is_owner()
+    @commands.command()
+    async def leave(self, ctx, *guildId: int):
+        
+        if guildId is ():
+            guildId = ctx.message.guild.id
+        else:
+            guildId = guildId[0]
+
+        guild = await self.bot.fetch_guild(guildId)
+
+        comfirmationMsg = await ctx.send(f"Vil du virkelig forlate {guild.name} (`{guild.id}`)?")
+        await comfirmationMsg.add_reaction("✅")
+
+        def comfirm(reaction, user):
+            return user == ctx.message.author and str(reaction.emoji) == "✅"
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=15.0, check=comfirm)
+        except asyncio.TimeoutError:
+            await ctx.message.delete()
+            await comfirmationMsg.delete()
+        else:
+            await guild.leave()
+            try:
+                embed = discord.Embed(color=0xE67E22, description="Forlatt guild! :ok_hand:")
+                await ctx.send(embed=embed)
+            except:
+                pass
+            
+        
 
 def setup(bot):
     bot.add_cog(DevTools(bot))

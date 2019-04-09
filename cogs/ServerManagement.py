@@ -7,7 +7,7 @@ import codecs
 import time
 from pathlib import Path
 
-class ServerManagement:
+class ServerManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -30,7 +30,6 @@ class ServerManagement:
     async def ban(self, ctx, *, bruker: discord.Member):
         """Utesteng en bruker fra serveren"""
 
-        #   Utfør
         await bruker.ban()
         await ctx.send(f"<@{bruker.id}> ({bruker.name}#{bruker.discriminator}) ble utestengt fra serveren")
 
@@ -41,7 +40,6 @@ class ServerManagement:
     async def prune(self, ctx, antall: int):
         """Sletter de siste antall meldingene du spesifiser"""
 
-        #   Utfør
         await ctx.message.channel.purge(limit=antall+1)
         statusmsg = await ctx.send(f"Slettet {antall} meldinger!")
         await asyncio.sleep(3)
@@ -55,15 +53,12 @@ class ServerManagement:
     async def settloggkanal(self, ctx, *, kanal: discord.TextChannel):
         """Setter en kanal som loggkanal"""
         
-        #   Sjekk om fil allerede eksisterer
         serverDataFile = Path(f"./assets/serverdata/{ctx.message.guild.id}.json")
         if serverDataFile.is_file() == False:
-            #   Skriv fil med gitt data
             with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "w") as f:
                 json.dump({"name": ctx.message.guild.name, "logChannelId": kanal.id}, f)
 
         else:
-            #   Skriv data til eksisterende fil
             with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r+", encoding="utf8") as f:
                 serverdata = json.load(f)
                 serverdata["logChannelId"] = kanal.id
@@ -79,12 +74,10 @@ class ServerManagement:
     async def loggkanal(self, ctx):
         """Viser hvilken kanal som er satt som loggkanal på serveren"""
         
-        #   Last inn serverdata
         with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r", encoding="utf8") as f:
             serverdata = json.load(f)
             logChannelId = serverdata["logChannelId"]
 
-            #   Sjekk om loggkanal eksisterer
             if logChannelId == None:
                 embed = discord.Embed(color=0xFF0000, description=":x: Du har ikke satt en loggkanal enda")
                 await ctx.send(embed=embed)

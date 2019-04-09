@@ -21,7 +21,7 @@ async def noFile(ctx, statusmsg):
     await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
 
-class ImageManipulation:
+class ImageManipulation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -30,11 +30,9 @@ class ImageManipulation:
     @commands.command(aliases=["needsmorejpeg", "jpg", "jpeg"])
     async def needsmorejpg(self, ctx, bilde=None):
 
-        #   Statusmelding
         embed = discord.Embed(description="JPG-ifiserer...")
         statusmsg = await ctx.send(embed=embed)
 
-        #   Hent bilde
         if ctx.message.attachments != [] and bilde == None:
             if ctx.message.attachments[0].size > 8000000:
                 await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
@@ -67,7 +65,6 @@ class ImageManipulation:
             await noFile(ctx, statusmsg)
             return
 
-        #   JPG-ifiser
         rawimage = Image.open(f"./assets/{ctx.message.author.id}_notjpged.png")
         rawimageNonRGB = rawimage.convert("RGB") 
         rawimageNonRGB.save(f"./assets/{ctx.message.author.id}_jpged.jpg", quality=5)
@@ -76,7 +73,6 @@ class ImageManipulation:
         await ctx.send(file=f)
         await statusmsg.delete()
 
-        #   Cleanup, sletting
         try:
             os.remove(f"./assets/{ctx.message.author.id}_notjpged.png")
         except:
