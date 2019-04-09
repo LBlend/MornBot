@@ -6,27 +6,17 @@ import codecs
 import json
 from pathlib import Path
 import os
-import urllib
-import requests
 from PIL import Image
 import numpy as np
-from wordcloud import WordCloud, ImageColorGenerator
+from wordcloud import WordCloud
+import re
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-async def fileFetchFail(ctx, statusmsg):
-    embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
-    await ctx.send(content=ctx.message.author.mention, embed=embed)
-    await statusmsg.delete()
 
-async def fileTooBig(ctx, statusmsg, fileSize):
-    embed = discord.Embed(color=0xFF0000, description=f":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn {fileSize}")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-
-
-class Ordsky:
+class Ordsky(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -71,7 +61,8 @@ class Ordsky:
                 f.seek(0)
                 f.write(json.dumps(userData))  
 
-        userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt")
+        userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt")
+
         try:
             os.remove(userMessages)
         except:
@@ -87,17 +78,17 @@ class Ordsky:
         """Få tilsendt dine data"""
 
         try:
-            await ctx.message.author.send(file=discord.File(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt"))
+            await ctx.message.author.send(file=discord.File(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt"))
             embed = discord.Embed(color=0x0085ff, description=f":white_check_mark: Meldingsdata har blitt sendt i DM!")
         except:
-            embed = discord.Embed(color=0xF1C40F, description=":exclamation: Jeg har ingen data om deg å sende!")
+            embed = discord.Embed(color=0xF1C40F, description=":exclamation: Jeg har ingen data om deg å sende eller så kan jeg ikke sende meldinger til deg!")
 
         await ctx.send(embed=embed)
 
 
     @commands.cooldown(1, 150, commands.BucketType.user)
     @commands.command(aliases=["wordcloud", "wc", "sky"])
-    async def ordsky(self, ctx, bilde=None):
+    async def ordsky(self, ctx):
         """Generer en ordsky"""
 
         #   Sjekk samtykke
@@ -118,98 +109,70 @@ class Ordsky:
 
         #   Statusmelding
         embed = discord.Embed(description="**Teller ord:** :hourglass:\n**Generer ordsky:** -")
-        statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)  
-
-        #   Hent bilde
-        if bilde == "ostehøvel":
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/ostmask.png"))
-        elif bilde == "laugh":
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/laughmask.png"))
-
-        elif ctx.message.attachments != [] and bilde == None:
-            if ctx.message.attachments[0].size() > 2000000:
-                await fileTooBig(ctx, statusmsg, fileSize="2 MiB")
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-            try:
-                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-
-        elif ctx.message.attachments == [] and bilde != None:
-            try:
-                linkedFile = requests.get(str(bilde))
-                linkedFileSize = len(linkedFile.content)
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return               
-
-            if linkedFileSize > 2000000:
-                await fileTooBig(ctx, statusmsg, fileSize="2 MiB")
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-
-            try:
-                urllib.request.urlretrieve(str(bilde), f"{ctx.message.author.id}_mask.png")
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-
-        else:
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/owomask.png"))
+        embed.set_footer(icon_url=ctx.message.author.avatar_url, text=f"{ctx.message.author.name}#{ctx.author.discriminator}")
+        statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)
 
         #   Søk etter ord
         """NEEDS TO BE REWRITTEN. TEMPORARY SOLUTION"""
         userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt")
         if userMessages.is_file() == False:
             with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt", "a+") as f:
-                for channel in ctx.message.guild.text_channels:
-                    async for message in channel.history(limit=4000):
-                        if message.author.id == ctx.message.author.id:
-                            try:
-                                f.write(f"{message.content} ")
-                            except:
+                try:
+                    for channel in ctx.message.guild.text_channels:
+                        for message in channel.history(limit=2000):
+                            if message.author.id == ctx.message.author.id:
+                                try:
+                                    f.write(f"{message.content} ")
+                                except:
+                                    pass
+                            else:
                                 pass
-                        else:
-                            pass
+                except:
+                    pass
 
         else:
             with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt", "a+") as f:
-                for channel in ctx.message.guild.text_channels:
-                    async for message in channel.history(limit=300):
-                        if message.author.id == ctx.message.author.id:
-                            try:
-                                f.write(f"{message.content} ")
-                            except:
+                try:
+                    for channel in ctx.message.guild.text_channels:
+                        for message in channel.history(limit=300):
+                            if message.author.id == ctx.message.author.id:
+                                try:
+                                    f.write(f"{message.content} ")
+                                except:
+                                    pass
+                            else:
                                 pass
-                        else:
-                            pass
-
-        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt").read()
+                except:
+                    pass
 
         await statusmsg.edit(content=ctx.message.author.mention)
         embed = discord.Embed(description="**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
+        embed.set_footer(icon_url=ctx.message.author.avatar_url, text=f"{ctx.message.author.name}#{ctx.author.discriminator}")
         await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
 
+        #   Tekstfiltrering
+        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt").read()
+        text = re.sub(r'http\S+', '', text)
+
+        """UHHHHHHHM DON'T THINK ABOUT IT OK?"""
+        filteredWords = ["og","i","det","på","som","er","en","til","å","han","av","for","med","at","var","de","ikke","den","har","jeg","om","et","men","så","seg","hun","hadde","fra","vi","du","kan","da","ble","ut","skal","vil","ham","etter","over","ved","også","bare","eller","sa","nå","dette","noe","være","meg","mot","opp","der","når","inn","dem","kunne","andre","blir","alle","noen","sin","ha","år","henne","må","selv","sier","få","kom","denne","enn","to","hans","bli","ville","før","vært","skulle","går","her","slik","gikk","mer","hva","igjen","fikk","man","alt","mange","ingen","får","oss","hvor","under","siden","hele","dag","gang","sammen","ned","kommer","sine","deg","se","første","godt","mellom","måtte","gå","helt","litt","nok","store","aldri","ta","sig","uten","ho","kanskje","blitt","ser","hvis","vel","si","vet","hennes","min","tre","ja","samme","mye","nye","tok","gjøre","disse","rundt","tilbake","mens","satt","flere","folk","fordi","både","la","gjennom","fått","like","nei","annet","komme","gjorde","hvordan","sånn","dere","jo"]
+
+        #   Skyform
+        maskbilde = np.array(Image.open("./assets/ordsky/mask/skyform.png"))
+
         #   Ordsky innstillinger
-        wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde)
+        wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde, repeat=True, stopwords=filteredWords)
+
+        #   Mer tekstfiltrering
+        wc.process_text(text)
 
         #   Generer ordsky
-        wc.generate(text)
-
-        #   Fargelegg
-        if  ctx.message.attachments != [] or bilde == "laugh":
-            image_colors = ImageColorGenerator(maskbilde)
-            wc.recolor(color_func=image_colors)
-        elif ctx.message.attachments == [] and bilde != None:
-            image_colors = ImageColorGenerator(maskbilde)
-            wc.recolor(color_func=image_colors)
+        try:
+            wc.generate(text)
+        except:
+            embed = discord.Embed(color=0xFF0000, description=":x: Generering av ordsky feilet")
+            await ctx.send(content=ctx.message.author.mention, embed=embed)
+            await statusmsg.delete()
 
         #   Lagre bilde
         wc.to_file(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
@@ -219,11 +182,6 @@ class Ordsky:
 
         #   Cleanup, sletting
         await statusmsg.delete()
-        
-        try:
-            os.remove(f"./{ctx.message.author.id}_mask.png")
-        except:
-            pass
         try:
             os.remove(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
         except:

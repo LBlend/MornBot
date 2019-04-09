@@ -9,12 +9,13 @@ import time
 import platform
 import os
 import psutil
+import math
 
 with codecs.open("config.json", "r", encoding="utf8") as f:
     config = json.load(f)
     prefix = config["prefix"]
 
-class Info:
+class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -31,21 +32,18 @@ class Info:
             website = config["website"]
             github = config["github"]
 
-        dev = self.bot.get_user(devId)
+        dev = await self.bot.fetch_user(devId)
 
-        #   Uptime
         now = time.time()
         diff = int(now - self.bot.uptime)
         days, remainder = divmod(diff, 24 * 60 * 60)
         hours, remainder = divmod(remainder, 60 * 60)
         minutes, seconds = divmod(remainder, 60)
 
-        #   Ressursforbruk
         process = psutil.Process(os.getpid())
         mem = round(process.memory_info().rss / 1000000, 1)
         cpuPer = process.cpu_percent()
 
-        #   Medlemstall
         totalmembers = []
         onlinemembers = []
         idlemembers = []
@@ -68,7 +66,6 @@ class Info:
                     offlinemembers.append(member.id)
                     totalmembers.append(member.id)
 
-        #   Embed
         embed = discord.Embed(color=0xE67E22, url=website)
         embed.add_field(name="Dev", value=f"{dev.mention}\n({dev.name}#{dev.discriminator})")
         embed.add_field(name="Oppetid", value=f"{days}d {hours}t {minutes}m {seconds}s")
@@ -93,11 +90,14 @@ class Info:
 
         guild = ctx.message.guild
 
-        #   Bot join og creation date
         guild_created = guild.created_at.strftime("%d %b %Y %H:%M")
         since_created = (ctx.message.created_at - guild.created_at).days
 
-        #   Medlemstall
+        if since_created == 1:
+            creationDagerString = "dag"
+        else:
+            creationDagerString = "dager"
+
         totalmembers = 0
         onlinemembers = 0
         idlemembers = 0
@@ -117,7 +117,6 @@ class Info:
                 offlinemembers += 1
                 totalmembers += 1
 
-        #   Roller
         roles = []
         for r in guild.roles:
             if r.name != "@everyone":
@@ -130,12 +129,10 @@ class Info:
         if len(roles) > 1024:
             roles = f"Skriv `{prefix}guildroller` for å se rollene"
 
-        #   Kanaler
         textChannels = len(guild.text_channels)
         voiceChannels = len(guild.voice_channels)
         totalChannels = textChannels + voiceChannels
 
-        #   Regionflagg
         flags = {
             "us": ":flag_us:", 
             "eu": ":flag_eu:", 
@@ -162,12 +159,11 @@ class Info:
 
         flag = flags[region]
 
-        #   Embed
         embed = discord.Embed(color=0x0085ff, url=guild.icon_url)
         embed.add_field(name="ID", value=guild.id)
         embed.add_field(name="Eier", value=guild.owner.mention)
         embed.add_field(name="Region", value=f"{flag} {guild.region}")
-        embed.add_field(name="Server lagd", value=f"{guild_created}\n{since_created} dag(er) siden")
+        embed.add_field(name="Server lagd", value=f"{guild_created}\n{since_created} {creationDagerString} siden")
         embed.add_field(name=f"Kanaler ({totalChannels})", value=f"Tekst: {textChannels}\nTale: {voiceChannels}")
         embed.add_field(name=f"Medlemmer ({totalmembers})", value=f"<:online:516328785910431754>Pålogget: **{onlinemembers}**\n<:idle:516328783347843082>Inaktiv: **{idlemembers}**\n<:dnd:516328782844395579>Ikke forstyrr: **{dndmembers}**\n<:offline:516328785407246356>Frakoblet: **{offlinemembers}**")
         embed.add_field(name="Roller", value=roles, inline=False)
@@ -212,13 +208,22 @@ class Info:
         guild = ctx.message.guild
 
         #   Member number
-        memberNumber = sorted(guild.members, key=lambda m: m.joined_at).index(bruker) + 1
+        joinNumber = sorted(guild.members, key=lambda m: m.joined_at).index(bruker) + 1
+        creationNumber = sorted(guild.members, key=lambda m: m.created_at).index(bruker) + 1
 
         #   Join & creation date
         bruker_joined = bruker.joined_at.strftime("%d %b %Y %H:%M")
         bruker_created = bruker.created_at.strftime("%d %b %Y %H:%M")
         since_created = (ctx.message.created_at - bruker.created_at).days
         since_joined = (ctx.message.created_at - bruker.joined_at).days
+        if since_created == 1:
+            creationDagerString = "dag"
+        else:
+            creationDagerString = "dager"
+        if since_joined == 1:
+            joinDagerString = "dag"
+        else:
+            joinDagerString = "dager"
 
         #   Roller
         roles = []
@@ -240,12 +245,11 @@ class Info:
             color = discord.Colour(0x99AAB5)
 
         #   Embed
-        embed = discord.Embed(color=color, url=bruker.avatar_url)
-        #embed.description = f"{bruker.status}"
-        embed.add_field(name="Bruker lagd", value=f"{bruker_created}\n{since_created} dag(er) siden")
-        embed.add_field(name="Ble med i serveren", value=f"{bruker_joined}\n{since_joined} dag(er) siden")
+        embed = discord.Embed(color=color, url=bruker.avatar_url, description=f"{bruker.mention}\nID: {bruker.id}")
+        embed.add_field(name="Bruker lagd", value=f"{bruker_created}\n{since_created} {creationDagerString} siden")
+        embed.add_field(name="Ble med i serveren", value=f"{bruker_joined}\n{since_joined} {joinDagerString} siden")
         embed.add_field(name="Roller", value=roles, inline=False)
-        embed.set_footer(text=f"Bruker #{memberNumber} | ID: {bruker.id}")
+        embed.set_footer(text=f"#{joinNumber} Medlem av serveren | #{creationNumber} Eldste brukeren på serveren")
         embed.set_thumbnail(url=bruker.avatar_url)
 
         #   Kallenavn
@@ -325,6 +329,11 @@ class Info:
         creationDate = rolle.created_at.strftime("%d %b %Y %H:%M")
         since_created = (ctx.message.created_at - rolle.created_at).days
 
+        if since_created == 1:
+            creationDagerString = "dag"
+        else:
+            creationDagerString = "dager"
+
         #   Medlememr med rollen
         medlemmer = []
         for m in rolle.members:
@@ -340,7 +349,7 @@ class Info:
         embed = discord.Embed(description=f"{rolle.mention}\n**ID:** {rolle.id}", color=color)
         embed.add_field(name="Antall med rollen", value=len(rolle.members))
         embed.add_field(name="Fargekode", value=str(rolle.color))
-        embed.add_field(name="Laget den", value=f"{creationDate}\n{since_created} dag(er) siden")
+        embed.add_field(name="Laget den", value=f"{creationDate}\n{since_created} {creationDagerString} siden")
         embed.add_field(name="Posisjon", value=rolle.position)
         embed.add_field(name="Nevnbar", value=mentionable)
         embed.add_field(name="Vises separat i medlemsliste", value=hoisted)
@@ -431,6 +440,66 @@ class Info:
             embed.set_thumbnail(url="https://cdn2.iconfinder.com/data/icons/black-white-social-media/64/social_media_logo_github-512.png")
             embed.add_field(name="Github Repo", value=f"[Klikk her]({github}) for å se den dritt skrevne kildekoden min")
             await ctx.send(embed=embed)
+
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=["oldest"])
+    async def eldst(self, ctx, *side: int):
+        """Liste over de eldste brukerene på serveren"""
+
+        if side is ():
+            side = 1
+        else:
+            side = side[0]
+
+        if side <= 0:
+            side = 1
+
+        startIndex = (side - 1) * 10
+        endIndex = side * 10
+
+        formattedString = ""
+        pagecount = math.ceil(len(ctx.guild.members) / 10)
+        members = sorted(ctx.guild.members, key=lambda m: m.created_at)[startIndex:endIndex]
+        for member in members:
+            bruker = ctx.guild.get_member(member.id)
+            creationDate = bruker.created_at.strftime("%d %b %Y %H:%M")
+            formattedString += f"#{(members.index(member) + 1) + startIndex} {bruker.mention} - {creationDate}\n"
+
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Eldste Discordbrukerene på serveren", value=formattedString)
+        embed.set_footer(text=f"Side: {side}/{pagecount}")
+        await ctx.send(embed=embed)
+
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def joinorder(self, ctx, *side: int):
+        """Liste over de første medlemmene av serveren"""
+
+        if side is ():
+            side = 1
+        else:
+            side = side[0]
+
+        if side <= 0:
+            side = 1
+
+        startIndex = (side - 1) * 10
+        endIndex = side * 10
+
+        formattedString = ""
+        pagecount = math.ceil(len(ctx.guild.members) / 10)
+        members = sorted(ctx.guild.members, key=lambda m: m.joined_at)[startIndex:endIndex]
+        for member in members:
+            bruker = ctx.guild.get_member(member.id)
+            joinDate = bruker.joined_at.strftime("%d %b %Y %H:%M")
+            formattedString += f"#{(members.index(member) + 1) + startIndex} {bruker.mention} - {joinDate}\n"
+
+        embed = discord.Embed(color=0xE67E22)
+        embed.add_field(name="Første Discordbrukerene på serveren", value=formattedString)
+        embed.set_footer(text=f"Side: {side}/{pagecount}")
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
