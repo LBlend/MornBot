@@ -74,10 +74,9 @@ class Ordsky(commands.Cog):
         try:
             database_user = database_col_users.find_one(database_find)
         except:
-            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                            'tilkobling til databasen. ' +
-                            'Be boteier om å fikse dette')
-            return
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
         # Sett inn manglende data i database og sett samtykke
         if database_user is None:
@@ -105,10 +104,9 @@ class Ordsky(commands.Cog):
         try:
             database_user = database_col_users.find_one(database_find)
         except:
-            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                            'tilkobling til databasen. ' +
-                            'Be boteier om å fikse dette')
-            return
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
         # Sett inn manglende data i database/fjern samtykke og meldingsdata
         if database_user is None:
@@ -141,16 +139,14 @@ class Ordsky(commands.Cog):
         try:
             database_user = database_col_users.find_one(database_find)
         except:
-            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                            'tilkobling til databasen. ' +
-                            'Be boteier om å fikse dette')
-            return
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
         # Sett inn manglende data i database og send melding om ingen data
         if database_user is None:
             await default_db_insert(self, ctx)
-            await error_no_data(self, ctx)
-            return
+            return await error_no_data(self, ctx)
 
         # Hent data fra alle guilds og samle i string
         raw_data = ''
@@ -162,8 +158,7 @@ class Ordsky(commands.Cog):
 
         # Feilmelding om ingen meldingsdata er funnet
         if raw_data == '':
-            await error_no_data(self, ctx)
-            return
+            return await error_no_data(self, ctx)
 
         # Legg meldingsdata inn i tekstfil
         with codecs.open(f'./assets/ordsky/{ctx.author.id}.txt',
@@ -204,10 +199,9 @@ class Ordsky(commands.Cog):
         try:
             database_user = database_col_users.find_one(database_find)
         except:
-            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                            'tilkobling til databasen. ' +
-                            'Be boteier om å fikse dette')
-            return
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
         # Sett inn manglende data i database
         if database_user is None:
@@ -234,8 +228,7 @@ class Ordsky(commands.Cog):
                 icon_url=ctx.author.avatar_url,
                 text=f'{ctx.author.name}#{ctx.author.discriminator}')
             status_msg = await ctx.send(ctx.author.mention, embed=embed)
-            self.bot.get_command('ordsky').reset_cooldown(ctx)
-            return
+            return self.bot.get_command('ordsky').reset_cooldown(ctx)
 
         # Statusmelding
         embed = discord.Embed(
