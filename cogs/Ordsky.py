@@ -69,9 +69,15 @@ class Ordsky(commands.Cog):
     async def samtykke(self, ctx):
         """Gi samtykke til å samle meldingsdataen din"""
 
-        # Let i database etter bruker
+         # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_users.find_one(database_find)
+        try:
+            database_user = database_col_users.find_one(database_find)
+        except:
+            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                            'tilkobling til databasen. ' +
+                            'Be boteier om å fikse dette')
+            return
 
         # Sett inn manglende data i database og sett samtykke
         if database_user is None:
@@ -94,9 +100,15 @@ class Ordsky(commands.Cog):
     async def tabort(self, ctx):
         """Fjern samtykke og slett meldingsdata"""
 
-        # Let i database etter bruker
+         # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_users.find_one(database_find)
+        try:
+            database_user = database_col_users.find_one(database_find)
+        except:
+            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                            'tilkobling til databasen. ' +
+                            'Be boteier om å fikse dette')
+            return
 
         # Sett inn manglende data i database/fjern samtykke og meldingsdata
         if database_user is None:
@@ -124,9 +136,15 @@ class Ordsky(commands.Cog):
     async def minedata(self, ctx):
         '''Få tilsendt dine data'''
 
-        # Let i database etter bruker
+         # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_users.find_one(database_find)
+        try:
+            database_user = database_col_users.find_one(database_find)
+        except:
+            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                            'tilkobling til databasen. ' +
+                            'Be boteier om å fikse dette')
+            return
 
         # Sett inn manglende data i database og send melding om ingen data
         if database_user is None:
@@ -183,7 +201,13 @@ class Ordsky(commands.Cog):
 
         # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_users.find_one(database_find)
+        try:
+            database_user = database_col_users.find_one(database_find)
+        except:
+            await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                            'tilkobling til databasen. ' +
+                            'Be boteier om å fikse dette')
+            return
 
         # Sett inn manglende data i database
         if database_user is None:
