@@ -69,7 +69,7 @@ class Ordsky(commands.Cog):
     async def samtykke(self, ctx):
         """Gi samtykke til å samle meldingsdataen din"""
 
-         # Let i database etter bruker
+        # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
         try:
             database_user = database_col_users.find_one(database_find)
@@ -100,7 +100,7 @@ class Ordsky(commands.Cog):
     async def tabort(self, ctx):
         """Fjern samtykke og slett meldingsdata"""
 
-         # Let i database etter bruker
+        # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
         try:
             database_user = database_col_users.find_one(database_find)
@@ -136,7 +136,7 @@ class Ordsky(commands.Cog):
     async def minedata(self, ctx):
         '''Få tilsendt dine data'''
 
-         # Let i database etter bruker
+        # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
         try:
             database_user = database_col_users.find_one(database_find)
@@ -230,6 +230,9 @@ class Ordsky(commands.Cog):
                 description=':exclamation: Du må gi meg tillatelse til å ' +
                             'samle og beholde meldingsdataene dine.\n\n' +
                             f'Skriv `{prefix}samtykke` for å gjøre dette')
+            embed.set_footer(
+                icon_url=ctx.author.avatar_url,
+                text=f'{ctx.author.name}#{ctx.author.discriminator}')
             status_msg = await ctx.send(ctx.author.mention, embed=embed)
             self.bot.get_command('ordsky').reset_cooldown(ctx)
             return
