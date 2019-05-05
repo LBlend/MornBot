@@ -17,6 +17,8 @@ gamemodes = {
     "standard": "0",
     "taiko": "1",
     "ctb": "2",
+    "catch the beat": "2",
+    "catch": "2",
     "mania": "3"
 }
 
@@ -74,6 +76,7 @@ class osu(commands.Cog):
             aRanks = data[0]["count_rank_a"]
             playcount = data[0]["playcount"]
             joinDate = data[0]["join_date"]
+            hours_played = round((int(data[0]["total_seconds_played"]) / 60) / 60)
 
             embed = discord.Embed(title=username, color=0xCC5288, url=userUrl)
             embed.set_thumbnail(url=profilePic)
@@ -87,7 +90,7 @@ class osu(commands.Cog):
             embed.set_author(name="osu!", icon_url="https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png")
 
             #   Ja, dette er ekte. Ikke klag, det funker 
-            embed.set_footer(text=f"Bruker lagd: {joinDate[8:10]}.{joinDate[5:7]}.{joinDate[:4]} {joinDate[11:]}")
+            embed.set_footer(text=f"Bruker lagd: {joinDate[8:10]}.{joinDate[5:7]}.{joinDate[:4]} {joinDate[11:]} | Timer spilt: {hours_played}")
 
             await statusmsg.edit(embed=embed)    
 

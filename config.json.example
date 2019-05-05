@@ -3,9 +3,9 @@
     "prefix": "m!",
     "presence": "m!help",
     "presenceActivity": "playing",
-    "devId": 170506717140877312,
-    "website": "http://lblend.com/",
+    "website": "https://lblend.moe/",
     "github": "https://github.com/LBlend",
+    "mongodb_url": "" 
     "openweathermapApiKey": "",
     "osuApiKey": "",
     "twitchApiKey": "",

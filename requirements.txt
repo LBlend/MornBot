@@ -7,3 +7,4 @@ wordcloud
 matplotlib
 pillow
 BeautifulSoup4
+pymongo

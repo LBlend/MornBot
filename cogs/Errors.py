@@ -1,50 +1,54 @@
-import discord
-from discord.ext.commands import errors
 import traceback
+import sys
+from discord.ext import commands
+import discord
 
-class Errors:
+
+class Errors(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        """The event triggered when an error is raised while invoking a command.
+        ctx   : Context
+        error : Exception"""
 
-    async def on_command_error(self, ctx, err):
-        if (isinstance(err, errors.MissingRequiredArgument) or isinstance(err, errors.BadArgument)):
-            formatter = ctx.bot.formatter
-            if ctx.invoked_subcommand is None:
-                _help = await formatter.format_help_for(ctx, ctx.command)
-            else:
-                _help = await formatter.format_help_for(ctx, ctx.invoked_subcommand)
+        # This prevents any commands with local handlers being handled here in on_command_error.
+        if hasattr(ctx.command, 'on_error'):
+            return
+        
+        ignored = (commands.CommandNotFound, commands.UserInputError)
+        
+        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
+        # If nothing is found. We keep the exception passed to on_command_error.
+        error = getattr(error, 'original', error)
+        
+        # Anything in ignored will return and prevent anything happening.
+        if isinstance(error, ignored):
+            return
 
-            for message in _help:
-                await ctx.send(message)
+        elif isinstance(error, commands.DisabledCommand):
+            return await ctx.send(f'{ctx.command} har blitt avskrudd.')
 
-        if isinstance(err, errors.CommandInvokeError):
-            pass
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"{ctx.message.author.mention} Kommandoen har nettopp blitt brukt. Prøv igjen om `{error.retry_after:.1f}` sekunder.")
 
-        elif isinstance(err, errors.NoPrivateMessage):
-            await ctx.send("Denne kommandoen er ikke tilgjengelig i DMs")
+        elif isinstance(error, commands.NoPrivateMessage):
+            try:
+                return await ctx.author.send(f'{ctx.command} kan ikke brukes i DMs.')
+            except:
+                pass
 
-        elif isinstance(err, errors.CheckFailure):
-            pass
+        # For this error example we check to see where it came from...
+        elif isinstance(error, commands.BadArgument):
+            if ctx.command.qualified_name == 'tag list':  # Check if the command being invoked is 'tag list'
+                return await ctx.send('Feil argument gitt. Prøv igjen')
 
-        elif isinstance(err, errors.CommandNotFound):
-            pass
-
-        elif isinstance(err, errors.NotOwner):
-            await ctx.send("Du er ikke dev av båtten")
-
-        elif isinstance(err, errors.MissingPermissions):
-            await ctx.send("Du mangler tillatelse til å gjøre dette")
-
-        elif isinstance(err, errors.BotMissingPermissions):
-            await ctx.send("Jeg mangler tillatelse til å gjøre dette")
-
-        elif isinstance(err, errors.CommandOnCooldown):
-            await ctx.send(f"{ctx.message.author.mention} Kommandoen har nettopp blitt brukt. Prøv igjen om `{err.retry_after:.1f}` sekunder.")
-
-        else:
-            tb = err.__traceback__             
-            traceback.print_tb(tb)             
-            print(err)
+        # All other Errors not returned come here... And we can just print the default TraceBack.
+        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+                
 
 def setup(bot):
     bot.add_cog(Errors(bot))

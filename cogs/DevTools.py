@@ -239,7 +239,14 @@ class DevTools(commands.Cog):
                 await ctx.send(embed=embed)
             except:
                 pass
-            
+
+
+    @commands.is_owner()
+    @commands.command()
+    async def resetcooldown(self, ctx, command: str):
+            self.bot.get_command(command).reset_cooldown(ctx)
+            embed = discord.Embed(color=0xE67E22, description="Fjernet cooldown! :ok_hand:")
+            await ctx.send(embed=embed)
         
 
 def setup(bot):

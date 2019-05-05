@@ -28,11 +28,10 @@ class Info(commands.Cog):
         #   Last inn config
         with codecs.open("config.json", "r", encoding="utf8") as f:
             config = json.load(f)
-            devId = config["devId"]
             website = config["website"]
             github = config["github"]
 
-        dev = await self.bot.fetch_user(devId)
+        dev = await self.bot.fetch_user(170506717140877312)
 
         now = time.time()
         diff = int(now - self.bot.uptime)
@@ -99,11 +98,14 @@ class Info(commands.Cog):
             creationDagerString = "dager"
 
         totalmembers = 0
+        botmembers = 0
         onlinemembers = 0
         idlemembers = 0
         dndmembers = 0
         offlinemembers = 0
         for member in guild.members:
+            if member.bot:
+                botmembers += 1
             if str(member.status) == "online":
                 onlinemembers += 1
                 totalmembers += 1
@@ -164,9 +166,9 @@ class Info(commands.Cog):
         embed.add_field(name="Eier", value=guild.owner.mention)
         embed.add_field(name="Region", value=f"{flag} {guild.region}")
         embed.add_field(name="Server lagd", value=f"{guild_created}\n{since_created} {creationDagerString} siden")
-        embed.add_field(name=f"Kanaler ({totalChannels})", value=f"Tekst: {textChannels}\nTale: {voiceChannels}")
-        embed.add_field(name=f"Medlemmer ({totalmembers})", value=f"<:online:516328785910431754>Pålogget: **{onlinemembers}**\n<:idle:516328783347843082>Inaktiv: **{idlemembers}**\n<:dnd:516328782844395579>Ikke forstyrr: **{dndmembers}**\n<:offline:516328785407246356>Frakoblet: **{offlinemembers}**")
-        embed.add_field(name="Roller", value=roles, inline=False)
+        embed.add_field(name=f"Kanaler ({totalChannels})", value=f"Tekst: **{textChannels}**\nTale: **{voiceChannels}**")
+        embed.add_field(name=f"Medlemmer ({totalmembers})", value=f"Mennesker: **{int(totalmembers) - int(botmembers)}**\nBåtter: **{botmembers}**\n<:online:516328785910431754>{onlinemembers} <:idle:516328783347843082>{idlemembers} <:dnd:516328782844395579>{dndmembers} <:offline:516328785407246356>{offlinemembers}")
+        embed.add_field(name=f"Roller ({len(guild.roles)})", value=roles, inline=False)
         embed.set_thumbnail(url=guild.icon_url)
         embed.set_author(name=guild.name)
         await ctx.send(embed=embed)
@@ -191,7 +193,7 @@ class Info(commands.Cog):
 
         embed = discord.Embed(color=0x0085ff, url=guild.icon_url, description=roles)
         embed.set_thumbnail(url=guild.icon_url)
-        embed.set_author(name=f"Roller: {guild.name}")
+        embed.set_author(name=f"Roller ({len(guild.roles)}): {guild.name}")
         await ctx.send(embed=embed)
 
         
@@ -499,6 +501,35 @@ class Info(commands.Cog):
         embed = discord.Embed(color=0xE67E22)
         embed.add_field(name="Første Discordbrukerene på serveren", value=formattedString)
         embed.set_footer(text=f"Side: {side}/{pagecount}")
+        await ctx.send(embed=embed)
+
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def mestspilt(self, ctx):
+        """Sjekk hvilket spill som blir spilt mest på serveren"""
+
+        spill = {}
+        for member in ctx.guild.members:
+            if member.bot:
+                continue
+            if member.activity is None:
+                continue
+            if member.activity.name not in spill:
+                spill[member.activity.name] = 1
+                continue
+            spill[member.activity.name] += 1
+
+        if spill == {}:
+            await ctx.send("Det er ingen som spiller noe akkurat nå")
+            return
+        
+        gamelist = sorted(spill.items(), key=operator.itemgetter(1), reverse=True)
+        formattedString = ""
+        for game in gamelist[0:10]:
+            formattedString += f"**{game[0]}**: {game[1]}\n"
+
+        embed = discord.Embed(color=0xE67E22, title="De mest spilte spillene på serveren for øyeblikket", description=formattedString)
         await ctx.send(embed=embed)
 
 
