@@ -128,7 +128,7 @@ class Interaksjon(commands.Cog):
         embed = discord.Embed(description="Laster...")
         statusmsg = await ctx.send(embed=embed)
 
-         if bruker.id == ctx.message.author.id:
+        if bruker.id == ctx.message.author.id:
             embed = discord.Embed(description="Jeg vet du er ensom, men du kan ikke kile deg selv")
             await statusmsg.edit(embed=embed)
             return

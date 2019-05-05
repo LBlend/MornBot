@@ -5,7 +5,7 @@
     "presenceActivity": "playing",
     "website": "https://lblend.moe/",
     "github": "https://github.com/LBlend",
-    "mongodb_url": "" 
+    "mongodb_url": "",
     "openweathermapApiKey": "",
     "osuApiKey": "",
     "twitchApiKey": "",
