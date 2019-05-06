@@ -81,6 +81,10 @@ class Ordsky(commands.Cog):
         # Sett inn manglende data i database og sett samtykke
         if database_user is None:
             await default_db_insert(self, ctx)
+            database_user = database_col_users.find_one(database_find)
+            database_col_users.update_one(database_find,
+                                          {'$set':
+                                           {'ordsky_consent': True}})
         else:
             database_col_users.update_one(database_find,
                                           {'$set':
@@ -243,6 +247,8 @@ class Ordsky(commands.Cog):
         message_data = ''
         if database_user['ordsky_data'][f'{ctx.guild.id}'] is None:
             for channel in ctx.guild.text_channels:
+                if not channel.permissions_for(ctx.author).send_messages:
+                    continue
                 try:
                     async for message in channel.history(limit=2000):
                         if message.author.id == ctx.author.id:
@@ -258,6 +264,8 @@ class Ordsky(commands.Cog):
 
         else:
             for channel in ctx.guild.text_channels:
+                if not channel.permissions_for(ctx.author).send_messages:
+                    continue
                 try:
                     async for message in channel.history(limit=300):
                         if message.author.id == ctx.author.id:
@@ -284,6 +292,7 @@ class Ordsky(commands.Cog):
 
         # Lenkefiltrering i meldingsdata
         text = sub(r'http\S+', '', database_message_data)
+        text = sub(r':\S+', '', text)
 
         # Hent ordliste for filtrering
         with codecs.open('./assets/ordsky/ordliste.txt',
