@@ -286,7 +286,8 @@ class Ordsky(commands.Cog):
         text = sub(r'http\S+', '', database_message_data)
 
         # Hent ordliste for filtrering
-        with codecs.open('./assets/ordsky/ordliste.txt', 'r') as f:
+        with codecs.open('./assets/ordsky/ordliste.txt',
+                         'r', encoding='utf-8') as f:
             filtered_words = [line.split(',') for line in f.readlines()]
             filtered_words = filtered_words[0]
 
