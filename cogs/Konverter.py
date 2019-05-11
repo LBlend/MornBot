@@ -1,119 +1,173 @@
 import discord
-import asyncio
 from discord.ext import commands
 
-import codecs
-import json
-import random
-import urllib.parse
-import requests
-from datetime import datetime
+from codecs import open
+from json import load as json_load
 
-with codecs.open("config.json", "r", encoding="utf8") as f:
-    config = json.load(f)
-    prefix = config["prefix"]
-    ksoftAuthentication = config["ksoftAuthentication"]
+from requests import get
+from datetime import datetime
+from re import sub
+
+from .utils import Defaults
+
+with open('config.json', 'r', encoding='utf8') as f:
+    config = json_load(f)
+    prefix = config['prefix']
+    ksoft_auth = config['ksoft_authentication']
+
 
 class Konverter(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=["fahrenheittocelcius"])
+    @commands.command(aliases=['fahrenheittocelcius'])
     async def ftc(self, ctx, tall):
         """Konverterer temperatur fra fahrenheit til celcius"""
 
-        if "," in tall:
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
-            await ctx.send(embed=embed)
-            return
+        if ',' in tall:
+            tall = sub(',', '.', tall)
 
         try:
-            tempCelcius = round((float(tall) - 32) / 9 * 5, 2)
-        except:
-            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help ftc` for hjelp")
-            await ctx.send(embed=embed)
-            return
-        
-        embed = discord.Embed(color=0x0085ff, description=f"`{tall} °F` :arrow_right: `{tempCelcius} °C`")
-        await ctx.send(embed=embed)
-    
+            temp_celcius = round((float(tall) - 32) / 9 * 5, 2)
+        except ValueError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Det du har skrevet inn er ikke et tall\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
 
+        if temp_celcius > 1000000000000 or temp_celcius < -1000000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
+        embed = discord.Embed(
+            color=0x0085ff,
+            description=f'`{tall} °F` :arrow_right: `{temp_celcius} °C`')
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=["celciustofahrenheit"])
+    @commands.command(aliases=['celciustofahrenheit'])
     async def ctf(self, ctx, tall):
         """Konverterer temperatur fra celcius til fahrenheit"""
 
-        if "," in tall:
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
-            await ctx.send(embed=embed)
-            return
+        if ',' in tall:
+            tall = sub(',', '.', tall)
 
         try:
-            tempFahrenheit = round((float(tall) * 9) / 5 + 32, 2)
-        except:
-            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help ctf` for hjelp")
-            await ctx.send(embed=embed)
-            return
-        
-        embed = discord.Embed(color=0x0085ff, description=f"`{tall} °C` :arrow_right: `{tempFahrenheit} °F`")
-        await ctx.send(embed=embed)
-        
+            temp_fahrenheit = round((float(tall) * 9) / 5 + 32, 2)
+        except ValueError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Det du har skrevet inn er ikke et tall\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
 
+        if temp_fahrenheit > 1000000000000 or temp_fahrenheit < -1000000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
+        embed = discord.Embed(
+            color=0x0085ff,
+            description=f'`{tall} °C` :arrow_right: `{temp_fahrenheit} °F`')
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def bmi(self, ctx, vekt_kg, høyde_meter):
         """Beregner BMIen din"""
 
-        if "," in vekt_kg or "," in høyde_meter:
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
-            await ctx.send(embed=embed)
-            return
+        if ',' in vekt_kg or ',' in høyde_meter:
+            vekt_kg = sub(',', '.', vekt_kg)
+            høyde_meter = sub(',', '.', høyde_meter)
 
         try:
-            calculatedBMI = round(float(vekt_kg) / float(float(høyde_meter) * float(høyde_meter)), 2)
-        except:
-            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help bmi` for hjelp")
-            await ctx.send(embed=embed)
-            return
+            vekt_kg = float(vekt_kg)
+            høyde_meter = float(høyde_meter)
+            bmi = round(vekt_kg / (høyde_meter * høyde_meter), 2)
+        except ValueError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Det du har skrevet inn er ikke et tall\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
+
+        if bmi > 50 or bmi <= 5:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Sjekk om du har skrevet riktige tall. ' +
+                     'Beregningen har gitt et usannsynlig svar\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
 
         embed = discord.Embed(color=0x0085ff)
-        if calculatedBMI < 18.5:
-            txt = "Dette vil si at du er undervektig. Gå og nyt en burger du :)"
-        elif calculatedBMI > 25:
-            txt = "Dette vil si at du er overvektig. Få ræva i gir istedenfor å sitte på Discord!"
+        if bmi < 18.5:
+            text = 'Dette vil si at du er undervektig. ' +\
+                   'Gå og nyt en burger du :)'
+        elif bmi > 25:
+            text = 'Dette vil si at du er overvektig. ' +\
+                   'Få ræva i gir istedenfor å sitte på Discord!'
         else:
-            txt = "Dette er en sunn BMI. Bra Jobba!"
-        
-        embed.add_field(name="BMI", value=f"`{calculatedBMI}`\n{txt}")
+            text = 'Dette er en sunn BMI. Bra Jobba!'
+
+        embed.add_field(name='BMI', value=f'`{bmi}`\n{text}')
         await ctx.send(embed=embed)
 
-
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=["penger", "money", "currency"])
+    @commands.command(aliases=['penger', 'money', 'currency'])
     async def valuta(self, ctx, til_valuta, verdi, fra_valuta):
         """Se hvor mye noe er verdt i en annen valuta"""
 
-        embed = discord.Embed(description="Laster...")
-        statusmsg = await ctx.send(embed=embed)
+        embed = discord.Embed(description='Laster...')
+        status_msg = await ctx.send(embed=embed)
 
-        if "," in verdi:
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må bruke `.` istedenfor `,`")
-            await ctx.send(embed=embed)
-            return
-        
+        if ',' in verdi:
+            verdi = sub(',', '.', verdi)
+
         try:
-            data = requests.get("https://api.ksoft.si/kumo/currency", headers={"Authorization":"Bearer " + ksoftAuthentication}, params={"from": fra_valuta, "to": til_valuta, "value": float(verdi)}).json()
-            value = data["pretty"]
+            verdi = float(verdi)
+        except ValueError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Sjekk om du har skrevet riktige tall. ' +
+                     'Beregningen har gitt et usannsynlig svar\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
 
-            embed = discord.Embed(color=0x0085ff, description=f"`{verdi} {fra_valuta.upper()}` :arrow_right: `{value}`", timestamp=datetime.utcnow())
-            await statusmsg.edit(embed=embed)
+        if verdi > 1000000000000 or verdi < -1000000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
 
-        except:
-            embed = discord.Embed(color=0xFF0000, description=f":x: Noe gikk galt\n\nSkriv `{prefix}help valuta` for hjelp")
-            await statusmsg.edit(embed=embed)
-            return
+        try:
+            data = get(
+                'https://api.ksoft.si/kumo/currency',
+                headers={'Authorization': 'Bearer ' + ksoft_auth},
+                params={
+                    'from': fra_valuta,
+                    'to': til_valuta,
+                    'value': verdi}).json()
+            value = data['pretty']
+
+            embed = discord.Embed(
+                color=0x0085ff,
+                description=f'`{verdi} {fra_valuta.upper()}` ' +
+                f':arrow_right: `{value}`',
+                timestamp=datetime.utcnow())
+            await status_msg.edit(embed=embed)
+
+        except KeyError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Sjekk om du har satt gyldige valutaer\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
 
 
 def setup(bot):

@@ -1,10 +1,15 @@
+"""
+Project does not use .utils
+This is to not further complicate things
+when used with other bot setups.
+"""
+
 import discord
-import asyncio
 from discord.ext import commands
 
 import pymongo
 
-import codecs
+from codecs import open
 from json import load as json_load
 
 from PIL import Image
@@ -16,7 +21,7 @@ import functools
 from io import BytesIO
 
 # Hent prefiks og monogdb innlogging
-with codecs.open('config.json', 'r', encoding='utf8') as f:
+with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
     prefix = config['prefix']
     mongodb_url = config['mongodb_url']
@@ -26,14 +31,16 @@ mongo = pymongo.MongoClient(mongodb_url)
 database = mongo['discord']
 database_col_users = database['users']
 
-async def default_db_insert(self, ctx):
+
+async def default_db_insert(ctx):
     """Standardmal for ny bruker i database"""
     database_col_users.insert_one(
         {'_id': ctx.author.id,
          'ordsky_consent': False,
          'ordsky_data': {f'{ctx.guild.id}': None}})
 
-async def error_no_data(self, ctx):
+
+async def error_no_data(ctx):
     """Send standard feilmelding for ingen data"""
     embed = discord.Embed(
         color=0xF1C40F,
@@ -51,10 +58,10 @@ class Ordsky(commands.Cog):
     @staticmethod
     def generate(text, mask_bilde, filtered_words):
         """Generer ordsky"""
-        wc = WordCloud(font_path=None,
-                       max_words=4000,
+
+        wc = WordCloud(max_words=4000,
                        mask=mask_bilde,
-                       repeat=True,
+                       repeat=False,
                        stopwords=filtered_words)
         wc.process_text(text)
         wc.generate(text)
@@ -64,6 +71,7 @@ class Ordsky(commands.Cog):
         b.seek(0)
         return b
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command(aliases=['consent'])
     async def samtykke(self, ctx):
@@ -98,6 +106,7 @@ class Ordsky(commands.Cog):
                          text=f'{ctx.author.name}#{ctx.author.discriminator}')
         await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.command(aliases=['ingensamtykke', 'noconsent', 'slettdata'])
     async def tabort(self, ctx):
@@ -133,10 +142,11 @@ class Ordsky(commands.Cog):
                          text=f'{ctx.author.name}#{ctx.author.discriminator}')
         await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 60, commands.BucketType.user)
     @commands.command(aliases=['mydata'])
     async def minedata(self, ctx):
-        '''Få tilsendt dine data'''
+        """Få tilsendt dine data"""
 
         # Let i database etter bruker
         database_find = {'_id': ctx.author.id}
@@ -165,8 +175,8 @@ class Ordsky(commands.Cog):
             return await error_no_data(self, ctx)
 
         # Legg meldingsdata inn i tekstfil
-        with codecs.open(f'./assets/ordsky/{ctx.author.id}.txt',
-                         'a+', encoding='utf-8') as f:
+        with open(f'./assets/ordsky/{ctx.author.id}.txt',
+                  'a+', encoding='utf-8') as f:
             f.write(raw_data)
 
         # Send tekstfil
@@ -193,6 +203,8 @@ class Ordsky(commands.Cog):
         except:
             pass
 
+    @commands.bot_has_permissions(
+        embed_links=True, read_message_history=True, attach_files=True)
     @commands.cooldown(1, 150, commands.BucketType.user)
     @commands.command(aliases=['wordcloud', 'wc', 'sky'])
     async def ordsky(self, ctx):
@@ -231,7 +243,7 @@ class Ordsky(commands.Cog):
             embed.set_footer(
                 icon_url=ctx.author.avatar_url,
                 text=f'{ctx.author.name}#{ctx.author.discriminator}')
-            status_msg = await ctx.send(ctx.author.mention, embed=embed)
+            await ctx.send(ctx.author.mention, embed=embed)
             return self.bot.get_command('ordsky').reset_cooldown(ctx)
 
         # Statusmelding
@@ -295,8 +307,8 @@ class Ordsky(commands.Cog):
         text = sub(r':\S+', '', text)
 
         # Hent ordliste for filtrering
-        with codecs.open('./assets/ordsky/ordliste.txt',
-                         'r', encoding='utf-8') as f:
+        with open('./assets/ordsky/ordliste.txt',
+                  'r', encoding='utf-8') as f:
             filtered_words = [line.split(',') for line in f.readlines()]
             filtered_words = filtered_words[0]
 

@@ -1,154 +1,128 @@
 import discord
-import asyncio
 from discord.ext import commands
 
-import base64
-import requests
-import urllib.request
+from base64 import standard_b64encode
+from requests import get, post
 import os
 from datetime import timedelta
-import PIL
 from PIL import Image
 
-async def fileFetchFail(ctx, statusmsg):
-    embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-
-async def fileTooBig(ctx, statusmsg, fileSize):
-    embed = discord.Embed(color=0xFF0000, description=f":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-
-async def noFile(ctx, statusmsg):
-    embed = discord.Embed(color=0xF1C40F, description=f":exclamation: Du må gi meg et bilde")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+from .utils import LBlend_utils, Defaults
 
 
 class Whatanime(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.guild)
-    @commands.command(aliases=["anime", "ani", "source", "saus", "sauce"])
+    @commands.command(aliases=['anime', 'ani', 'source', 'saus', 'sauce'])
     async def whatanime(self, ctx, bilde=None):
         """Finner ut hvilken anime et skjermbilde er tatt fra"""
 
-        embed = discord.Embed(description="Finner saus... :mag_right:")
-        statusmsg = await ctx.send(embed=embed)
+        embed = discord.Embed(description='Finner saus... :mag_right:')
+        await Defaults.set_footer(ctx, embed)
+        status_msg = await ctx.send(embed=embed)
 
-        if ctx.message.attachments != [] and bilde == None:
-            if ctx.message.attachments[0].size > 8000000:
-                await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
-                return
-            try:
-                await ctx.message.attachments[0].save(fp=f"./assets/{ctx.message.author.id}_trace.png")
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                return
-        
-        elif ctx.message.attachments == [] and bilde != None:
-            try:
-                linkedFile = requests.get(str(bilde))
-                linkedFileSize = len(linkedFile.content)
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                return
-
-            if linkedFileSize > 8000000:
-                await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
-                return
-
-            try:
-                urllib.request.urlretrieve(str(bilde), f"./assets/{ctx.message.author.id}_trace.png")
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                return
-
-        else:
-            await noFile(ctx, statusmsg)
+        if not await LBlend_utils.download_photo(
+                ctx, status_msg,
+                link=bilde, max_file_size=8,
+                meassurement_type='MB',
+                filepath=f'./assets/{ctx.author.id}_trace.png'):
             return
 
-        filesize = os.path.getsize(f"./assets/{ctx.message.author.id}_trace.png")
+        filesize = os.path.getsize(f'./assets/{ctx.author.id}_trace.png')
         if filesize > 1000000:
-            basewidth = 300
-            img = Image.open(f"./assets/{ctx.message.author.id}_trace.png")
-            wpercent = (basewidth / float(img.size[0]))
-            hsize = int((float(img.size[1]) * float(wpercent)))
-            img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-            img.save(f"./assets/{ctx.message.author.id}_trace.png")
+            base_width = 300
+            img = Image.open(f'./assets/{ctx.author.id}_trace.png')
+            width_percent = (base_width / float(img.size[0]))
+            height_size = int((float(img.size[1]) * float(width_percent)))
+            img = img.resize((base_width, height_size), Image.ANTIALIAS)
+            img.save(f'./assets/{ctx.author.id}_trace.png')
 
-            newFilesize = os.path.getsize(f"./assets/{ctx.message.author.id}_trace.png")
-            if newFilesize > 1000000:
-                await fileTooBig(ctx, statusmsg, fileSize=None)
-                os.remove(f"./assets/{ctx.message.author.id}_trace.png")
-                return
+            new_file_size = os.path.getsize(
+                f'./assets/{ctx.author.id}_trace.png')
+            if await LBlend_utils.check_file_too_big(
+                    ctx, status_msg,
+                    file=new_file_size,
+                    max_file_size=1,
+                    meassurement_type='MB'):
+                return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
-        with open(f"./assets/{ctx.message.author.id}_trace.png", "rb") as f:
-            base = base64.standard_b64encode(f.read())
-            try:
-                data = requests.post("https://trace.moe/api/search", data={'image': base}).json()
-            except:
-                embed = discord.Embed(color=0xF1C40F, description=":exclamation: Ingen saus ble funnet")
-                await ctx.send(content=ctx.message.author.mention, embed=embed)
-                await statusmsg.delete()
-                os.remove(f"./assets/{ctx.message.author.id}_trace.png")
-                return
+        with open(f'./assets/{ctx.author.id}_trace.png', 'rb') as f:
+            base = standard_b64encode(f.read())
+            data = post(
+                'https://trace.moe/api/search',
+                data={'image': base}).json()
 
-        similarity = data["docs"][0]["similarity"]
+        similarity = data['docs'][0]['similarity']
         if similarity < 0.85:
-            embed = discord.Embed(color=0xF1C40F, description=":exclamation: Saus ble funnet, men grunnet lav likhetsprosent, er det høy sannsynlighet for at dette ikke er riktig saus. Vennligst prøv et annet bilde")
-            await ctx.send(content=ctx.message.author.mention, embed=embed)
-            await statusmsg.delete()
-            os.remove(f"./assets/{ctx.message.author.id}_trace.png")
-            return
-
-        anilistId = data["docs"][0]["anilist_id"]
-        malId = data["docs"][0]["mal_id"]
-        romajiTitle = data["docs"][0]["title_romaji"]
-        nativeTitle = data["docs"][0]["title_native"]
-        englishTitle = data["docs"][0]["title_english"]
-        episode = data["docs"][0]["episode"]
-        time = int(data["docs"][0]["at"])
-
-        malData = requests.get(f"https://api.jikan.moe/v3/anime/{malId}/pictures").json()
-        thumbnail = malData["pictures"][0]["small"]
-
-        similarity_percent = round(similarity * 100, 2)
-        formattedTime = timedelta(seconds=time)
-        if episode == "":
-            episode = "0 (Film)"
+            await Defaults.error_warning_edit(
+                ctx, status_msg,
+                text='Saus ble funnet, men grunnet ' +
+                     'lav likhetsprosent, er det høy sannsynlighet ' +
+                     'for at dette ikke er riktig saus')
+            return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
         try:
-            embed = discord.Embed(title=romajiTitle, color=0x0085ff, url=f"https://anilist.co/anime/{anilistId}")
+            anilist_id = data['docs'][0]['anilist_id']
+            mal_id = data['docs'][0]['mal_id']
+            title_romaji = data['docs'][0]['title_romaji']
+            title_native = data['docs'][0]['title_native']
+            title_english = data['docs'][0]['title_english']
+            episode = data['docs'][0]['episode']
+            time = int(data['docs'][0]['at'])
+        except KeyError:
+            await Defaults.error_fatal_edit(
+                ctx, status_msg,
+                text='Fant ingen saus')
+            return os.remove(f'./assets/{ctx.author.id}_trace.png')
+
+        similarity_percent = round(similarity * 100, 2)
+        formatted_time = timedelta(seconds=time)
+        if episode is '':
+            episode = '0 (Film)'
+
+        thumbnail_data = get(
+            f'https://api.jikan.moe/v3/anime/{mal_id}/pictures').json()
+
+        embed = discord.Embed(
+            title=title_romaji,
+            color=0x0085ff,
+            url=f'https://anilist.co/anime/{anilist_id}',
+            description=f'{title_native}\n{title_english}')
+        embed.set_author(
+            name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        try:
+            thumbnail = thumbnail_data['pictures'][0]['small']
             embed.set_thumbnail(url=thumbnail)
-            embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
-            embed.description = f"{nativeTitle}\n{englishTitle}"
-            embed.add_field(name="Episode", value=str(episode))
-            embed.add_field(name="Tidspunkt", value=str(formattedTime))
-            embed.add_field(name="Likhet %", value=f"{similarity_percent}%")
-            embed.add_field(name="Lenker", value=f"[MAL](https://myanimelist.net/anime/{malId}) | [Anilist](https://anilist.co/anime/{anilistId})")
+        except KeyError:
+            pass
+        embed.add_field(name='Episode', value=str(episode))
+        embed.add_field(name='Tidspunkt', value=str(formatted_time))
+        embed.add_field(name='Likhet %', value=f'{similarity_percent}%')
+        embed.add_field(
+            name='Lenker',
+            value=f'[MAL](https://myanimelist.net/anime/{mal_id}) | ' +
+            f'[Anilist](https://anilist.co/anime/{anilist_id})')
+        await ctx.send(content=ctx.author.mention, embed=embed)
+        await status_msg.delete()
 
-            await ctx.send(content=ctx.message.author.mention, embed=embed)
-            await statusmsg.delete()
+        os.remove(f'./assets/{ctx.author.id}_trace.png')
 
-        except:
-            embed = discord.Embed(color=0xFF0000, description=":x: Fant ingen saus :(")
-            await ctx.send(content=ctx.message.author.mention, embed=embed)
-            await statusmsg.delete()
-
-        os.remove(f"./assets/{ctx.message.author.id}_trace.png")
-
-
+    @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
     @commands.command()
     async def tracelimit(self, ctx):
-        data = requests.get("https://trace.moe/api/me").json()
-        limit = data["limit"]
-        limit_ttl = data["limit_ttl"]
+        data = get('https://trace.moe/api/me').json()
+        limit = data['limit']
+        limit_ttl = data['limit_ttl']
 
         embed = discord.Embed(color=0xE67E22)
-        embed.add_field(name="Limits", value=f"{limit} requests\n{limit_ttl} sekunder til resettelse")
+        embed.add_field(
+            name='Limits',
+            value=f'{limit} requests\n{limit_ttl} sekunder til resettelse')
         await ctx.send(embed=embed)
-
 
 
 def setup(bot):

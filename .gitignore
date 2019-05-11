@@ -3,7 +3,8 @@
 *.pyc
 __pycache__/
 .vscode/
-FunReplies.py
+venv/
+.idea/
 *.log
 *.mp3
 *.wav

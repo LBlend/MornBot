@@ -8,3 +8,4 @@ matplotlib
 pillow
 BeautifulSoup4
 pymongo
+numpy

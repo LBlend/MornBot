@@ -1,84 +1,46 @@
 import discord
-import asyncio
 from discord.ext import commands
 
-import urllib
-import requests
-import os
-import PIL
+from os import remove
 from PIL import Image
 
-async def fileFetchFail(ctx, statusmsg):
-    embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-
-async def fileTooBig(ctx, statusmsg, fileSize):
-    embed = discord.Embed(color=0xFF0000, description=f":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn {fileSize}")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
-
-async def noFile(ctx, statusmsg):
-    embed = discord.Embed(color=0xF1C40F, description=f":exclamation: Du må gi meg et bilde")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+from .utils import LBlend_utils
 
 
 class ImageManipulation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
+    @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=["needsmorejpeg", "jpg", "jpeg"])
+    @commands.command(aliases=['needsmorejpeg', 'jpg', 'jpeg'])
     async def needsmorejpg(self, ctx, bilde=None):
 
-        embed = discord.Embed(description="JPG-ifiserer...")
-        statusmsg = await ctx.send(embed=embed)
+        embed = discord.Embed(description='JPG-ifiserer...')
+        embed.set_footer(
+            icon_url=ctx.author.avatar_url,
+            text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        status_msg = await ctx.send(embed=embed)
 
-        if ctx.message.attachments != [] and bilde == None:
-            if ctx.message.attachments[0].size > 8000000:
-                await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
-                return
-            try:
-                await ctx.message.attachments[0].save(fp=f"./assets/{ctx.message.author.id}_notjpged.png")
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                return
-        
-        elif ctx.message.attachments == [] and bilde != None:
-            try:
-                linkedFile = requests.get(str(bilde))
-                linkedFileSize = len(linkedFile.content)
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                return
-
-            if linkedFileSize > 8000000:
-                await fileTooBig(ctx, statusmsg, fileSize="8 MiB")
-                return
-
-            try:
-                urllib.request.urlretrieve(str(bilde), f"./assets/{ctx.message.author.id}_notjpged.png")
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                return
-
-        else:
-            await noFile(ctx, statusmsg)
+        if not await LBlend_utils.download_photo(
+                ctx, status_msg,
+                link=bilde, max_file_size=8,
+                meassurement_type='MB',
+                filepath=f'./assets/{ctx.author.id}_notjpged.png'):
             return
 
-        rawimage = Image.open(f"./assets/{ctx.message.author.id}_notjpged.png")
-        rawimageNonRGB = rawimage.convert("RGB") 
-        rawimageNonRGB.save(f"./assets/{ctx.message.author.id}_jpged.jpg", quality=5)
+        raw_image = Image.open(f'./assets/{ctx.author.id}_notjpged.png')
+        raw_image_not_rgb = raw_image.convert('RGB')
+        raw_image_not_rgb.save(
+            f'./assets/{ctx.author.id}_jpged.jpg', quality=5)
 
-        f = discord.File(f"./assets/{ctx.message.author.id}_jpged.jpg")
+        f = discord.File(f'./assets/{ctx.author.id}_jpged.jpg')
         await ctx.send(file=f)
-        await statusmsg.delete()
+        await status_msg.delete()
 
         try:
-            os.remove(f"./assets/{ctx.message.author.id}_notjpged.png")
-        except:
-            pass
-        try:
-            os.remove(f"./assets/{ctx.message.author.id}_jpged.jpg")
+            remove(f'./assets/{ctx.author.id}_notjpged.png')
+            remove(f'./assets/{ctx.author.id}_jpged.jpg')
         except:
             pass
 

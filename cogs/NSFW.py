@@ -1,73 +1,63 @@
 import discord
-import asyncio
 from discord.ext import commands
 
-import requests
+from requests import get
+
 
 class NSFW(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=["bj"])
+    @commands.command(aliases=['bj'])
     async def blowjob(self, ctx):
-        """Blowjob"""
+        """Blowjob GIF"""
 
-        embed = discord.Embed(description="Laster...")
-        statusmsg = await ctx.send(embed=embed)
+        embed = discord.Embed(description='Laster...')
+        status_msg = await ctx.send(embed=embed)
 
-        if not ctx.channel.is_nsfw():
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
-            await statusmsg.edit(embed=embed)
-            return
-
-        data = requests.get("https://nekos.life/api/v2/img/bj").json()
-        bj = data["url"]
+        data = get('https://nekos.life/api/v2/img/bj').json()
+        returned_data = data['url']
 
         embed = discord.Embed(color=0x0085ff)
-        embed.set_image(url=bj)
-        await statusmsg.edit(embed=embed)
+        embed.set_image(url=returned_data)
+        await status_msg.edit(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def yuri(self, ctx):
         """Yuri"""
-        
-        embed = discord.Embed(description="Laster...")
-        statusmsg = await ctx.send(embed=embed)
 
-        if not ctx.channel.is_nsfw():
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
-            await statusmsg.edit(embed=embed)
-            return
+        embed = discord.Embed(description='Laster...')
+        status_msg = await ctx.send(embed=embed)
 
-        data = requests.get("https://nekos.life/api/v2/img/yuri").json()
-        yuri = data["url"]
+        data = get('https://nekos.life/api/v2/img/yuri').json()
+        returned_data = data['url']
 
         embed = discord.Embed(color=0x0085ff)
-        embed.set_image(url=yuri)
-        await statusmsg.edit(embed=embed)
+        embed.set_image(url=returned_data)
+        await status_msg.edit(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=["felle"])
+    @commands.command(aliases=['felle'])
     async def trap(self, ctx):
         """Er det en gutt eller en jente?"""
 
-        embed = discord.Embed(description="Laster...")
-        statusmsg = await ctx.send(embed=embed)
+        embed = discord.Embed(description='Laster...')
+        status_msg = await ctx.send(embed=embed)
 
-        if not ctx.channel.is_nsfw():
-            embed = discord.Embed(color=0xFF0000, description=":x: Du må være i en NSFW-kanal")
-            await statusmsg.edit(embed=embed)
-            return
-
-        data = requests.get("https://nekos.life/api/v2/img/trap").json()
-        trap = data["url"]
+        data = get('https://nekos.life/api/v2/img/trap').json()
+        returned_data = data['url']
 
         embed = discord.Embed(color=0x0085ff)
-        embed.set_image(url=trap)
-        await statusmsg.edit(embed=embed)
+        embed.set_image(url=returned_data)
+        await status_msg.edit(embed=embed)
 
 
 def setup(bot):
