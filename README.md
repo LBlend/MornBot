@@ -6,9 +6,7 @@ Norwegian Discord bot written for personal use. **It is not recommended that you
 
 In order to run the bot yourself you need to install the things listed below
 
-```
-Python 3.6 or newer
-```
+* Python 3.6 or newer
 
 ### Installing
 
@@ -38,7 +36,7 @@ It is preferred that you also consider these points, but they are not required
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 
 
