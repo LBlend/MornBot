@@ -1,233 +1,348 @@
+"""
+Project does not use .utils
+This is to not further complicate things
+when used with other bot setups.
+"""
+
 import discord
-import asyncio
 from discord.ext import commands
 
-import codecs
-import json
-from pathlib import Path
-import os
-import urllib
-import requests
+import pymongo
+
+from codecs import open
+from json import load as json_load
+
 from PIL import Image
-import numpy as np
-from wordcloud import WordCloud, ImageColorGenerator
+from numpy import array
+from wordcloud import WordCloud
+from re import sub
+from os import remove
+import functools
+from io import BytesIO
 
-with codecs.open("config.json", "r", encoding="utf8") as f:
-    config = json.load(f)
-    prefix = config["prefix"]
+# Hent prefiks og monogdb innlogging
+with open('config.json', 'r', encoding='utf8') as f:
+    config = json_load(f)
+    prefix = config['prefix']
+    mongodb_url = config['mongodb_url']
 
-async def fileFetchFail(ctx, statusmsg):
-    embed = discord.Embed(color=0xFF0000, description=":x: Henting av bilde feilet")
-    await ctx.send(content=ctx.message.author.mention, embed=embed)
-    await statusmsg.delete()
-
-async def fileTooBig(ctx, statusmsg, fileSize):
-    embed = discord.Embed(color=0xFF0000, description=f":x: **Stoppet!**\n\nFilen er for stor. Prøv en fil som er mindre enn {fileSize}")
-    await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+# Koble til database
+mongo = pymongo.MongoClient(mongodb_url)
+database = mongo['discord']
+database_col_users = database['users']
 
 
-class Ordsky:
+async def default_db_insert(ctx):
+    """Standardmal for ny bruker i database"""
+    database_col_users.insert_one(
+        {'_id': ctx.author.id,
+         'ordsky_consent': False,
+         'ordsky_data': {f'{ctx.guild.id}': None}})
+
+
+async def error_no_data(ctx):
+    """Send standard feilmelding for ingen data"""
+    embed = discord.Embed(
+        color=0xF1C40F,
+        description=':exclamation: Jeg har ingen data om deg å ' +
+                    'sende eller så kan jeg ikke sende meldinger til deg!')
+    embed.set_footer(icon_url=ctx.author.avatar_url,
+                     text=f'{ctx.author.name}#{ctx.author.discriminator}')
+    await ctx.send(embed=embed)
+
+
+class Ordsky(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @staticmethod
+    def generate(text, mask_bilde, filtered_words):
+        """Generer ordsky"""
 
+        wc = WordCloud(max_words=4000,
+                       mask=mask_bilde,
+                       repeat=False,
+                       stopwords=filtered_words)
+        wc.process_text(text)
+        wc.generate(text)
+        img = wc.to_image()
+        b = BytesIO()
+        img.save(b, 'png')
+        b.seek(0)
+        return b
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
-    @commands.command(aliases=["consent"])
+    @commands.command(aliases=['consent'])
     async def samtykke(self, ctx):
         """Gi samtykke til å samle meldingsdataen din"""
-    
-        userDataFile = Path(f"./assets/userdata/{ctx.message.author.id}.json")
-        if userDataFile.is_file() == False:
-            with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "w") as f:
-                json.dump({"name": f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "consent": True}, f)
-            
-        else:
-            """NEEDS TO BE REWRITTEN. TEMPORARY SOLUTION"""
-            with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "r+") as f:
-                userData = json.load(f)
-                userData["consent"] = True
-                with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "w") as f2:
-                    f2.seek(0)
-                    f2.write(json.dumps(userData))
-        
-        embed = discord.Embed(color=0x0085ff, description=f":white_check_mark: Samtykke registrert!")
-        await ctx.send(embed=embed)
 
-
-    @commands.cooldown(1, 2, commands.BucketType.user)
-    @commands.command(aliases=["ingensamtykke", "noconsent"])
-    async def tabort(self, ctx):
-        """Ta bort samtykken din om samling av meldingsdata"""
-
-        userDataFile = Path(f"./assets/userdata/{ctx.message.author.id}.json")
-        if userDataFile.is_file() == False:
-            with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "w") as f:
-                json.dump({"name": f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "consent": False}, f)
-
-        else:
-            with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "r+") as f:
-                userData = json.load(f)
-                userData["consent"] = False
-                f.seek(0)
-                f.write(json.dumps(userData))  
-
-        userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt")
+        # Let i database etter bruker
+        database_find = {'_id': ctx.author.id}
         try:
-            os.remove(userMessages)
+            database_user = database_col_users.find_one(database_find)
         except:
-            pass
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
-        embed = discord.Embed(color=0x0085ff, description=f":white_check_mark: Meldingsdata er slettet!")
+        # Sett inn manglende data i database og sett samtykke
+        if database_user is None:
+            await default_db_insert(self, ctx)
+            database_user = database_col_users.find_one(database_find)
+            database_col_users.update_one(database_find,
+                                          {'$set':
+                                           {'ordsky_consent': True}})
+        else:
+            database_col_users.update_one(database_find,
+                                          {'$set':
+                                           {'ordsky_consent': True}})
+
+        # Send bekreftelsesmelding
+        embed = discord.Embed(
+            color=0x0085ff,
+            description=':white_check_mark: Samtykke registrert!')
+        embed.set_footer(icon_url=ctx.author.avatar_url,
+                         text=f'{ctx.author.name}#{ctx.author.discriminator}')
         await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    @commands.command(aliases=['ingensamtykke', 'noconsent', 'slettdata'])
+    async def tabort(self, ctx):
+        """Fjern samtykke og slett meldingsdata"""
 
+        # Let i database etter bruker
+        database_find = {'_id': ctx.author.id}
+        try:
+            database_user = database_col_users.find_one(database_find)
+        except:
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
+
+        # Sett inn manglende data i database/fjern samtykke og meldingsdata
+        if database_user is None:
+            await default_db_insert(self, ctx)
+        else:
+            database_col_users.update_one(database_find,
+                                          {'$set':
+                                           {'ordsky_consent': False}})
+            for guild in database_user['ordsky_data']:
+                database_col_users.update_one(database_find,
+                                              {'$set':
+                                               {f'ordsky_data.{guild}': None}},
+                                              upsert=True)
+
+        # Send bekreftelsesmelding
+        embed = discord.Embed(
+            color=0x0085ff,
+            description=':white_check_mark: Meldingsdata er slettet!')
+        embed.set_footer(icon_url=ctx.author.avatar_url,
+                         text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 60, commands.BucketType.user)
-    @commands.command(aliases=["mydata"])
+    @commands.command(aliases=['mydata'])
     async def minedata(self, ctx):
         """Få tilsendt dine data"""
 
+        # Let i database etter bruker
+        database_find = {'_id': ctx.author.id}
         try:
-            await ctx.message.author.send(file=discord.File(f"./assets/ordsky/tekst/{ctx.message.author.id}.txt"))
-            embed = discord.Embed(color=0x0085ff, description=f":white_check_mark: Meldingsdata har blitt sendt i DM!")
+            database_user = database_col_users.find_one(database_find)
         except:
-            embed = discord.Embed(color=0xF1C40F, description=":exclamation: Jeg har ingen data om deg å sende!")
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
+        # Sett inn manglende data i database og send melding om ingen data
+        if database_user is None:
+            await default_db_insert(self, ctx)
+            return await error_no_data(self, ctx)
+
+        # Hent data fra alle guilds og samle i string
+        raw_data = ''
+        for key, value in database_user['ordsky_data'].items():
+            if value is None:
+                continue
+            else:
+                raw_data += value
+
+        # Feilmelding om ingen meldingsdata er funnet
+        if raw_data == '':
+            return await error_no_data(self, ctx)
+
+        # Legg meldingsdata inn i tekstfil
+        with open(f'./assets/ordsky/{ctx.author.id}.txt',
+                  'a+', encoding='utf-8') as f:
+            f.write(raw_data)
+
+        # Send tekstfil
+        try:
+            await ctx.author.send(
+                file=discord.File(f'./assets/ordsky/{ctx.author.id}.txt'))
+            embed = discord.Embed(
+                color=0x0085ff,
+                description=':white_check_mark: Meldingsdata har ' +
+                            'blitt sendt i DM!')
+        except:
+            embed = discord.Embed(
+                color=0xFF0000,
+                description=':x: Sending av data feilet! ' +
+                            'Sjekk om du har blokkert meg')
+        embed.set_footer(
+            icon_url=ctx.author.avatar_url,
+            text=f'{ctx.author.name}#{ctx.author.discriminator}')
         await ctx.send(embed=embed)
 
+        # Slett den lokale tekstfilen
+        try:
+            remove(f'./assets/ordsky/{ctx.author.id}.txt')
+        except:
+            pass
 
+    @commands.bot_has_permissions(
+        embed_links=True, read_message_history=True, attach_files=True)
     @commands.cooldown(1, 150, commands.BucketType.user)
-    @commands.command(aliases=["wordcloud", "wc", "sky"])
-    async def ordsky(self, ctx, bilde=None):
+    @commands.command(aliases=['wordcloud', 'wc', 'sky'])
+    async def ordsky(self, ctx):
         """Generer en ordsky"""
 
-        #   Sjekk samtykke
-        userDataFile = Path(f"./assets/userdata/{ctx.message.author.id}.json")
-        if userDataFile.is_file() == False:
-            with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "w") as f:
-                json.dump({"name": f"{ctx.message.author.name}#{ctx.message.author.discriminator}", "consent": False}, f)
-      
-        with codecs.open(f"./assets/userdata/{ctx.message.author.id}.json", "r", encoding="utf8") as f:
-            userData = json.load(f)
-            consent = userData["consent"]
+        # Let i database etter bruker
+        database_find = {'_id': ctx.author.id}
+        try:
+            database_user = database_col_users.find_one(database_find)
+        except:
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
+                                  'tilkobling til databasen. ' +
+                                  'Be boteier om å fikse dette')
 
-        if consent == False:
-            embed = discord.Embed(color=0xF1C40F, description=f":exclamation: Du må gi meg tillatelse til å samle og beholde meldingsdataene dine.\n\nSkriv `{prefix}samtykke` for å gjøre dette")
-            statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)
-            self.bot.get_command("ordsky").reset_cooldown(ctx)
-            return
+        # Sett inn manglende data i database
+        if database_user is None:
+            await default_db_insert(self, ctx)
+            database_user = database_col_users.find_one(database_find)
+        if ctx.guild.id not in database_user['ordsky_data']:
+            database_col_users.update_one(
+                database_find,
+                {'$set':
+                 {f'ordsky_data.{ctx.guild.id}': None}},
+                upsert=True)
 
-        #   Statusmelding
-        embed = discord.Embed(description="**Teller ord:** :hourglass:\n**Generer ordsky:** -")
-        statusmsg = await ctx.send(ctx.message.author.mention, embed=embed)  
+        # Let i database på nytt for opddaterte verdier
+        database_user = database_col_users.find_one(database_find)
 
-        #   Hent bilde
-        if bilde == "ostehøvel":
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/ostmask.png"))
-        elif bilde == "laugh":
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/laughmask.png"))
+        # Sjekk om bruker har gitt samtykke
+        if database_user['ordsky_consent'] is False:
+            embed = discord.Embed(
+                color=0xF1C40F,
+                description=':exclamation: Du må gi meg tillatelse til å ' +
+                            'samle og beholde meldingsdataene dine.\n\n' +
+                            f'Skriv `{prefix}samtykke` for å gjøre dette')
+            embed.set_footer(
+                icon_url=ctx.author.avatar_url,
+                text=f'{ctx.author.name}#{ctx.author.discriminator}')
+            await ctx.send(ctx.author.mention, embed=embed)
+            return self.bot.get_command('ordsky').reset_cooldown(ctx)
 
-        elif ctx.message.attachments != [] and bilde == None:
-            if ctx.message.attachments[0].size() > 2000000:
-                await fileTooBig(ctx, statusmsg, fileSize="2 MiB")
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-            try:
-                await ctx.message.attachments[0].save(fp=f"{ctx.message.author.id}_mask.png")
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
+        # Statusmelding
+        embed = discord.Embed(
+            description='**Henter meldinger:** :hourglass:\n' +
+                        '**Generer ordsky:** -')
+        embed.set_footer(
+            icon_url=ctx.author.avatar_url,
+            text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        status_msg = await ctx.send(embed=embed)
 
-        elif ctx.message.attachments == [] and bilde != None:
-            try:
-                linkedFile = requests.get(str(bilde))
-                linkedFileSize = len(linkedFile.content)
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return               
-
-            if linkedFileSize > 2000000:
-                await fileTooBig(ctx, statusmsg, fileSize="2 MiB")
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-
-            try:
-                urllib.request.urlretrieve(str(bilde), f"{ctx.message.author.id}_mask.png")
-                maskbilde = np.array(Image.open(f"{ctx.message.author.id}_mask.png"))
-            except:
-                await fileFetchFail(ctx, statusmsg)
-                self.bot.get_command("ordsky").reset_cooldown(ctx)
-                return
-
-        else:
-            maskbilde = np.array(Image.open("./assets/ordsky/mask/owomask.png"))
-
-        #   Søk etter ord
-        """NEEDS TO BE REWRITTEN. TEMPORARY SOLUTION"""
-        userMessages = Path(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt")
-        if userMessages.is_file() == False:
-            with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt", "a+") as f:
-                for channel in ctx.message.guild.text_channels:
-                    async for message in channel.history(limit=4000):
-                        if message.author.id == ctx.message.author.id:
-                            try:
-                                f.write(f"{message.content} ")
-                            except:
-                                pass
-                        else:
-                            pass
+        # Hent meldinger
+        message_data = ''
+        if database_user['ordsky_data'][f'{ctx.guild.id}'] is None:
+            for channel in ctx.guild.text_channels:
+                if not channel.permissions_for(ctx.author).send_messages:
+                    continue
+                try:
+                    async for message in channel.history(limit=2000):
+                        if message.author.id == ctx.author.id:
+                            message_data += f'{message.clean_content} '
+                except:
+                    continue
+            database_col_users.update_one(
+                database_find,
+                {'$set':
+                 {f'ordsky_data.{ctx.guild.id}': message_data}},
+                upsert=True)
+            database_message_data = message_data
 
         else:
-            with codecs.open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt", "a+") as f:
-                for channel in ctx.message.guild.text_channels:
+            for channel in ctx.guild.text_channels:
+                if not channel.permissions_for(ctx.author).send_messages:
+                    continue
+                try:
                     async for message in channel.history(limit=300):
-                        if message.author.id == ctx.message.author.id:
-                            try:
-                                f.write(f"{message.content} ")
-                            except:
-                                pass
-                        else:
-                            pass
+                        if message.author.id == ctx.author.id:
+                            message_data += f'{message.clean_content} '
+                except:
+                    continue
+            database_message_data = database_user['ordsky_data']
+            [f'{ctx.guild.id}']
+            database_message_data += message_data
+            database_col_users.update_one(
+                database_find,
+                {'$set':
+                 {f'ordsky_data.{ctx.guild.id}': database_message_data}},
+                upsert=True)
 
-        text = open(f"./assets/ordsky/tekst/{ctx.message.author.id}_{ctx.message.guild.id}.txt").read()
+        # Rediger statusmelding. Fortell at meldingshenting er ferdig
+        embed = discord.Embed(
+            description='**Henter meldinger:** :white_check_mark:\n' +
+                        '**Generer ordsky:** :hourglass:')
+        embed.set_footer(
+            icon_url=ctx.author.avatar_url,
+            text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        await status_msg.edit(embed=embed)
 
-        await statusmsg.edit(content=ctx.message.author.mention)
-        embed = discord.Embed(description="**Teller ord:** :white_check_mark:\n**Generer ordsky:** :hourglass:")
-        await statusmsg.edit(content=ctx.message.author.mention, embed=embed)
+        # Lenkefiltrering i meldingsdata
+        text = sub(r'http\S+', '', database_message_data)
+        text = sub(r':\S+', '', text)
 
-        #   Ordsky innstillinger
-        wc = WordCloud(font_path=None, max_words=4000, mask=maskbilde)
+        # Hent ordliste for filtrering
+        with open('./assets/ordsky/ordliste.txt',
+                  'r', encoding='utf-8') as f:
+            filtered_words = [line.split(',') for line in f.readlines()]
+            filtered_words = filtered_words[0]
 
-        #   Generer ordsky
-        wc.generate(text)
+        # Hent skyform/mask
+        mask_bilde = array(Image.open('./assets/ordsky/mask/skyform.png'))
 
-        #   Fargelegg
-        if  ctx.message.attachments != [] or bilde == "laugh":
-            image_colors = ImageColorGenerator(maskbilde)
-            wc.recolor(color_func=image_colors)
-        elif ctx.message.attachments == [] and bilde != None:
-            image_colors = ImageColorGenerator(maskbilde)
-            wc.recolor(color_func=image_colors)
+        task = functools.partial(
+            Ordsky.generate, text,
+            mask_bilde, filtered_words)
+        b = await self.bot.loop.run_in_executor(None, task)
 
-        #   Lagre bilde
-        wc.to_file(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
+        # Sett embedfarge
+        if str(ctx.author.color) != '#000000':
+            color = ctx.author.color
+        else:
+            color = discord.Colour(0x99AAB5)
 
-        #   Send bilde
-        await ctx.send(f":white_check_mark: Generert ordsky for {ctx.message.author.mention}", file=discord.File(f"./assets/ordsky/bilde/{ctx.message.author.id}.png"))
+        # Lag embed og send
+        final_image = discord.File(
+            b, filename=f'{ctx.author.id}_{ctx.guild.id}.png')
+        embed = discord.Embed(
+            color=color,
+            description=':cloud: Her er ordskyen din! :cloud:')
+        embed.set_image(url=f'attachment://{ctx.author.id}_{ctx.guild.id}.png')
+        embed.set_footer(
+            text=f'{ctx.author.name}#{ctx.author.discriminator}',
+            icon_url=ctx.author.avatar_url)
+        await ctx.send(
+            file=final_image,
+            content=ctx.author.mention,
+            embed=embed)
 
-        #   Cleanup, sletting
-        await statusmsg.delete()
-        
-        try:
-            os.remove(f"./{ctx.message.author.id}_mask.png")
-        except:
-            pass
-        try:
-            os.remove(f"./assets/ordsky/bilde/{ctx.message.author.id}.png")
-        except:
-            pass
+        # Slett statusmelding
+        await status_msg.delete()
 
 
 def setup(bot):

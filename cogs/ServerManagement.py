@@ -1,99 +1,56 @@
 import discord
-import asyncio
 from discord.ext import commands
 
-import json
-import codecs
-import time
-from pathlib import Path
+from .utils import Defaults
 
-class ServerManagement:
+
+class ServerManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
+    @commands.bot_has_permissions(kick_members=True)
+    @commands.has_permissions(kick_members=True)
     @commands.guild_only()
-    @commands.has_permissions(ban_members=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=["spark"])
-    async def kick(self, ctx, *, bruker: discord.Member):
+    @commands.command(aliases=['spark'])
+    async def kick(self, ctx, bruker: discord.Member):
         """Kaster ut en bruker fra serveren"""
 
         await bruker.kick()
-        await ctx.send(f"<@{bruker.id}> ({bruker.name}#{bruker.discriminator}) ble kastet ut av serveren")
+        await ctx.send(f'{bruker.mention} ' +
+                       f'({bruker.name}#{bruker.discriminator}) ' +
+                       'ble kastet ut av serveren')
 
-
-    @commands.guild_only()
+    @commands.bot_has_permissions(ban_members=True)
     @commands.has_permissions(ban_members=True)
+    @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
-    async def ban(self, ctx, *, bruker: discord.Member):
+    async def ban(self, ctx, bruker: discord.Member):
         """Utesteng en bruker fra serveren"""
 
-        #   Utfør
         await bruker.ban()
-        await ctx.send(f"<@{bruker.id}> ({bruker.name}#{bruker.discriminator}) ble utestengt fra serveren")
+        await ctx.send(f'{bruker.mention} ' +
+                       f'({bruker.name}#{bruker.discriminator}) ' +
+                       'ble utestengt fra serveren')
 
-
+    @commands.bot_has_permissions(manage_messages=True)
     @commands.has_permissions(manage_messages=True)
-    @commands.cooldown(1, 15, commands.BucketType.guild)
-    @commands.command(aliases=["purge", "delete", "slett"])
+    @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.command(aliases=['purge', 'delete', 'slett'])
     async def prune(self, ctx, antall: int):
         """Sletter de siste antall meldingene du spesifiser"""
 
-        #   Utfør
-        await ctx.message.channel.purge(limit=antall+1)
-        statusmsg = await ctx.send(f"Slettet {antall} meldinger!")
-        await asyncio.sleep(3)
-        await statusmsg.delete()
+        if antall > 100:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Du kan ikke slette mer enn 100 meldinger om gangen',
+                mention=False)
 
+        await ctx.channel.purge(limit=antall+1)
+        await ctx.send(content=f'Slettet {antall} meldinger!',
+                       delete_after=3.0)
 
-    @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=["setloggkanal", "setlogkanal", "settlogkanal", "setlogchannel", "setlogging", "setloggingchannel"])
-    async def settloggkanal(self, ctx, *, kanal: discord.TextChannel):
-        """Setter en kanal som loggkanal"""
-        
-        #   Sjekk om fil allerede eksisterer
-        serverDataFile = Path(f"./assets/serverdata/{ctx.message.guild.id}.json")
-        if serverDataFile.is_file() == False:
-            #   Skriv fil med gitt data
-            with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "w") as f:
-                json.dump({"name": ctx.message.guild.name, "logChannelId": kanal.id}, f)
-
-        else:
-            #   Skriv data til eksisterende fil
-            with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r+", encoding="utf8") as f:
-                serverdata = json.load(f)
-                serverdata["logChannelId"] = kanal.id
-                f.seek(0)
-                f.write(json.dumps(serverdata))                
-
-        await ctx.send(f"Loggkanal satt til {kanal.mention}")
-
-
-    @commands.guild_only()
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=["logchannel", "logkanal", "loggingchannel"])
-    async def loggkanal(self, ctx):
-        """Viser hvilken kanal som er satt som loggkanal på serveren"""
-        
-        #   Last inn serverdata
-        with codecs.open(f"./assets/serverdata/{ctx.message.guild.id}.json", "r", encoding="utf8") as f:
-            serverdata = json.load(f)
-            logChannelId = serverdata["logChannelId"]
-
-            #   Sjekk om loggkanal eksisterer
-            if logChannelId == None:
-                embed = discord.Embed(color=0xFF0000, description=":x: Du har ikke satt en loggkanal enda")
-                await ctx.send(embed=embed)
-            else:
-                kanal = self.bot.get_channel(logChannelId)
-                embed = discord.Embed(color=0x0085ff)
-                embed.add_field(name="Loggkanal", value=kanal.mention)
-                await ctx.send(embed=embed)
-        
 
 def setup(bot):
     bot.add_cog(ServerManagement(bot))
