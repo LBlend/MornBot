@@ -24,7 +24,7 @@ class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.bot_has_permissions(embed_links=True, external_emoji=True)
+    @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['info', 'about', 'om', 'båttinfo'])
     async def botinfo(self, ctx):
@@ -95,7 +95,7 @@ class Info(commands.Cog):
             text=dev.name, icon_url=dev.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.bot_has_permissions(embed_links=True, external_emoji=True)
+    @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['serverinfo', 'si', 'gi'])
@@ -219,7 +219,7 @@ class Info(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon_url_as(format='png'))
         await ctx.send(embed=embed)
 
-    @commands.bot_has_permissions(embed_links=True, external_emoji=True)
+    @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['userinfo', 'ui', 'bi'])
@@ -264,9 +264,17 @@ class Info(commands.Cog):
         else:
             color = discord.Colour(0x99AAB5)
 
+        statuses = {
+            'online': '<:online:516328785910431754> Pålogget',
+            'idle': '<:idle:516328783347843082> Inaktiv',
+            'dnd': '<:dnd:516328782844395579> Ikke forstyrr',
+            'offline': '<:offline:516328785407246356> Frakoblet'
+        }
+        status = statuses[str(bruker.status)]
+
         embed = discord.Embed(
             color=color,
-            description=f'{bruker.mention}\nID: {bruker.id}')
+            description=f'{bruker.mention}\nID: {bruker.id}\n{status}')
         if bruker.display_name == bruker.name:
             embed.set_author(
                 name=f'{bruker.name}#{bruker.discriminator}',
