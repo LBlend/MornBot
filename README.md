@@ -18,19 +18,26 @@ Install the required modules
 python -m pip install -r requiremnets.txt
 ```
 
-Rename the [config.json.example](config.json.example) to **config.json** and fill in the required fields
+Rename the [config.json.example](config.json.example) to **config.json** and fill in the following:
 
 * token
+* prefix
 
-The other fields are required for certain commands to work.
+If you don't know how to retrieve this token, google it.
+
+The other fields are only required for certain commands to work. These commands will automatically be disabled if a required field is not filled in
+
+**Do not remove the other fields from the file. Leave them as is.**
 
 ## Contributing
 
-If you for some reason want to clean up my shitty code/contribute then these are the requirements
+If you for some reason want to clean up my shitty code/contribute then these are the requirements:
+
 * Code should meet the PEP8 standard
 * Use single quotes unless it's necessary to use double quotation marks
 
-It is preferred that you also consider these points, but they are not required
+It is preferred that you also consider the following, however it is not required:
+
 * Using embeds to send messages
 * Messages should be in norwegian
 
