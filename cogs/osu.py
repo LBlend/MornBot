@@ -13,7 +13,7 @@ from .utils import Defaults
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
     prefix = config['prefix']
-    osu_api_key = config['osu_api_Key']
+    osu_api_key = config['osu_api_key']
 
 gamemodes = {
     'taiko': '1',
