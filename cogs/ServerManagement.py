@@ -13,10 +13,11 @@ class ServerManagement(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['spark'])
-    async def kick(self, ctx, bruker: discord.Member):
+    async def kick(
+            self, ctx, bruker: discord.Member, *, begrunnelse: str=None):
         """Kaster ut en bruker fra serveren"""
 
-        await bruker.kick()
+        await bruker.kick(reason=begrunnelse)
         await ctx.send(f'{bruker.mention} ' +
                        f'({bruker.name}#{bruker.discriminator}) ' +
                        'ble kastet ut av serveren')
@@ -26,10 +27,10 @@ class ServerManagement(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
-    async def ban(self, ctx, bruker: discord.Member):
+    async def ban(self, ctx, bruker: discord.Member, *, begrunnelse: str=None):
         """Utesteng en bruker fra serveren"""
 
-        await bruker.ban()
+        await bruker.ban(reason=begrunnelse)
         await ctx.send(f'{bruker.mention} ' +
                        f'({bruker.name}#{bruker.discriminator}) ' +
                        'ble utestengt fra serveren')
