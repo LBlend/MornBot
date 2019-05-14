@@ -297,8 +297,7 @@ class Misc(commands.Cog):
         except AttributeError:
             return await Defaults.error_warning_edit(
                 ctx, status_msg,
-                text='Teksten er for lang eller så ' +
-                     'har du ikke gitt meg noe tekst',
+                text='Du er ikke koblet til en talekanal',
                 mention=False)
 
         link = 'https://canary.discordapp.com/channels/' +\
@@ -307,7 +306,7 @@ class Misc(commands.Cog):
             title=f'Videochat: {ctx.author.voice.channel.name}',
             color=0x0085ff,
             description=f'[Trykk her for å bli med i videochat]({link})')
-        await ctx.send(embed=embed)
+        await status_msg.edit(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
