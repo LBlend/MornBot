@@ -49,7 +49,7 @@ class Errors(commands.Cog):
             return await Defaults.error_warning_send(
                 ctx,
                 text='Kommandoen har nettopp blitt brukt. Prøv igjen om ' +
-                     f'{error.retry_after:.1f}` sekunder.')
+                     f'`{error.retry_after:.1f}` sekunder.')
 
         elif isinstance(error, commands.NSFWChannelRequired):
             return await Defaults.error_fatal_send(
