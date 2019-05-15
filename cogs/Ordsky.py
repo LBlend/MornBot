@@ -264,7 +264,10 @@ class Ordsky(commands.Cog):
                 try:
                     async for message in channel.history(limit=2000):
                         if message.author.id == ctx.author.id:
-                            message_data += f'{message.clean_content} '
+                            message_data += '['+\
+                                f'{str(message.created_at)[0:19]}] ' +\
+                                f'({message.channel.id}-{message.id}) ' +\
+                                f'{message.clean_content} '
                 except:
                     continue
             database_col_users.update_one(
@@ -281,7 +284,10 @@ class Ordsky(commands.Cog):
                 try:
                     async for message in channel.history(limit=300):
                         if message.author.id == ctx.author.id:
-                            message_data += f'{message.clean_content} '
+                            message_data += '[' + \
+                                f'{str(message.created_at)[0:19]}] ' + \
+                                f'({message.channel.id}-{message.id}) ' + \
+                                f'{message.clean_content} '
                 except:
                     continue
             database_message_data = database_user['ordsky_data']
@@ -311,6 +317,16 @@ class Ordsky(commands.Cog):
                   'r', encoding='utf-8') as f:
             filtered_words = [line.split(',') for line in f.readlines()]
             filtered_words = filtered_words[0]
+
+        if text is '' or text is None:
+            embed = discord.Embed(
+                color=0xF1C40F,
+                description=':x: Har ikke nok meldingsdata ' +
+                            'for å generere ordsky')
+            embed.set_footer(
+                icon_url=ctx.author.avatar_url,
+                text=f'{ctx.author.name}#{ctx.author.discriminator}')
+            return await ctx.send(ctx.author.mention, embed=embed)
 
         # Hent skyform/mask
         mask_bilde = array(Image.open('./assets/ordsky/mask/skyform.png'))
