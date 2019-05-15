@@ -103,7 +103,7 @@ class DevTools(commands.Cog):
         users = '\n'.join(user_list[start_index:end_index])
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(name='Guilds', value=users)
+        embed.add_field(name='Brukere', value=users)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
         await ctx.send(embed=embed)
 
