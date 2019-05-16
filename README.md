@@ -4,7 +4,7 @@ Norwegian Discord bot written for personal use. **It is not recommended that you
 
 ### Prerequisites
 
-In order to run the bot yourself you need to install the things listed below
+In order to run the bot yourself you need to install the programs listed below
 
 * Python 3.6 or newer
 
@@ -23,7 +23,7 @@ Rename the [config.json.example](config.json.example) to **config.json** and fil
 * token
 * prefix
 
-If you don't know how to retrieve this token, google it.
+If you don't know how to retrieve a discord bot token, google it.
 
 The other fields are only required for certain commands to work. These commands will automatically be disabled if a required field is not filled in
 
@@ -38,8 +38,8 @@ If you for some reason want to clean up my shitty code/contribute then these are
 
 It is preferred that you also consider the following, however it is not required:
 
-* Using embeds to send messages
-* Messages should be in norwegian
+* Use embeds
+* All responses should be in norwegian
 
 ## License
 
