@@ -29,6 +29,11 @@ class Konverter(commands.Cog):
         if ',' in tall:
             tall = sub(',', '.', tall)
 
+        if tall > 1000000000 or tall < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
         try:
             temp_celcius = round((float(tall) - 32) / 9 * 5, 2)
         except ValueError:
@@ -36,11 +41,6 @@ class Konverter(commands.Cog):
                 ctx,
                 text='Det du har skrevet inn er ikke et tall\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                mention=False)
-
-        if temp_celcius > 1000000000000 or temp_celcius < -1000000000000:
-            return await Defaults.error_warning_send(
-                ctx, text='Tallet du har skrevet er for lavt/høyt!',
                 mention=False)
 
         embed = discord.Embed(
@@ -57,6 +57,11 @@ class Konverter(commands.Cog):
         if ',' in tall:
             tall = sub(',', '.', tall)
 
+        if tall > 1000000000 or tall < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
         try:
             temp_fahrenheit = round((float(tall) * 9) / 5 + 32, 2)
         except ValueError:
@@ -64,11 +69,6 @@ class Konverter(commands.Cog):
                 ctx,
                 text='Det du har skrevet inn er ikke et tall\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                mention=False)
-
-        if temp_fahrenheit > 1000000000000 or temp_fahrenheit < -1000000000000:
-            return await Defaults.error_warning_send(
-                ctx, text='Tallet du har skrevet er for lavt/høyt!',
                 mention=False)
 
         embed = discord.Embed(
@@ -86,6 +86,16 @@ class Konverter(commands.Cog):
             vekt_kg = sub(',', '.', vekt_kg)
             høyde_meter = sub(',', '.', høyde_meter)
 
+        if vekt_kg > 1000000000 or vekt_kg < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
+        if høyde_meter > 1000000000 or høyde_meter < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
         try:
             vekt_kg = float(vekt_kg)
             høyde_meter = float(høyde_meter)
@@ -94,14 +104,6 @@ class Konverter(commands.Cog):
             return await Defaults.error_warning_send(
                 ctx,
                 text='Det du har skrevet inn er ikke et tall\n\n' +
-                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                mention=False)
-
-        if bmi > 50 or bmi <= 5:
-            return await Defaults.error_warning_send(
-                ctx,
-                text='Sjekk om du har skrevet riktige tall. ' +
-                     'Beregningen har gitt et usannsynlig svar\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
 
@@ -133,15 +135,15 @@ class Konverter(commands.Cog):
         try:
             verdi = float(verdi)
         except ValueError:
-            return await Defaults.error_warning_send(
-                ctx,
+            return await Defaults.error_warning_edit(
+                ctx, status_msg
                 text='Sjekk om du har skrevet riktige tall. ' +
                      'Beregningen har gitt et usannsynlig svar\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
 
-        if verdi > 1000000000000 or verdi < -1000000000000:
-            return await Defaults.error_warning_send(
+        if verdi > 1000000000 or verdi < -1000000000:
+            return await Defaults.error_warning_edit(
                 ctx, text='Tallet du har skrevet er for lavt/høyt!',
                 mention=False)
 
@@ -163,8 +165,8 @@ class Konverter(commands.Cog):
             await status_msg.edit(embed=embed)
 
         except KeyError:
-            return await Defaults.error_warning_send(
-                ctx,
+            return await Defaults.error_warning_edit(
+                ctx, status_msg
                 text='Sjekk om du har satt gyldige valutaer\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)

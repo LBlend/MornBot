@@ -42,7 +42,7 @@ class Errors(commands.Cog):
             return await Defaults.error_warning_send(
                 ctx,
                 text='Du mangler følgende ' +
-                     f'tillatelser:\n\n````{permissions}```',
+                     f'tillatelser:\n\n```{permissions}```',
                 mention=False)
 
         elif isinstance(error, commands.CommandOnCooldown):

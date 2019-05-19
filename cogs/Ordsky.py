@@ -90,7 +90,7 @@ class Ordsky(commands.Cog):
 
         # Set consent and insert missing data
         if database_user is None:
-            await default_db_insert(self, ctx)
+            await default_db_insert(ctx)
             database_user = database_col_users.find_one(database_find)
             database_col_users.update_one(database_find,
                                           {'$set':
@@ -125,7 +125,7 @@ class Ordsky(commands.Cog):
 
         # Remove consent & data, insert missing data
         if database_user is None:
-            await default_db_insert(self, ctx)
+            await default_db_insert(ctx)
         else:
             database_col_users.update_one(database_find,
                                           {'$set':
@@ -161,8 +161,8 @@ class Ordsky(commands.Cog):
 
         # Return no data error, insert missing data
         if database_user is None:
-            await default_db_insert(self, ctx)
-            return await error_no_data(self, ctx)
+            await default_db_insert(ctx)
+            return await error_no_data(ctx)
 
         # Fetch all user data & append to string
         raw_data = ''
@@ -174,7 +174,7 @@ class Ordsky(commands.Cog):
 
         # No data error message
         if raw_data == '':
-            return await error_no_data(self, ctx)
+            return await error_no_data(ctx)
 
         # Insert data in .txt file
         with open(f'./assets/ordsky/{ctx.author.id}.txt',
@@ -223,7 +223,7 @@ class Ordsky(commands.Cog):
 
         # Insert missing data
         if database_user is None:
-            await default_db_insert(self, ctx)
+            await default_db_insert(ctx)
             database_user = database_col_users.find_one(database_find)
         if ctx.guild.id not in database_user['ordsky_data']:
             database_col_users.update_one(

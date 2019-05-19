@@ -48,7 +48,7 @@ class Twitch(commands.Cog):
         name = user_data['name']
         bio = user_data['bio']
         creation_date = str(user_data['created_at'])
-        creation_date_formatted = f'{creation_date[8:10]}. ' +\
+        creation_date_formatted = f'{creation_date[8:10]}.' +\
             f'{creation_date[5:7]}.{creation_date[:4]}'
         user_url = f'https://twitch.tv/{name}'
         follow_count = str(follow_count_data['_total'])

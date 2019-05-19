@@ -20,6 +20,7 @@ class Reddit(commands.Cog):
         self.bot = bot
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['hm', 'hmm', 'hmmmm'])
     async def hmmm(self, ctx):
@@ -46,6 +47,7 @@ class Reddit(commands.Cog):
         await status_msg.edit(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def copypasta(self, ctx):

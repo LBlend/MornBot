@@ -24,22 +24,6 @@ class Misc(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command()
-    async def smug(self, ctx):
-        """Sender et smug bilde"""
-
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
-
-        data = get('https://nekos.life/api/v2/img/smug').json()
-        returned_data = data['url']
-
-        embed = discord.Embed(color=0x0085ff)
-        embed.set_image(url=returned_data)
-        await status_msg.edit(embed=embed)
-
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['voff', 'doggo', 'dog', 'hund', 'bikkje'])
     async def woof(self, ctx):
         """Sender en tilfeldig bissevoff"""
@@ -48,23 +32,6 @@ class Misc(commands.Cog):
         status_msg = await ctx.send(embed=embed)
 
         data = get('https://nekos.life/api/v2/img/woof').json()
-        returned_data = data['url']
-
-        embed = discord.Embed(color=0x0085ff)
-        embed.set_image(url=returned_data)
-        await status_msg.edit(embed=embed)
-
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.is_nsfw()
-    @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=['bakgrunn'])
-    async def wallpaper(self, ctx):
-        """Sender et tilfeldig bakgrunnsbilde (NSFW)"""
-
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
-
-        data = get('https://nekos.life/api/v2/img/wallpaper').json()
         returned_data = data['url']
 
         embed = discord.Embed(color=0x0085ff)
@@ -89,6 +56,10 @@ class Misc(commands.Cog):
         # Må jo gi meg selv en stor kuk
         if bruker.id == 170506717140877312:
             dick_size = 69
+        elif bruker.id == 202745416062599168:
+            dick_size = 0
+        elif bruker.id == 142580278940925953:
+            dick_size = 18
         else:
             dick_size = hash_dicksize(user_id, 25, 2)
 
@@ -98,8 +69,13 @@ class Misc(commands.Cog):
         embed.set_author(
             name=f'{bruker.name}#{bruker.discriminator}',
             icon_url=bruker.avatar_url)
-        embed.add_field(
-            name='Kukstørrelse', value=f'{dick_size} cm\n8{dick_drawing}D')
+        if bruker.id == 209305971066011648:
+            embed.add_field(
+            name='Kukstørrelse', value=f'18.1 cm lang\n16.5 cm girth')
+        else:
+            embed.add_field(
+                name='Kukstørrelse', value=f'{dick_size} cm\n8{dick_drawing}D')
+        
         await ctx.send(embed=embed)
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -111,10 +87,10 @@ class Misc(commands.Cog):
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(name='8ball')
-    async def ball8(self, ctx, *spørsmål):
+    async def ball8(self, ctx, *, spørsmål):
         """Svarer på dine dypeste spørsmål"""
 
-        if '?' not in spørsmål:
+        if spørsmål[-1:] != '?':
             return await Defaults.error_warning_send(
                 ctx, text='Du må stille meg et spørsmål da dømdøm!',
                 mention=False)
@@ -139,35 +115,15 @@ class Misc(commands.Cog):
     async def reverser(self, ctx, *, tekst):
         """Reverserer tekst"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
-
-        if tekst is None or len(tekst) >= 1000:
-            return await Defaults.error_warning_edit(
-                ctx, status_msg,
-                text='Teksten er for lang eller så ' +
-                     'har du ikke gitt meg noe tekst',
-                mention=False)
-
         embed = discord.Embed(color=0x0085ff, description=tekst[::-1])
         await Defaults.set_footer(ctx, embed)
-        await status_msg.edit(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['owoify', 'uwu'])
-    async def owo(self, ctx, *tekst: str):
+    async def owo(self, ctx, *, tekst: str):
         """Oversetter teksten din til owo"""
-
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
-
-        if not tekst or len(tekst) >= 1000:
-            return await Defaults.error_warning_edit(
-                ctx, status_msg,
-                text='Oopsie whoopsie you made a fucky wucky. Teksten er ' +
-                     'enten for lang eller så har du ikke gitt noe tekst',
-                mention=False)
 
         tekst = sub("'|,", "", str(tekst))
         tekst = sub('r|l', 'w', tekst)
@@ -177,9 +133,13 @@ class Misc(commands.Cog):
         tekst = sub('ove', 'uv', tekst)
         # tekst = sub('!', ' (・`ω´・)', tekst) https://kaomoji.moe/
 
-        embed = discord.Embed(color=0x0085ff, description=tekst[1:-1])
+        if not tekst or len(tekst) >= 1000:
+            return await Defaults.error_warning_send(
+                ctx, text='Teksten er for lang', mention=False)
+
+        embed = discord.Embed(color=0x0085ff, description=tekst)
         await Defaults.set_footer(ctx, embed)
-        await status_msg.edit(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -261,26 +221,19 @@ class Misc(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['clapify'])
-    async def klappifiser(self, ctx, *tekst):
+    async def klappifiser(self, ctx, *, tekst):
         """Klapppifiserer teksten din"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
-
         if not tekst or len(tekst) >= 1000:
-            return await Defaults.error_warning_edit(
-                ctx, status_msg,
-                text='Teksten er for lang eller så ' +
-                     'har du ikke gitt meg noe tekst',
-                mention=False)
+            return await Defaults.error_warning_send(
+                ctx, text='Teksten er for lang', mention=False)
 
-        tekst = sub('|,', '', str(tekst).upper())
         tekst = sub(' ', '👏', tekst)
 
         embed = discord.Embed(
-            color=0x0085ff, description=f'**{tekst[1:-1]}**')
+            color=0x0085ff, description=f'**{tekst.upper()}**')
         await Defaults.set_footer(ctx, embed)
-        await status_msg.edit(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
