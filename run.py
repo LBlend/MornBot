@@ -67,8 +67,6 @@ for file in listdir('cogs'):
                               'satt i config.json')
         except KeyError:
             pass
-        if name == 'run':
-            continue
         bot.load_extension(f'cogs.{name}')
 
 @bot.event
