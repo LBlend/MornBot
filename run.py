@@ -43,7 +43,7 @@ bot = commands.Bot(
     case_insensitive=True)
 
 requirements = {
-    'Info': [website, github],
+    'BotInfo': [website, github],
     'Konverter': ksoft_authentication,
     'Ordsky': mongodb_url,
     'osu': osu_api_key,
@@ -67,6 +67,8 @@ for file in listdir('cogs'):
                               'satt i config.json')
         except KeyError:
             pass
+        if name == 'run':
+            continue
         bot.load_extension(f'cogs.{name}')
 
 @bot.event
