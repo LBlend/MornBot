@@ -136,7 +136,7 @@ class Konverter(commands.Cog):
             verdi = float(verdi)
         except ValueError:
             return await Defaults.error_warning_edit(
-                ctx, status_msg
+                ctx, status_msg,
                 text='Sjekk om du har skrevet riktige tall. ' +
                      'Beregningen har gitt et usannsynlig svar\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
@@ -166,7 +166,7 @@ class Konverter(commands.Cog):
 
         except KeyError:
             return await Defaults.error_warning_edit(
-                ctx, status_msg
+                ctx, status_msg,
                 text='Sjekk om du har satt gyldige valutaer\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
