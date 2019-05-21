@@ -174,7 +174,6 @@ class Info(commands.Cog):
         if str(bruker.desktop_status) != "offline":
             app += "💻"
 
-        print(app)
         join_index = sorted(
             ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
         creation_index = sorted(
