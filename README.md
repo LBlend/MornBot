@@ -21,9 +21,8 @@ python -m pip install -r requiremnets.txt
 Rename the [config.json.example](config.json.example) to **config.json** and fill in the following:
 
 * token
-* prefix
 
-If you don't know how to retrieve a discord bot token, google it.
+[Click here if you don't know how to retrieve a discord bot token](https://discordpy.readthedocs.io/en/latest/discord.html).
 
 The other fields are only required for certain commands to work. These commands will automatically be disabled if a required field is not filled in
 
