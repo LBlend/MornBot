@@ -166,6 +166,15 @@ class Info(commands.Cog):
         if not bruker:
             bruker = ctx.author
 
+        app = ""
+        if str(bruker.mobile_status) != "offline":
+            app += "📱 "
+        if str(bruker.web_status) != "offline":
+            app += "🖥️ "
+        if str(bruker.desktop_status) != "offline":
+            app += "💻"
+
+        print(app)
         join_index = sorted(
             ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
         creation_index = sorted(
@@ -211,7 +220,7 @@ class Info(commands.Cog):
 
         embed = discord.Embed(
             color=color,
-            description=f'{bruker.mention}\nID: {bruker.id}\n{status}')
+            description=f'{bruker.mention}\nID: {bruker.id}\n{status}\n{app}')
         if bruker.display_name == bruker.name:
             embed.set_author(
                 name=f'{bruker.name}#{bruker.discriminator}',
@@ -233,6 +242,12 @@ class Info(commands.Cog):
         embed.set_footer(
             text=f'#{join_index} Medlem av serveren | ' +
             f'#{creation_index} Eldste brukeren på serveren')
+
+        if bruker.activities:
+            games = ""
+            for activity in bruker.activities:
+                games += f"{activity.name}\n"
+            embed.add_field(name='Spiller:', value=games, inline=False)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
