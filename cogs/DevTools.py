@@ -23,6 +23,7 @@ class DevTools(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color, description='Stopper bot...')
         await ctx.send(embed=embed)
+        await self.bot.logout()
         exit('Bot stoppet')
 
     @commands.bot_has_permissions(embed_links=True)
@@ -47,7 +48,7 @@ class DevTools(commands.Cog):
 
         guild_list = []
         for guild in self.bot.guilds:
-            guild_list.append(guild.name)
+            guild_list.append(f'{guild.name} - {guild.id}')
 
         pagecount = ceil(len(guild_list) / 10)
 

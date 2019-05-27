@@ -29,19 +29,21 @@ class Konverter(commands.Cog):
         if ',' in tall:
             tall = sub(',', '.', tall)
 
-        if tall > 1000000000 or tall < -1000000000:
-            return await Defaults.error_warning_send(
-                ctx, text='Tallet du har skrevet er for lavt/høyt!',
-                mention=False)
-
         try:
-            temp_celcius = round((float(tall) - 32) / 9 * 5, 2)
+            tall = float(tall)
         except ValueError:
             return await Defaults.error_warning_send(
                 ctx,
                 text='Det du har skrevet inn er ikke et tall\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
+
+        if tall > 1000000000 or tall < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
+        temp_celcius = round((float(tall) - 32) / 9 * 5, 2)
 
         embed = discord.Embed(
             color=0x0085ff,
@@ -57,19 +59,21 @@ class Konverter(commands.Cog):
         if ',' in tall:
             tall = sub(',', '.', tall)
 
-        if tall > 1000000000 or tall < -1000000000:
-            return await Defaults.error_warning_send(
-                ctx, text='Tallet du har skrevet er for lavt/høyt!',
-                mention=False)
-
         try:
-            temp_fahrenheit = round((float(tall) * 9) / 5 + 32, 2)
+            tall = float(tall)
         except ValueError:
             return await Defaults.error_warning_send(
                 ctx,
                 text='Det du har skrevet inn er ikke et tall\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
+
+        if tall > 1000000000 or tall < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                mention=False)
+
+        temp_fahrenheit = round((float(tall) * 9) / 5 + 32, 2)
 
         embed = discord.Embed(
             color=0x0085ff,
@@ -86,6 +90,16 @@ class Konverter(commands.Cog):
             vekt_kg = sub(',', '.', vekt_kg)
             høyde_meter = sub(',', '.', høyde_meter)
 
+        try:
+            vekt_kg = float(vekt_kg)
+            høyde_meter = float(høyde_meter)
+        except ValueError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Det du har skrevet inn er ikke et tall\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False)
+
         if vekt_kg > 1000000000 or vekt_kg < -1000000000:
             return await Defaults.error_warning_send(
                 ctx, text='Tallet du har skrevet er for lavt/høyt!',
@@ -96,16 +110,7 @@ class Konverter(commands.Cog):
                 ctx, text='Tallet du har skrevet er for lavt/høyt!',
                 mention=False)
 
-        try:
-            vekt_kg = float(vekt_kg)
-            høyde_meter = float(høyde_meter)
-            bmi = round(vekt_kg / (høyde_meter * høyde_meter), 2)
-        except ValueError:
-            return await Defaults.error_warning_send(
-                ctx,
-                text='Det du har skrevet inn er ikke et tall\n\n' +
-                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                mention=False)
+        bmi = round(vekt_kg / (høyde_meter * høyde_meter), 2)
 
         embed = discord.Embed(color=0x0085ff)
         if bmi < 18.5:
@@ -170,6 +175,61 @@ class Konverter(commands.Cog):
                 text='Sjekk om du har satt gyldige valutaer\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(aliases=['banan', 'bananas', 'bananaforscale'])
+    async def bananer(self, ctx, tall, måleenhet: str):
+        """Banana for scale"""
+
+        if ',' in tall:
+            tall = sub(',', '.', tall)
+
+        try:
+            tall = float(tall)
+        except ValueError:
+            return await Defaults.error_warning_send(
+                ctx,
+                text='Du må gi meg et tall\n\n' +
+                     f'Skriv `{prefix}help {ctx.command}` for hjelp',
+                mention=False
+            )
+
+        if tall > 1000000000 or tall < -1000000000:
+            return await Defaults.error_warning_send(
+                ctx, text='Tallet du har skrevet er for lavt/høyt',
+                mention=False)
+
+        meassurements = {
+            'mm': 1000000,
+            'millimeter': 1000000,
+            'millimeters': 1000000,
+            'cm': 100000,
+            'centimeter': 100000,
+            'centimeters': 100000,
+            'm': 1000,
+            'meter': 1000,
+            'meters': 1000,
+            'km': 1,
+            'kilometer': 1,
+            'kilometers': 1
+        }
+        meassurement_type = måleenhet
+        try:
+            måleenhet = meassurements[måleenhet]
+        except:
+            return await Defaults.error_warning_send(
+                ctx, text='Ugyldig måleenhet. Prøv en av følgende ```\n' +
+                          'mm\ncm\nm\nkm\n```', mention=False)
+
+        size_km = tall / måleenhet
+        bananas = round(size_km / 0.0001778, 2)
+
+        embed = discord.Embed(
+            color=0x0085ff,
+            description=f'`{tall}{meassurement_type}` ' +
+                        f':arrow_right: `{bananas} 🍌`')
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

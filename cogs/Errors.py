@@ -2,6 +2,7 @@ from discord.ext import commands
 
 import traceback
 import sys
+from datetime import datetime
 
 from .utils import Defaults
 
@@ -9,6 +10,14 @@ from .utils import Defaults
 class Errors(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        print(f'{datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | '
+              f'{ctx.command} - ' +
+              f'{ctx.author.name}#{ctx.author.discriminator} ' +
+              f'({ctx.author.id}) | ' +
+              f'{ctx.guild.id}-{ctx.channel.id}-{ctx.message.id}')
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):

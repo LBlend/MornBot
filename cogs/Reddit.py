@@ -20,71 +20,97 @@ class Reddit(commands.Cog):
         self.bot = bot
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=['hm', 'hmm', 'hmmmm'])
-    async def hmmm(self, ctx):
-        """Sender en tilfeldig post fra /r/hmmm"""
+    @commands.command()
+    async def redditimg(self, ctx, subreddit: str):
+        """Sender et bilde fra en tilfeldig post fra subreddit"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        reddit = praw.Reddit(
-            client_id=reddit_client_id,
-            client_secret=reddit_secret,
-            user_agent='MornBot')
+            reddit = praw.Reddit(
+                client_id=reddit_client_id,
+                client_secret=reddit_secret,
+                user_agent='MornBot')
 
-        sub = reddit.subreddit('hmmm')
-        posts = [post for post in sub.hot(limit=100)]
-        random_post_number = randint(0, 100)
-        submission = posts[random_post_number]
+            try:
+                sub = reddit.subreddit(subreddit)
+                if sub.over18:
+                    if not ctx.channel.is_nsfw():
+                        return await Defaults.error_fatal_send(
+                            ctx, text='Du må være i en NSFW-Kanal',
+                            mention=False)
+            except:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Subredditen finnes ikke eller' +
+                              'så har jeg ikke tilgang på den', mention=False)
 
-        embed = discord.Embed(
-            title='Tilfeldig post fra /r/hmmm',
-            color=0x0085ff,
-            url=submission.url)
-        embed.set_image(url=submission.url)
-        await status_msg.edit(embed=embed)
+            posts = []
+            for post in sub.hot(limit=100):
+                if not ctx.channel.is_nsfw() and post.over_18:
+                    continue
+                if 'i.redd.it' in post.url or 'i.imgur.com' in post.url:
+                    if post.url.endswith('v'):
+                        post.url = post.url[:-1]
+                    posts.append(post)
+            random_post_number = randint(0, len(posts))
+            try:
+                submission = posts[random_post_number]
+            except IndexError:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Fant ingen posts', mention=False)
+
+            embed = discord.Embed(
+                title=f'Tilfeldig bildepost fra /r/{sub.display_name}',
+                color=0x0085ff,
+                url=submission.url)
+            embed.set_image(url=submission.url)
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def copypasta(self, ctx):
         """Sender en tilfeldig copypasta fra /r/copypasta"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        reddit = praw.Reddit(
-            client_id=reddit_client_id,
-            client_secret=reddit_secret,
-            user_agent='MornBot')
+            reddit = praw.Reddit(
+                client_id=reddit_client_id,
+                client_secret=reddit_secret,
+                user_agent='MornBot')
 
-        sub = reddit.subreddit("copypasta")
+            sub = reddit.subreddit("copypasta")
 
-        posts = [post for post in sub.hot(limit=50)]
-        valid_posts = []
-        for post in posts:
-            if len(post.selftext) >= 2000:
-                continue
-            valid_posts.append(post)
+            posts = [post for post in sub.hot(limit=50)]
+            valid_posts = []
+            for post in posts:
+                if len(post.selftext) >= 2000:
+                    continue
+                if post.spoiler:
+                    continue
+                if not ctx.channel.is_nsfw() and post.over_18:
+                    continue
+                valid_posts.append(post)
 
-        if valid_posts is []:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Kan for øyeblikket ikke finne copypasta. ' +
-                     'Prøv igjen senere')
+            if valid_posts is []:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Kan for øyeblikket ikke finne copypasta. ' +
+                              'Prøv igjen senere')
 
-        submission = choice(valid_posts)
+            submission = choice(valid_posts)
 
-        embed = discord.Embed(
-            title=submission.title, color=0x0085ff, url=submission.url)
-        embed.add_field(
-            name=f'Postet av: /u/{submission.author}',
-            value=submission.selftext,
-            inline=False)
-        await status_msg.edit(embed=embed)
+            if not ctx.channel.is_nsfw() and submission.over_18:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Du må være i en NSFW-Kanal', mention=False)
+
+            embed = discord.Embed(
+                title=f'{submission.title}',
+                color=0x0085ff, url=submission.url,
+                description=f'*/u/{submission.author}*' +
+                            f'\n\n{submission.selftext}')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

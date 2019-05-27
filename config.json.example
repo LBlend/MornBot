@@ -4,7 +4,7 @@
     "presence": "m!help",
     "presence_activity": "playing",
     "website": "https://lblend.moe/",
-    "github": "https://github.com/LBlend",
+    "github": "https://github.com/LBlend/MornBot",
     "mongodb_url": "",
     "openweathermap_api_key": "",
     "osu_api_key": "",

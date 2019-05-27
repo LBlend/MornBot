@@ -74,8 +74,7 @@ class BotInfo(commands.Cog):
             value=f'RAM: {memory_usage} MiB\nCPU: {cpu_percent}%')
         embed.add_field(
             name='Maskin',
-            value=f'{platform.version()}\n' +
-            f'{platform.system()} {platform.release()}')
+            value=f'{platform.system()} {platform.release()}')
         embed.add_field(
             name=f'Brukere ({len(total_members)})',
             value=f'<:online:516328785910431754>{len(online_members)} ' +
