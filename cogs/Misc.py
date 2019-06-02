@@ -40,7 +40,7 @@ class Misc(commands.Cog):
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
-    async def roll(self, ctx):
+    async def drepmeg(self, ctx):
         """Dreper deg"""
 
         await ctx.send("Du er død nå")
