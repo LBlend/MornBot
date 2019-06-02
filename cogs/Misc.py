@@ -58,6 +58,13 @@ class Misc(commands.Cog):
                     embed=embed)
             return await ctx.send(embed=embed)
 
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command()
+    async def drepmeg(self, ctx):
+        """Dreper deg"""
+
+        await ctx.send("Du er død nå")
+
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['kukstørrelse', 'pikkstørrelse'])
@@ -79,7 +86,7 @@ class Misc(commands.Cog):
         elif bruker.id == 202745416062599168:
             dick_size = 0
         elif bruker.id == 142580278940925953:
-            dick_size = 18
+            dick_size = 14
         else:
             dick_size = hash_dicksize(user_id, 25, 2)
 
