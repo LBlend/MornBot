@@ -64,7 +64,7 @@ class Vær(commands.Cog):
             embed = discord.Embed(
                 title=f':flag_{country_code}: {city_name}, ' +
                 f'{country_code.upper()} | {fetch_date} (Norsk Tid)',
-                color=0x0085ff, url=link, description=description)
+                color=ctx.me.color, url=link, description=description)
             embed.set_author(
                 name='OpenWeatherMap',
                 icon_url='https://pbs.twimg.com/profile_images/' +
@@ -78,7 +78,7 @@ class Vær(commands.Cog):
             embed.add_field(name='Soloppgang (Norsk tid)', value=sunrise)
             embed.add_field(name='Solnedgang (Norsk tid)', value=sunset)
             embed.set_footer(text=f'Tid i Norge nå: {time_now}')
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
 
 def setup(bot):

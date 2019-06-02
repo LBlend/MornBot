@@ -27,10 +27,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'{ctx.author.mention} klappet {bruker.mention}')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -51,10 +51,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff, description=f'{ctx.author.mention} ' +
+                color=ctx.me.color, description=f'{ctx.author.mention} ' +
                                             f'ga {bruker.mention} en klem')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -75,10 +75,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff, description=f'{ctx.author.mention} ' +
+                color=ctx.me.color, description=f'{ctx.author.mention} ' +
                                             f'ga {bruker.mention} en klem')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -99,10 +99,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'{ctx.author.mention} poket {bruker.mention}')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -123,10 +123,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'{ctx.author.mention} kysset {bruker.mention}')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -147,10 +147,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'{ctx.author.mention} kilte {bruker.mention}')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -171,9 +171,9 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff, description=f'{bruker.mention} er en BAKA')
+                color=ctx.me.color, description=f'{bruker.mention} er en BAKA')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -193,10 +193,10 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'{ctx.author.mention} klasket {bruker.mention}')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -209,9 +209,9 @@ class Weeb(commands.Cog):
             data = get('https://nekos.life/api/v2/img/smug').json()
             returned_data = data['url']
 
-            embed = discord.Embed(color=0x0085ff)
+            embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -225,9 +225,9 @@ class Weeb(commands.Cog):
             data = get('https://nekos.life/api/v2/img/wallpaper').json()
             returned_data = data['url']
 
-            embed = discord.Embed(color=0x0085ff)
+            embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -241,9 +241,9 @@ class Weeb(commands.Cog):
             data = get('https://nekos.life/api/v2/img/bj').json()
             returned_data = data['url']
 
-            embed = discord.Embed(color=0x0085ff)
+            embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -257,9 +257,9 @@ class Weeb(commands.Cog):
             data = get('https://nekos.life/api/v2/img/yuri').json()
             returned_data = data['url']
 
-            embed = discord.Embed(color=0x0085ff)
+            embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -273,9 +273,9 @@ class Weeb(commands.Cog):
             data = get('https://nekos.life/api/v2/img/trap').json()
             returned_data = data['url']
 
-            embed = discord.Embed(color=0x0085ff)
+            embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -292,17 +292,17 @@ class Weeb(commands.Cog):
 
             if not bruker == ctx.author:
                 embed = discord.Embed(
-                    color=0x0085ff,
+                    color=ctx.me.color,
                     description=f'{ctx.author.mention} har en fetisj ' +
                                 'og pisker seg selv')
                 embed.set_image(url=returned_data)
                 return await ctx.send(embed=embed)
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'{ctx.author.mention} pisket {bruker.mention}')
             embed.set_image(url=returned_data)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
         
 
 def setup(bot):

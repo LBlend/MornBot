@@ -46,7 +46,7 @@ class Konverter(commands.Cog):
         temp_celcius = round((float(tall) - 32) / 9 * 5, 2)
 
         embed = discord.Embed(
-            color=0x0085ff,
+            color=ctx.me.color,
             description=f'`{tall} °F` :arrow_right: `{temp_celcius} °C`')
         await ctx.send(embed=embed)
 
@@ -76,7 +76,7 @@ class Konverter(commands.Cog):
         temp_fahrenheit = round((float(tall) * 9) / 5 + 32, 2)
 
         embed = discord.Embed(
-            color=0x0085ff,
+            color=ctx.me.color,
             description=f'`{tall} °C` :arrow_right: `{temp_fahrenheit} °F`')
         await ctx.send(embed=embed)
 
@@ -112,7 +112,7 @@ class Konverter(commands.Cog):
 
         bmi = round(vekt_kg / (høyde_meter * høyde_meter), 2)
 
-        embed = discord.Embed(color=0x0085ff)
+        embed = discord.Embed(color=ctx.me.color)
         if bmi < 18.5:
             text = 'Dette vil si at du er undervektig. ' +\
                    'Gå og nyt en burger du :)'
@@ -163,7 +163,7 @@ class Konverter(commands.Cog):
             value = data['pretty']
 
             embed = discord.Embed(
-                color=0x0085ff,
+                color=ctx.me.color,
                 description=f'`{verdi} {fra_valuta.upper()}` ' +
                 f':arrow_right: `{value}`',
                 timestamp=datetime.utcnow())
@@ -226,7 +226,7 @@ class Konverter(commands.Cog):
         bananas = round(size_km / 0.0001778, 2)
 
         embed = discord.Embed(
-            color=0x0085ff,
+            color=ctx.me.color,
             description=f'`{tall}{meassurement_type}` ' +
                         f':arrow_right: `{bananas} 🍌`')
         await ctx.send(embed=embed)

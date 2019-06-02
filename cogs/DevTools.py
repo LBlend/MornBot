@@ -3,7 +3,7 @@ import asyncio
 from discord.ext import commands
 
 from sys import exit
-from os import listdir
+from os import listdir, system
 import socket
 from requests import get
 from math import ceil
@@ -243,6 +243,15 @@ class DevTools(commands.Cog):
         except:
             await Defaults.error_fatal_send(
                 ctx, text='Error!', mention=False)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.is_owner()
+    @commands.command()
+    async def cmd(self, ctx, *, command: str):
+        """Execute terminal commands"""
+
+        system(command)
+        await ctx.send('Fullført!')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()

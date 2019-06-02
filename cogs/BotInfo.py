@@ -85,7 +85,7 @@ class BotInfo(commands.Cog):
             name='Lenker',
             value='[Inviter](https://discordapp.com/oauth2/authorize?client_' +
                   f'id={self.bot.user.id}&permissions=388174&scope=bot) ' +
-                  f'| [Nettside]({website}) | [Github]({github})')
+                  f'| [Nettside]({website}) | [Kildekode]({github})')
         embed.set_footer(
             text=dev.name, icon_url=dev.avatar_url)
         await ctx.send(embed=embed)
@@ -96,7 +96,7 @@ class BotInfo(commands.Cog):
     async def inviter(self, ctx):
         """Inviter meg"""
 
-        embed = discord.Embed(color=0x0085ff)
+        embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(
             name='Invitasjonslink',
@@ -117,7 +117,7 @@ class BotInfo(commands.Cog):
         hours, remainder = divmod(remainder, 60 * 60)
         minutes, seconds = divmod(remainder, 60)
 
-        embed = discord.Embed(color=0x0085ff)
+        embed = discord.Embed(color=ctx.me.color)
         embed.add_field(
             name='Oppetid',
             value=f'{days}d, {hours}t, {minutes}m, {seconds}s')
@@ -129,7 +129,7 @@ class BotInfo(commands.Cog):
     async def ping(self, ctx):
         """Sjekk pingen til båtten"""
 
-        embed = discord.Embed(color=0x0085ff)
+        embed = discord.Embed(color=ctx.me.color)
         embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)}ms')
         await ctx.send(embed=embed)
 
@@ -139,7 +139,7 @@ class BotInfo(commands.Cog):
     async def github(self, ctx):
         """Sender link til Github-repoet mitt"""
 
-        embed = discord.Embed(color=0x0085ff)
+        embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(
             url='https://cdn2.iconfinder.com/data/icons/black-' +
                 'white-social-media/64/social_media_logo_github-512.png')

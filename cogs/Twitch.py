@@ -79,7 +79,7 @@ class Twitch(commands.Cog):
                 f'**Spill:**\n{livestream_game}',
                 inline=False)
             embed.set_image(url=livestream_preview)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
 
 def setup(bot):

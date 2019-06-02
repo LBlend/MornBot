@@ -24,19 +24,39 @@ class Misc(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=['voff', 'doggo', 'dog', 'hund', 'bikkje'])
-    async def woof(self, ctx):
-        """Sender en tilfeldig bissevoff"""
+    @commands.command(aliases=['woof', 'doggo', 'dog', 'hund', 'bikkje'])
+    async def voff(self, ctx):
+        """Sender bilde av en tilfeldig bissevoff"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        data = get('https://nekos.life/api/v2/img/woof').json()
-        returned_data = data['url']
+            data = get('https://nekos.life/api/v2/img/woof').json()
+            returned_data = data['url']
 
-        embed = discord.Embed(color=0x0085ff)
-        embed.set_image(url=returned_data)
-        await status_msg.edit(embed=embed)
+            embed = discord.Embed(color=ctx.me.color)
+            embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
+            return await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['meow', 'nya'])
+    async def mjau(self, ctx):
+        """Sender bilde av en tilfeldig katt"""
+
+        async with ctx.channel.typing():
+
+            data = get('https://nekos.life/api/v2/img/meow').json()
+            returned_data = data['url']
+
+            embed = discord.Embed(color=ctx.me.color)
+            embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
+            if ctx.guild.id == 297798952538079233:
+                return await ctx.send(
+                    content='<@516234701221134346> er glad i katter',
+                    embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -65,7 +85,7 @@ class Misc(commands.Cog):
 
         dick_drawing = '=' * dick_size
 
-        embed = discord.Embed(color=0x0085ff)
+        embed = discord.Embed(color=bruker.color)
         embed.set_author(
             name=f'{bruker.name}#{bruker.discriminator}',
             icon_url=bruker.avatar_url)
@@ -115,7 +135,7 @@ class Misc(commands.Cog):
     async def reverser(self, ctx, *, tekst):
         """Reverserer tekst"""
 
-        embed = discord.Embed(color=0x0085ff, description=tekst[::-1])
+        embed = discord.Embed(color=ctx.me.color, description=tekst[::-1])
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -137,7 +157,7 @@ class Misc(commands.Cog):
             return await Defaults.error_warning_send(
                 ctx, text='Teksten er for lang', mention=False)
 
-        embed = discord.Embed(color=0x0085ff, description=tekst)
+        embed = discord.Embed(color=ctx.me.color, description=tekst)
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -147,41 +167,41 @@ class Misc(commands.Cog):
     async def urbandictionary(self, ctx, *ord):
         """Sjekk definisjonen av et ord"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        try:
-            data = get(
-                f'https://api.urbandictionary.com/v0/define?term={ord}').json()
-            urban_url = data['list'][0]['permalink']
-        except IndexError:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Fant ingen definisjon for dette ordet!',
-                mention=False)
+            try:
+                data = get('https://api.urbandictionary.com/' +
+                           f'v0/define?term={ord}').json()
+                urban_url = data['list'][0]['permalink']
+            except IndexError:
+                return await Defaults.error_fatal_send(
+                    ctx,
+                    text='Fant ingen definisjon for dette ordet!',
+                    mention=False)
 
-        word = data['list'][0]['word']
-        submitter = data['list'][0]['author']
-        definition = sub(';|\[|\]', '', data['list'][0]['definition'])
-        example = sub(';|\[|\]', '', data['list'][0]['example'])
-        upvotes = data['list'][0]['thumbs_up']
-        downvotes = data['list'][0]['thumbs_down']
+            word = data['list'][0]['word']
+            submitter = data['list'][0]['author']
+            definition = sub(';|\[|\]', '', data['list'][0]['definition'])
+            example = sub(';|\[|\]', '', data['list'][0]['example'])
+            upvotes = data['list'][0]['thumbs_up']
+            downvotes = data['list'][0]['thumbs_down']
 
-        embed = discord.Embed(
-            title=word, color=0x0085ff,
-            url=urban_url, description=f'**Definert av:** {submitter}')
-        embed.set_author(
-            name='Urban Dictionary',
-            icon_url='https://a2.mzstatic.com/us/r30/Purple/v4/dd/ef/75/' +
-                     'ddef75c7-d26c-ce82-4e3c-9b07ff0871a5/mzl.yvlduoxl.png')
-        embed.add_field(name='Definisjon', value=definition)
-        embed.add_field(name='Eksempel', value=example, inline=False)
-        embed.add_field(
-            name='Vurdering',
-            value=f':thumbsup: {upvotes} / :thumbsdown: {downvotes}',
-            inline=False)
-        await Defaults.set_footer(ctx, embed)
-        await status_msg.edit(embed=embed)
+            embed = discord.Embed(
+                title=word, color=ctx.me.color,
+                url=urban_url, description=f'**Definert av:** {submitter}')
+            embed.set_author(
+                name='Urban Dictionary',
+                icon_url='https://a2.mzstatic.com/us/r30/Purple/v4/dd/ef/75/' +
+                         'ddef75c7-d26c-ce82-4e3c-9b07ff0871a5/' +
+                         'mzl.yvlduoxl.png')
+            embed.add_field(name='Definisjon', value=definition)
+            embed.add_field(name='Eksempel', value=example, inline=False)
+            embed.add_field(
+                name='Vurdering',
+                value=f':thumbsup: {upvotes} / :thumbsdown: {downvotes}',
+                inline=False)
+            await Defaults.set_footer(ctx, embed)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.guild)
@@ -189,34 +209,33 @@ class Misc(commands.Cog):
     async def isitup(self, ctx, nettside: str):
         """Sjekk om en nettside er oppe"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        data = get(f'https://isitup.org/{nettside}')
-        scraped = BeautifulSoup(data.text, 'html.parser')
-        status = scraped.find('p').get_text()
-        nettside = scraped.find(class_='domain').get_text()
-        website_url = scraped.find(class_='domain')['href']
+            data = get(f'https://isitup.org/{nettside}')
+            scraped = BeautifulSoup(data.text, 'html.parser')
+            status = scraped.find('p').get_text()
+            nettside = scraped.find(class_='domain').get_text()
+            website_url = scraped.find(class_='domain')['href']
 
-        embed = discord.Embed(
-            title=nettside.capitalize(),
-            url=website_url, timestamp=datetime.utcnow())
+            embed = discord.Embed(
+                title=nettside.capitalize(),
+                url=website_url, timestamp=datetime.utcnow())
 
-        if status[-6:] == 'is up.':
-            status = 'Oppe!'
-            ping = scraped.find(class_='smaller').get_text()
-            pinglist = []
-            for i in ping.split():
-                if i.isdigit():
-                    pinglist.append(i)
-            embed.add_field(name='Ping', value=f'{pinglist[0]} ms')
-            embed.color = 0x2ECC71
-        else:
-            status = 'Nede!'
-            embed.color = 0xff0000
+            if status[-6:] == 'is up.':
+                status = 'Oppe!'
+                ping = scraped.find(class_='smaller').get_text()
+                pinglist = []
+                for i in ping.split():
+                    if i.isdigit():
+                        pinglist.append(i)
+                embed.add_field(name='Ping', value=f'{pinglist[0]} ms')
+                embed.color = 0x2ECC71
+            else:
+                status = 'Nede!'
+                embed.color = 0xff0000
 
-        embed.add_field(name='Status', value=status)
-        await status_msg.edit(embed=embed)
+            embed.add_field(name='Status', value=status)
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -231,7 +250,7 @@ class Misc(commands.Cog):
         tekst = sub(' ', '👏', tekst)
 
         embed = discord.Embed(
-            color=0x0085ff, description=f'**{tekst.upper()}**')
+            color=ctx.me.color, description=f'**{tekst.upper()}**')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -242,24 +261,22 @@ class Misc(commands.Cog):
     async def videochat(self, ctx):
         """Få link til videochat"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        try:
-            voice_channel_id = ctx.author.voice.channel.id
-        except AttributeError:
-            return await Defaults.error_warning_edit(
-                ctx, status_msg,
-                text='Du er ikke koblet til en talekanal',
-                mention=False)
+            try:
+                voice_channel_id = ctx.author.voice.channel.id
+            except AttributeError:
+                return await Defaults.error_warning_send(
+                    ctx, text='Du er ikke koblet til en talekanal',
+                    mention=False)
 
-        link = 'https://canary.discordapp.com/channels/' +\
-               f'{ctx.guild.id}/{voice_channel_id}'
-        embed = discord.Embed(
-            title=f'Videochat: {ctx.author.voice.channel.name}',
-            color=0x0085ff,
-            description=f'[Trykk her for å bli med i videochat]({link})')
-        await status_msg.edit(embed=embed)
+            link = 'https://canary.discordapp.com/channels/' +\
+                   f'{ctx.guild.id}/{voice_channel_id}'
+            embed = discord.Embed(
+                title=f'Videochat: {ctx.author.voice.channel.name}',
+                color=ctx.me.color,
+                description=f'[Trykk her for å bli med i videochat]({link})')
+            return await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -267,46 +284,133 @@ class Misc(commands.Cog):
     async def klokka(self, ctx, kontinent, by):
         """Se hvor mye klokka er i et bestemt område"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        try:
-            data = get(
-                'http://worldtimeapi.org/api/timezone/' +
-                f'{kontinent.capitalize()}/{by.capitalize()}').json()
-            timezone = data['timezone']
-        except KeyError:
-            return await Defaults.error_warning_edit(
-                ctx, status_msg,
-                text='Kunne ikke finne sted/tidssone',
-                mention=False)
+            try:
+                data = get(
+                    'http://worldtimeapi.org/api/timezone/' +
+                    f'{kontinent.capitalize()}/{by.capitalize()}').json()
+                timezone = data['timezone']
+            except KeyError:
+                return await Defaults.error_warning_send(
+                    ctx,
+                    text='Kunne ikke finne sted/tidssone',
+                    mention=False)
 
-        timezone = split('/', timezone)
-        timezone_local = data['abbreviation']
-        timezone_utc = data['utc_offset']
-        time_norway = datetime.now().strftime('%H:%M\n%d.%m.%Y')
+            timezone = split('/', timezone)
+            timezone_local = data['abbreviation']
+            timezone_utc = data['utc_offset']
+            time_norway = datetime.now().strftime('%H:%M\n%d.%m.%Y')
 
-        time = data['datetime']
-        time_formatted = f'{time[11:16]}\n{time[8:10]}.{time[5:7]}.{time[:4]}'
+            time = data['datetime']
+            time_formatted = f'{time[11:16]}\n{time[8:10]}.' +\
+                             f'{time[5:7]}.{time[:4]}'
 
-        daylight_savings = data['dst']
-        if daylight_savings is False:
-            daylight_savings = 'Nei'
-        else:
-            daylight_savings = 'Ja'
+            daylight_savings = data['dst']
+            if daylight_savings is False:
+                daylight_savings = 'Nei'
+            else:
+                daylight_savings = 'Ja'
+
+            embed = discord.Embed(
+                title=f'Klokka i {timezone[1]}',
+                color=0x0085ff, timestamp=datetime.utcnow())
+            embed.add_field(name='Klokka', value=time_formatted)
+            embed.add_field(name='Klokka i Norge', value=time_norway)
+            embed.add_field(name='Sommertid', value=daylight_savings)
+            embed.add_field(name='UTC tidssone', value=timezone_utc)
+            embed.add_field(
+                name='Standard tidssone for sted', value=timezone_local)
+            embed.set_footer(text='Klokka i din tidssone ->')
+
+            return await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['country'])
+    async def land(self, ctx, *, land: str):
+        """Se info om et land"""
+
+        async with ctx.channel.typing():
+
+            try:
+                data = get(
+                    f'https://restcountries.eu/rest/v2/name/{land}').json()
+                name = data[0]['name']
+            except KeyError:
+                return await Defaults.error_warning_send(
+                    ctx,
+                    text='Kunne ikke finne landet',
+                    mention=False)
+
+            try:
+                country_code = data[0]['alpha2Code'].lower()
+                capital = data[0]['capital']
+                sub_region = data[0]['subregion']
+                population = data[0]['population']
+                area = int(data[0]['area'])
+                native_name = data[0]['nativeName']
+                currency_name = data[0]['currencies'][0]['name']
+                currency_abbreviation = data[0]['currencies'][0]['code']
+                main_language = data[0]['languages'][0]['name']
+                main_language_natvive = data[0]['languages'][0]['nativeName']
+                flag = 'https://www.countryflags.io/' +\
+                       f'{country_code}/flat/64.png'
+            except TypeError:
+                return await Defaults.error_warning_send(
+                    ctx, text='Kunne ikke finne landet', mention=False)
+
+            data_list = [country_code, capital, sub_region, population, area,
+                         native_name, currency_name, currency_abbreviation,
+                         main_language_natvive, main_language_natvive, flag]
+
+            for i in data_list:
+                if not i or i is '':
+                    return await Defaults.error_warning_send(
+                        ctx, text='Kunne ikke finne landet', mention=False)
+
+            if main_language != main_language_natvive:
+                language = f'{main_language}\n{main_language_natvive}'
+            else:
+                language = main_language
+
+            embed = discord.Embed(
+                title=f':flag_{country_code}: {name}',
+                color=ctx.me.color, timestamp=datetime.utcnow())
+            if name == native_name:
+                embed.description = native_name
+            embed.set_thumbnail(url=flag)
+            embed.add_field(name='Hovedstad', value=capital)
+            embed.add_field(name='Region', value=sub_region)
+            embed.add_field(name='Språk', value=language)
+            embed.add_field(name='Valuta',
+                            value=f'{currency_name}\n{currency_abbreviation}')
+            embed.add_field(
+                name='Befolkningstall', value=population)
+            embed.add_field(
+                name='Størrelse', value=f'{area}km')
+
+            return await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def lmgtfy(self, ctx, mention: discord.Member=None, *, søkeord: str):
+        """Fordi noen trenger en internett 101 leksjon"""
 
         embed = discord.Embed(
-            title=f'Klokka i {timezone[1]}',
-            color=0x0085ff, timestamp=datetime.utcnow())
-        embed.add_field(name='Klokka', value=time_formatted)
-        embed.add_field(name='Klokka i Norge', value=time_norway)
-        embed.add_field(name='Sommertid', value=daylight_savings)
-        embed.add_field(name='UTC tidssone', value=timezone_utc)
-        embed.add_field(
-            name='Standard tidssone for sted', value=timezone_local)
-        embed.set_footer(text='Klokka i din tidssone ->')
-
-        await status_msg.edit(embed=embed)
+            color=ctx.me.color,
+            description='[Trykk her for løsningen ' +
+            f'på problemet ditt](https://lmgtfy.com/?q={søkeord})')
+        embed.set_image(
+            url='http://ecx.images-amazon.com/images/I/' +
+                '51IESUsBdbL._SX258_BO1,204,203,200_.jpg')
+        embed.set_footer(
+            text=f'{mention.name}#{mention.discriminator}',
+            icon_url=mention.avatar_url)
+        if not mention:
+            return await ctx.send(embed=embed)
+        await ctx.send(embed=embed, content=mention.mention)
 
 
 def setup(bot):

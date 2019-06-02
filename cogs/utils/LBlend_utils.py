@@ -8,8 +8,7 @@ from ..utils import Defaults
 
 
 async def download_photo(
-        ctx, status_msg, link,
-        max_file_size: int, meassurement_type: str, filepath: str):
+        ctx, link, max_file_size: int, meassurement_type: str, filepath: str):
     """Downloads photo from messsage and checks its filesize"""
 
     max_file_size_actual = max_file_size
@@ -25,41 +24,37 @@ async def download_photo(
 
     if ctx.message.attachments != [] and not link:
         if ctx.message.attachments[0].size > max_file_size:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Filen er for stor. Prøv et bilde som er mindre enn ' +
-                     f'{max_file_size_actual} {meassurement}')
+            return await Defaults.error_fatal_send(
+                ctx, text='Filen er for stor. Prøv et bilde som er mindre ' +
+                          f'enn {max_file_size_actual} {meassurement}')
 
         try:
             await ctx.message.attachments[0].save(fp=filepath)
         except:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Kunne ikke hente bilde!')
+            return await Defaults.error_fatal_send(
+                ctx, text='Kunne ikke hente bilde!')
 
     elif not ctx.message.attachments and link is not None:
         try:
             linked_file = get(str(link))
         except:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Kunne ikke hente bilde!')
+            return await Defaults.error_fatal_send(
+                ctx, text='Kunne ikke hente bilde!')
         if len(linked_file.content) > max_file_size:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
+            return await Defaults.error_fatal_send(
+                ctx,
                 text='Filen er for stor. Prøv et bilde som er mindre enn ' +
                      f'{max_file_size_actual} {meassurement}')
 
         try:
             urllib.request.urlretrieve(link, filepath)
         except:
-            return await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Kunne ikke hente bilde!')
+            return await Defaults.error_fatal_send(
+                ctx, text='Kunne ikke hente bilde!')
 
     else:
-        return await Defaults.error_warning_edit(
-            ctx, status_msg, text='Du må gi meg et bilde!')
+        return await Defaults.error_warning_send(
+            ctx, text='Du må gi meg et bilde!')
 
     return True
 

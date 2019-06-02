@@ -108,7 +108,7 @@ class Osu(commands.Cog):
                 text='Joined: ' +
                      f'{join_date[8:10]}.{join_date[5:7]}.{join_date[:4]} ' +
                      f'{join_date[11:]} | Hours played: {hours_played}')
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
 
 def setup(bot):

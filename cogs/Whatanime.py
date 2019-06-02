@@ -87,8 +87,7 @@ class Whatanime(commands.Cog):
             f'https://api.jikan.moe/v3/anime/{mal_id}/pictures').json()
 
         embed = discord.Embed(
-            title=title_romaji,
-            color=0x0085ff,
+            title=title_romaji, color=ctx.me.color,
             url=f'https://anilist.co/anime/{anilist_id}',
             description=f'{title_native}\n{title_english}')
         embed.set_author(
@@ -108,7 +107,7 @@ class Whatanime(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
         await status_msg.delete()
 
-        os.remove(f'./assets/{ctx.author.id}_trace.png')
+        return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
@@ -118,7 +117,7 @@ class Whatanime(commands.Cog):
         limit = data['limit']
         limit_ttl = data['limit_ttl']
 
-        embed = discord.Embed(color=0xE67E22)
+        embed = discord.Embed(color=ctx.me.color)
         embed.add_field(
             name='Limits',
             value=f'{limit} requests\n{limit_ttl} sekunder til resettelse')

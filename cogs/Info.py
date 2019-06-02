@@ -36,14 +36,13 @@ class Info(commands.Cog):
         else:
             since_created_days_string = 'dager'
 
-        total_members = 0
+        total_members = ctx.guild.member_count
         bot_members = 0
         online_members = 0
         idle_members = 0
         dnd_members = 0
         offline_members = 0
         for member in ctx.guild.members:
-            total_members += 1
             if member.bot:
                 bot_members += 1
             if str(member.status) == 'online':
@@ -65,6 +64,8 @@ class Info(commands.Cog):
         roles = ', '.join(roles)
         if len(roles) > 1024:
             roles = f'Skriv `{prefix}guildroller` for å se rollene'
+        if roles == '':
+            roles = '**Ingen roller**'
 
         text_channels = len(ctx.guild.text_channels)
         voice_channels = len(ctx.guild.voice_channels)
@@ -83,7 +84,8 @@ class Info(commands.Cog):
             'japan': ':flag_jp:',
             'russia': ':flag_ru:',
             'southafrica': ':flag_za:',
-            'hongkong': ':flag_hk:'
+            'hongkong': ':flag_hk:',
+            'india': ':flag_in:'
             }
         region = str(ctx.guild.region)
         if region.startswith('us'):
@@ -92,14 +94,74 @@ class Info(commands.Cog):
             region = 'eu'
         elif region.startswith('amsterdam'):
             region = 'amsterdam'
-        flag = flags[region]
+        try:
+            flag = flags[region]
+        except KeyError:
+            flag = ':question:'
 
-        embed = discord.Embed(color=0x0085ff)
-        embed.set_author(name=ctx.guild.name)
+        region_names = {
+            'eu-central': 'Sentral-Europa',
+            'eu-west': 'Vest-Europa',
+            'hongkong': 'Hong Kong',
+            'russia': 'Russland',
+            'southafrica': 'Sør-Afrika',
+            'us-central': 'Midt-USA',
+            'us-east': 'New Jersey',
+            'us-south': 'Sør-USA',
+            'us-west': 'California',
+            'vip-amsterdam': 'Amsterdam (VIP)',
+            'vip-us-east': 'Øst-USA (VIP)',
+            'vip-us-west': 'Vest-USA (VIP)',
+        }
+        try:
+            region_name = region_names[str(ctx.guild.region)]
+        except KeyError:
+            region_name = str(ctx.guild.region).title()
+
+        features_string = ''
+        if ctx.guild.features != []:
+            features = {
+                'VIP_REGIONS': 'VIP',
+                'VANITY_URL': 'Egen URL',
+                'INVITE_SPLASH': 'Invitasjonsbilde',
+                'VERIFIED': 'Verfisert',
+                'MORE_EMOJI': 'Ekstra emoji',
+                'ANIMATED_ICON': 'Animert ikon'
+            }
+            for feature in ctx.guild.features:
+                features_string += f'{features[feature]}\n'
+
+        photos = {}
+        if ctx.guild.splash_url:
+            photos['Invitasjonsbilde'] = ctx.guild.splash_url_as(format='png')
+        if ctx.guild.banner_url:
+            photos['Banner'] = ctx.guild.banner_url_as(format='png')
+
+        verification_level = {
+            'none': 'ingen',
+            'low': 'e-post',
+            'medium': 'e-post, registrert i 5 min',
+            'high': 'e-post, registrert i 5 min, medlem i 10 min',
+            'extreme': 'telefon'
+        }
+        verification = verification_level[str(ctx.guild.verification_level)]
+
+        content_filter = {
+            'disabled': 'nei',
+            'no_role': 'for alle uten rolle',
+            'all_members': 'ja'
+        }
+        content = content_filter[str(ctx.guild.explicit_content_filter)]
+
+        embed = discord.Embed(
+            color=ctx.me.color,
+            description=f'**Verifiseringskrav:** {verification}\n' +
+                        f'**Innholdsfilter:** {content}')
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         embed.set_thumbnail(url=ctx.guild.icon_url_as(format='png'))
         embed.add_field(name='ID', value=ctx.guild.id)
         embed.add_field(name='Eier', value=ctx.guild.owner.mention)
-        embed.add_field(name='Region', value=f'{flag} {ctx.guild.region}')
+        embed.add_field(name='Region', value=f'{flag} {region_name}')
         embed.add_field(
             name='Server lagd',
             value=f'{guild_created_date}\n{since_created_days} ' +
@@ -119,6 +181,15 @@ class Info(commands.Cog):
         embed.add_field(
             name=f'Roller ({len(ctx.guild.roles) - 1})', value=roles,
             inline=False)
+
+        if features_string != '':
+            embed.add_field(name='AAA', value=features_string)
+
+        if photos != {}:
+            photos_string = ''
+            for key, value in photos.items():
+                photos_string += f'[{key}]({value})\n'
+            embed.add_field(name='Bilder', value=photos_string)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -137,8 +208,11 @@ class Info(commands.Cog):
         roles.reverse()
         roles = ', '.join(roles)
 
+        if roles == '':
+            roles = '**Ingen roller**'
+
         embed = discord.Embed(
-            color=0x0085ff, description=roles)
+            color=ctx.me.color, description=roles)
         embed.set_author(
             name=f'Roller ({len(ctx.guild.roles) - 1}): {ctx.guild.name}')
         embed.set_thumbnail(url=ctx.guild.icon_url_as(format='png'))
@@ -151,7 +225,7 @@ class Info(commands.Cog):
         """Viser ikonet til serveren du er i"""
 
         embed = discord.Embed(
-            color=0x0085ff,
+            color=ctx.me.color,
             description=f'[Link]({ctx.guild.icon_url_as(format="png")})')
         embed.set_image(url=ctx.guild.icon_url_as(format='png'))
         await ctx.send(embed=embed)
@@ -170,7 +244,7 @@ class Info(commands.Cog):
         if str(bruker.mobile_status) != "offline":
             app += "📱 "
         if str(bruker.web_status) != "offline":
-            app += "🖥️ "
+            app += "🌐 "
         if str(bruker.desktop_status) != "offline":
             app += "💻"
 
@@ -203,6 +277,8 @@ class Info(commands.Cog):
 
         if len(roles) > 1024:
             roles = f'Skriv `{prefix}{ctx.command}` for å se rollene'
+        if roles == '':
+            roles = '**Ingen roller**'
 
         if str(bruker.color) != '#000000':
             color = bruker.color
@@ -237,7 +313,8 @@ class Info(commands.Cog):
             name='Ble med i serveren',
             value=f'{bruker_joined_date}\n{since_joined_days} ' +
             f'{since_joined_days_string} siden')
-        embed.add_field(name='Roller', value=roles, inline=False)
+        embed.add_field(name=f'Roller ({len(bruker.roles) - 1})',
+                        value=roles, inline=False)
         embed.set_footer(
             text=f'#{join_index} Medlem av serveren | ' +
             f'#{creation_index} Eldste brukeren på serveren')
@@ -267,6 +344,9 @@ class Info(commands.Cog):
             roles = ['**Ingen Roller**']
         roles.reverse()
         roles = ', '.join(roles)
+
+        if roles == '':
+            roles = '**Ingen roller**'
 
         if str(bruker.color) != '#000000':
             color = bruker.color
@@ -349,6 +429,8 @@ class Info(commands.Cog):
 
         if len(members) > 1024:
             members = 'For mange medlemmer for å vise her'
+        if len(members) == 0:
+            members = '**Ingen**'
 
         embed = discord.Embed(
             description=f'{rolle.mention}\n**ID:** {rolle.id}', color=color)
@@ -362,8 +444,75 @@ class Info(commands.Cog):
         embed.add_field(name='Nevnbar', value=mentionable)
         embed.add_field(name='Vises separat i medlemsliste', value=hoisted)
         embed.add_field(
-            name='Brukere med rollen', value=members, inline=False)
+            name=f'Brukere med rollen ({len(rolle.members)})',
+            value=members, inline=False)
         embed.set_footer(text=rolle.guild.name, icon_url=rolle.guild.icon_url)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['tekstkanal', 'kanal'])
+    async def kanalinfo(self, ctx, *, kanal: discord.TextChannel):
+        """Viser info om en tekstkanal"""
+
+        nsfw = 'Nei'
+        if kanal.is_nsfw():
+            nsfw = 'Ja'
+
+        if kanal.slowmode_delay == 0:
+            saktemodus = 'Nei'
+        else:
+            saktemodus = f'Ja ({kanal.slowmode_delay} sekunder)'
+
+        description = '**Ingen**'
+        if kanal.topic:
+         description = kanal.topic
+
+        members = []
+        for member in kanal.members:
+            members.append(member.mention)
+        members = ' '.join(members)
+        if len(members) > 1024:
+            members = 'For mange for å vise her'
+
+        embed = discord.Embed(
+            color=ctx.me.color, description=f'{kanal.mention}\nID: {kanal.id}')
+        embed.set_author(name=kanal.name, icon_url=kanal.guild.icon_url)
+        embed.add_field(name='Beskrivelse', value=description, inline=False)
+        embed.add_field(
+            name='Laget', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name='NSFW', value=nsfw)
+        embed.add_field(name='Saktemodus', value=saktemodus)
+        if kanal.category:
+            embed.add_field(name='Kategori', value=kanal.category.name)
+        embed.add_field(
+            name=f'Antall med tilgang ({len(kanal.members)})', value=members)
+        embed.set_footer(text=kanal.guild.name, icon_url=kanal.guild.icon_url)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['talekanalinfo', 'voicechannel'])
+    async def talekanal(self, ctx, *, kanal: discord.VoiceChannel):
+        """Viser info om en talekanal"""
+
+        if kanal.user_limit == 0:
+            limit = '∞ personer'
+        else:
+            limit = f'{kanal.user_limit} personer'
+
+        embed = discord.Embed(
+            color=ctx.me.color, description=f'ID: {kanal.id}')
+        embed.set_author(name=kanal.name, icon_url=kanal.guild.icon_url)
+        embed.add_field(
+            name='Laget', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(
+            name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
+        embed.add_field(name='Maksgrense', value=limit)
+        if kanal.category:
+            embed.add_field(name='Kategori', value=kanal.category.name)
+        embed.add_field(name=f'Antall koblet til', value=len(kanal.members))
+        embed.set_footer(text=kanal.guild.name, icon_url=kanal.guild.icon_url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -402,7 +551,7 @@ class Info(commands.Cog):
             formatted_string += f'#{bruker_index} {bruker.mention} ' +\
                 f'- {bruker_created_date}\n'
 
-        embed = discord.Embed(color=0xE67E22)
+        embed = discord.Embed(color=ctx.me.color)
         embed.add_field(
             name='Eldste Discordbrukerene på serveren', value=formatted_string)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
@@ -438,7 +587,7 @@ class Info(commands.Cog):
             formatted_string += f'#{bruker_index} {bruker.mention} ' +\
                 f'- {bruker_joined_date}\n'
 
-        embed = discord.Embed(color=0xE67E22)
+        embed = discord.Embed(color=ctx.me.color)
         embed.add_field(
             name='Første Discordbrukerene på serveren', value=formatted_string)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
@@ -470,8 +619,40 @@ class Info(commands.Cog):
             formatted_string += f'**{game[0]}**: {game[1]}\n'
 
         embed = discord.Embed(
-            color=0xE67E22,
+            color=ctx.me.color,
             title='De mest spilte spillene på serveren for øyeblikket',
+            description=formatted_string)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def hvemspiller(self, ctx, *, spill: str):
+        """Sjekk hvem spiller et spesifisert spik"""
+
+        users = []
+        for member in ctx.guild.members:
+            if member.bot:
+                continue
+            if not member.activity:
+                continue
+            if member.activity.name.lower() == spill.lower():
+                spill = member.activity.name
+                users.append(f'{member.name}#{member.discriminator}')
+
+        if users == []:
+            embed = discord.Embed(
+                color=ctx.me.color,
+                description='Det er ingen som spiller dette spillet')
+            return await ctx.send(embed=embed)
+
+        formatted_string = ''
+        for user in users[0:10]:
+            formatted_string += f'• {user}\n'
+
+        embed = discord.Embed(
+            color=ctx.me.color,
+            title=f'Disse spiller {spill} for øyeblikket (maks 10)',
             description=formatted_string)
         await ctx.send(embed=embed)
 
