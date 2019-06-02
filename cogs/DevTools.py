@@ -244,7 +244,6 @@ class DevTools(commands.Cog):
             await Defaults.error_fatal_send(
                 ctx, text='Error!', mention=False)
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
     @commands.command()
     async def cmd(self, ctx, *, command: str):

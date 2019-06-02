@@ -13,6 +13,43 @@ class ImageManipulation(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def pride(self, ctx, *, bruker: discord.Member=None):
+        """Pride"""
+
+        if not bruker:
+            bruker = ctx.author
+
+        async with ctx.channel.typing():
+            await bruker.avatar_url_as(format='png').save(fp=f'./assets/{bruker.id}_raw.png')
+
+            raw_image = Image.open(f'./assets/{bruker.id}_raw.png')
+            image_edit = raw_image.convert('RGBA')
+            width, height = image_edit.size
+            gay = Image.open('./assets/gay.png')
+            gay_edit = gay.convert('RGBA')
+            gay_edit = gay_edit.resize((width, height), Image.ANTIALIAS)
+            gay_edit.save(f'./assets/gay.png')
+            mask = Image.open(f'./assets/gay.png', 'r')
+            image_edit.paste(gay_edit, mask=mask)
+            image_edit.save(f'./assets/{bruker.id}_edit.png')
+
+            f = discord.File(f'./assets/{bruker.id}_edit.png')
+            embed = discord.Embed()
+            embed.set_image(url=f'attachment://{bruker.id}_edit.png')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed, file=f)
+
+            try:
+                remove(f'./assets/{bruker.id}_raw.png')
+                remove(f'./assets/{bruker.id}_edit.png')
+            except:
+                pass
+
+            return
+
+    @commands.bot_has_permissions(embed_links=True, attach_files=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['needsmorejpeg', 'jpg', 'jpeg'])
     async def needsmorejpg(self, ctx, bilde=None):
         """JPG er et kjempebra bildeformat"""
@@ -41,6 +78,8 @@ class ImageManipulation(commands.Cog):
             except:
                 pass
 
+            return
+
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['invert'])
@@ -55,7 +94,7 @@ class ImageManipulation(commands.Cog):
                 return
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
-            image_edit = raw_image.convert('RGBA')
+            image_edit = raw_image.convert('RGB')
             image_edit = ImageOps.invert(image_edit)
             image_edit.save(f'./assets/{ctx.author.id}_edit.png')
 
@@ -70,6 +109,8 @@ class ImageManipulation(commands.Cog):
                 remove(f'./assets/{ctx.author.id}_edit.png')
             except:
                 pass
+
+            return
 
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -86,7 +127,7 @@ class ImageManipulation(commands.Cog):
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
             image_edit = raw_image.convert('RGBA')
-            image_edit = ImageOps.mirror(image_edit)
+            image_edit = image_edit.rotate(180)
             image_edit.save(f'./assets/{ctx.author.id}_edit.png')
 
             f = discord.File(f'./assets/{ctx.author.id}_edit.png')
@@ -100,6 +141,8 @@ class ImageManipulation(commands.Cog):
                 remove(f'./assets/{ctx.author.id}_edit.png')
             except:
                 pass
+
+            return
 
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -131,6 +174,8 @@ class ImageManipulation(commands.Cog):
                 remove(f'./assets/{ctx.author.id}_edit.png')
             except:
                 pass
+
+            return
 
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -169,6 +214,8 @@ class ImageManipulation(commands.Cog):
                 remove(f'./assets/{ctx.author.id}_edit.png')
             except:
                 pass
+
+            return
 
 
 def setup(bot):
