@@ -10,6 +10,8 @@ from hashlib import md5
 from bs4 import BeautifulSoup
 from datetime import datetime
 from re import sub, split
+from PIL import Image, ImageDraw, ImageFont
+from os import remove
 
 from .utils import Defaults
 
@@ -418,6 +420,76 @@ class Misc(commands.Cog):
         if not mention:
             return await ctx.send(embed=embed)
         await ctx.send(embed=embed, content=mention.mention)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def match(self, ctx, *, bruker: discord.Member=None):
+        """Se hvor mye du matcher med en annen"""
+
+        if not bruker:
+            return await Defaults.error_fatal_send(
+                ctx, text='Du må gi meg en bruker', mention=False)
+        if bruker == ctx.author:
+            return await Defaults.error_warning_send(
+                ctx, 
+                text='Jeg vet du er ensom, men du kan ikke matche med deg selv',
+                mention=False)
+
+        async with ctx.channel.typing():
+
+            invoker_id = int(str(ctx.author.id)[11:14])
+            user_id = int(str(bruker.id)[11:14])
+
+            match_percent = int((invoker_id + user_id) % 100)
+
+            if bruker.id == self.bot.user.id:
+                match_percent = 100
+            elif ctx.author.id == 516234701221134346 and bruker.id == 142580278940925953:
+                match_percent = 100
+            elif ctx.author.id == 142580278940925953 and bruker.id == 516234701221134346:
+                match_percent = 100
+
+            await ctx.author.avatar_url_as(format='png').save(
+                fp=f'./assets/{ctx.author.id}_raw.png')
+            await bruker.avatar_url_as(format='png').save(
+                fp=f'./assets/{bruker.id}_raw.png')
+
+            invoker = Image.open(
+                f'./assets/{ctx.author.id}_raw.png').convert('RGBA')
+            invoker = invoker.resize((389, 389), Image.ANTIALIAS)
+            user = Image.open(
+                f'./assets/{bruker.id}_raw.png').convert('RGBA')
+            user = user.resize((389, 389), Image.ANTIALIAS)
+            heart = Image.open(f'./assets/heart.png')
+            mask = Image.open(f'./assets/heart.png', 'r')
+
+            image = Image.new('RGBA', (1024, 576))
+            image.paste(invoker, (0, 94))
+            image.paste(user, (635, 94))
+            image.paste(heart, (311, 94), mask=mask)
+            draw = ImageDraw.Draw(image)
+            font = ImageFont.truetype('DejaVuSerif-Bold.ttf', 86)
+            font_size = font.getsize(f'{match_percent}%')
+            font_size = ((image.size[0] - font_size[0]) / 2, (image.size[1] - font_size[1]) / 2)
+            draw.text(font_size, f'{match_percent}%', font=font, fill=(255,255,255,255))
+
+            image.save(f'./assets/{ctx.author.id}_{bruker.id}_edit.png')
+
+            f = discord.File(f'./assets/{ctx.author.id}_{bruker.id}_edit.png')
+            embed = discord.Embed()
+            embed.set_image(url=f'attachment://{ctx.author.id}_{bruker.id}_edit.png')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed, file=f)
+
+            try:
+                remove(f'./assets/{bruker.id}_raw.png')
+                remove(f'./assets/{ctx.author.id}_raw.png')
+                remove(f'./assets/{ctx.author.id}_{bruker.id}_edit.png')
+            except:
+                pass
+
+            return
 
 
 def setup(bot):
