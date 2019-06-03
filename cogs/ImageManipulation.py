@@ -21,7 +21,8 @@ class ImageManipulation(commands.Cog):
             bruker = ctx.author
 
         async with ctx.channel.typing():
-            await bruker.avatar_url_as(format='png').save(fp=f'./assets/{bruker.id}_raw.png')
+            await bruker.avatar_url_as(format='png').save(
+                fp=f'./assets/{bruker.id}_raw.png')
 
             raw_image = Image.open(f'./assets/{bruker.id}_raw.png')
             image_edit = raw_image.convert('RGBA')
