@@ -219,6 +219,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['serverikon', 'servericon', 'guildicon'])
     async def guildikon(self, ctx):
@@ -387,6 +388,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(alises=['roleinfo'])
     async def rolleinfo(self, ctx, *, rolle: discord.Role):
@@ -450,6 +452,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['tekstkanal', 'kanal'])
     async def kanalinfo(self, ctx, *, kanal: discord.TextChannel):
@@ -491,6 +494,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['talekanalinfo', 'voicechannel'])
     async def talekanal(self, ctx, *, kanal: discord.VoiceChannel):
@@ -516,6 +520,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['oldest'])
     async def eldst(self, ctx, *side: int):
@@ -558,6 +563,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def joinorder(self, ctx, *side: int):
@@ -594,6 +600,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def mestspilt(self, ctx):
@@ -625,6 +632,7 @@ class Info(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def hvemspiller(self, ctx, *, spill: str):
