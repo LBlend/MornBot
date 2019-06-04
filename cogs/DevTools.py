@@ -372,6 +372,29 @@ class DevTools(commands.Cog):
             color=ctx.me.color, description='Fjernet cooldown! :ok_hand:')
         await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True, external_emojis=True)
+    @commands.is_owner()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def allemoji(self, ctx):
+        """Se alle emoji båtten har tilgang til"""
+
+        embed = discord.Embed(title="Emoji", colour=ctx.me.color)
+        await Defaults.set_footer(ctx, embed)
+
+        emoji_string = ''
+        for guild in self.bot.guilds:
+            emoji_string += f'\n**{guild.name}**\n'
+            for emoji in guild.emojis:
+                if len(emoji_string) > 2000:
+                    embed.description = emoji_string
+                    await ctx.send(embed=embed)
+                    emoji_string = f'\n**{guild.name}**\n'
+                emoji_string += f'{emoji} '
+        
+        embed.description = emoji_string
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(DevTools(bot))

@@ -519,6 +519,62 @@ class Info(commands.Cog):
         embed.set_footer(text=kanal.guild.name, icon_url=kanal.guild.icon_url)
         await ctx.send(embed=embed)
 
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['emote'])
+    async def emoji(self, ctx, emoji: discord.Emoji):
+        """Viser info om en CUSTOM emoji som tilhører serveren"""
+
+        animated = 'Nei'
+        if emoji.animated:
+            animated = 'Ja'
+
+        emoji_2 = await emoji.guild.fetch_emoji(emoji.id)
+        try:
+            emoji_creator = f'{emoji_2.user.name}#{emoji_2.user.discriminator}'
+        except AttributeError:
+            emoji_creator = 'Jeg trenger `manage_emojis`-' +\
+                            'tillatelsen for å hente dette'
+
+        embed = discord.Embed(
+            color=ctx.me.color, description=f'ID: {emoji.id}')
+        embed.set_author(name=emoji.name, icon_url=emoji.url)
+        embed.add_field(
+            name=f'Laget', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name='Animert', value=animated)
+        embed.add_field(
+            name='Lagt til av',
+            value=emoji_creator)
+        embed.set_image(url=emoji.url)
+        embed.set_footer(text=emoji.guild.name, icon_url=emoji.guild.icon_url)
+        await ctx.send(embed=embed)
+    
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['serveremoji', 'serveremotes'])
+    async def guildemoji(self, ctx):
+        """Viser alle emoji som serveren har"""
+
+        embed = discord.Embed(
+            title=f"Emoji",
+            colour=ctx.me.color)
+        embed.set_footer(text=ctx.guild.name, icon_url=ctx.guild.icon_url)
+
+        emoji_string = ''
+        for emoji in ctx.guild.emojis:
+            if len(emoji_string) > 2000:
+                embed.description = emoji_string
+                await ctx.send(embed=embed)
+                emoji_string = ''
+            emoji_string += f'{emoji} '
+
+        embed.description = emoji_string
+        await ctx.send(embed=embed)
+
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
