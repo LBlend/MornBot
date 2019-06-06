@@ -126,7 +126,8 @@ class Info(commands.Cog):
                 'INVITE_SPLASH': 'Invitasjonsbilde',
                 'VERIFIED': 'Verfisert',
                 'MORE_EMOJI': 'Ekstra emoji',
-                'ANIMATED_ICON': 'Animert ikon'
+                'ANIMATED_ICON': 'Animert ikon',
+                'BANNER': 'Banner'
             }
             for feature in ctx.guild.features:
                 features_string += f'{features[feature]}\n'
@@ -183,7 +184,7 @@ class Info(commands.Cog):
             inline=False)
 
         if features_string != '':
-            embed.add_field(name='AAA', value=features_string)
+            embed.add_field(name='Tillegsfunksjoner', value=features_string)
 
         if photos != {}:
             photos_string = ''
@@ -229,6 +230,42 @@ class Info(commands.Cog):
             color=ctx.me.color,
             description=f'[Link]({ctx.guild.icon_url_as(format="png")})')
         embed.set_image(url=ctx.guild.icon_url_as(format='png'))
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command()
+    async def guildsplash(self, ctx):
+        """Viser invite splash til serveren"""
+
+        if not ctx.guild.splash_url:
+            return await Defaults.error_warning_send(
+                ctx, text='Serveren har ikke en invite splash', mention=False)
+
+        url = ctx.guild.banner_url_as(format='png')
+
+        embed = discord.Embed(
+            color=ctx.me.color, description=f'[Link]({url})')
+        embed.set_image(url=url)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command()
+    async def guildbanner(self, ctx):
+        """Viser invite splash til serveren"""
+
+        if not ctx.guild.banner_url:
+            return await Defaults.error_warning_send(
+                ctx, text='Serveren har ikke et banner', mention=False)
+
+        url = ctx.guild.banner_url_as(format='png')
+
+        embed = discord.Embed(
+            color=ctx.me.color, description=f'[Link]({url})')
+        embed.set_image(url=url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)
