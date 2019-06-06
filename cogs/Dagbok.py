@@ -3,6 +3,7 @@ import discord
 
 import pymongo
 from json import load as json_load
+from os import remove
 
 from .utils import Defaults
 
@@ -24,7 +25,7 @@ class Dagbok(commands.Cog):
         if message.author.bot:
             return
 
-        if message.content.lower().startswith('kjære dagbok:'):
+        if message.content.lower().startswith('kjære dagbok:') or message.content.lower().startswith('kjære dagbok,'):
 
             database_find = {'_id': message.author.id}
             database_user = database_col_dagbok.find_one(database_find)
@@ -33,21 +34,65 @@ class Dagbok(commands.Cog):
                 return
 
             date = message.created_at.strftime('%d-%m-%Y')
+            
+            database_col_dagbok.update_one(
+                database_find,
+                {'$set':
+                        {f'data.{date}': message.clean_content}},
+                upsert=True)
 
             try:
-                database_user['data'][f'{date}']
+                await message.add_reaction('✅')
             except:
-                database_col_dagbok.update_one(
-                    database_find,
-                    {'$set':
-                         {f'data.{date}': message.clean_content}},
-                    upsert=True)
+                pass
 
     @commands.guild_only()
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
-    async def mindagbok(self, ctx, dato: str):
+    @commands.group()
+    async def dagbok(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
+
+    @dagbok.command()
+    async def på(self, ctx):
+        """Legger deg inn i databasen"""
+
+        database_find = {'_id': ctx.author.id}
+        database_user = database_col_dagbok.find_one(database_find)
+        if database_user is not None:
+            embed = discord.Embed(
+                description='Du ligger allerede i databasen')
+            await Defaults.set_footer(ctx, embed)
+            return await ctx.send(embed=embed)
+
+        database_col_dagbok.insert_one({'_id': ctx.author.id})
+        embed = discord.Embed(
+            description=':white_check_mark: Du er nå i lagt inn i databasen')
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @dagbok.command()
+    async def av(self, ctx):
+        """Sletter deg fra databasen"""
+
+        database_find = {'_id': ctx.author.id}
+        database_user = database_col_dagbok.find_one(database_find)
+        if database_user is None:
+            embed = discord.Embed(
+                description='Du lå ikke i databasen fra før av')
+            await Defaults.set_footer(ctx, embed)
+            return await ctx.send(embed=embed)
+
+        database_col_dagbok.delete_one(database_user)
+
+        embed = discord.Embed(
+            description=':white_check_mark: Dine data har blitt slettet!')
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @dagbok.command()
+    async def dag(self, ctx, dato: str):
         """Hent opp dagboka di fra en dato"""
 
         database_find = {'_id': ctx.author.id}
@@ -66,38 +111,60 @@ class Dagbok(commands.Cog):
             data = database_user['data'][f'{dato}']
             embed = discord.Embed(
                 color=color, description=data)
-            await Defaults.set_footer(ctx, embed)
+            embed.set_footer(
+                text=f'{ctx.author.name}#{ctx.author.discriminator} | {dato}',
+                icon_url=ctx.author.avatar_url)
             return await ctx.send(embed=embed)
         except:
             await Defaults.error_fatal_send(
                 ctx, text='Fant ingen data fra denne datoen. Dobbelsjekk ' +
-                          'om du har skrevet riktig dato `DD-MM-YYYY`')
-
-    @commands.guild_only()
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.group()
-    async def dagbok(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+                          'om du har skrevet riktig dato `DD-MM-YYYY`',
+                          mention=False)
 
     @dagbok.command()
-    async def på(self, ctx):
-        """legger deg i database"""
-
-        database_col_dagbok.insert_one({'_id': ctx.author.id})
-        await ctx.send('Du er nå lagt inn i databasen!')
-
-    @dagbok.command()
-    async def av(self, ctx):
-        """Sletter deg fra database"""
+    async def data(self, ctx):
+        """Sender deg dine data"""
 
         database_find = {'_id': ctx.author.id}
         database_user = database_col_dagbok.find_one(database_find)
-        database_col_dagbok.delete_one(database_user)
 
-        await ctx.send(
-            'Du er nå fjernet fra databasen. All din data er slettet')
+        if database_user is None:
+            return await Defaults.error_warning_send(
+                ctx, text='Jeg har ingen data om deg')
+            
+        raw_data = ''
+        try:
+            database_user['data']
+        except KeyError:
+            return await Defaults.error_warning_send(
+                ctx, text='Jeg har ingen data om deg')
+
+        for key, value in database_user['data'].items():
+            raw_data += f'({key})\n{value}\n\n'
+
+        with open(f'./assets/{ctx.author.id}.txt',
+                  'a+', encoding='utf-8') as f:
+            f.write(raw_data)
+
+        try:
+            await ctx.author.send(
+                file=discord.File(f'./assets/{ctx.author.id}.txt'))
+            embed = discord.Embed(
+                color=0x0085ff,
+                description=':white_check_mark: Dine data har ' +
+                            'blitt sendt i DM!')
+        except:
+            await Defaults.error_fatal_send(
+                ctx,
+                text='Sending av data feilet! Sjekk om du har blokkert meg')
+
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+        try:
+            remove(f'./assets/{ctx.author.id}.txt')
+        except:
+            pass
 
 
 def setup(bot):
