@@ -123,17 +123,7 @@ class Ordsky(commands.Cog):
                                   'Be boteier om å fikse dette')
 
         # Remove consent & data, insert missing data
-        if database_user is None:
-            await default_db_insert(ctx)
-        else:
-            database_col_users.update_one(database_find,
-                                          {'$set':
-                                           {'ordsky_consent': False}})
-            for guild in database_user['ordsky_data']:
-                database_col_users.update_one(database_find,
-                                              {'$set':
-                                               {f'ordsky_data.{guild}': None}},
-                                              upsert=True)
+        database_col_users.delete_one(database_user)
 
         # Confirmation message
         embed = discord.Embed(
@@ -261,23 +251,18 @@ class Ordsky(commands.Cog):
                     continue
                 try:
                     async for message in channel.history(limit=300):
-                        has_prefix = False
+                        has_prefixes = False
                         if message.author.id == ctx.author.id:
-                            for prefix in command_prefixes:
-                                if prefix in message.clean_content[:3]:
-                                    has_prefix = True
-                            if has_prefix is False:
+                            for prefixes in command_prefixes:
+                                if prefixes in message.clean_content[:3]:
+                                    has_prefixes = True
+                            if has_prefixes is False:
                                 message_data += '[' + \
                                     f'{str(message.created_at)[0:19]}] ' + \
                                     f'({message.channel.id}-{message.id}) ' + \
                                     f'{message.clean_content} '
                 except:
                     continue
-            database_col_users.update_one(
-                database_find,
-                {'$set':
-                 {f'ordsky_data.{ctx.guild.id}': message_data}},
-                upsert=True)
 
         except KeyError:
             for channel in ctx.guild.text_channels:
@@ -285,23 +270,37 @@ class Ordsky(commands.Cog):
                     continue
                 try:
                     async for message in channel.history(limit=2000):
+                        has_prefixes = False
                         if message.author.id == ctx.author.id:
-                            for prefix in command_prefixes:
-                                if prefix in message.clean_content[:3]:
-                                    has_prefix = True
-                            if has_prefix is False:
+                            for prefixes in command_prefixes:
+                                if prefixes in message.clean_content[:3]:
+                                    has_prefixes = True
+                            if has_prefixes is False:
                                 message_data += '[' + \
                                     f'{str(message.created_at)[0:19]}] ' + \
                                     f'({message.channel.id}-{message.id}) ' + \
                                     f'{message.clean_content} '
                 except:
                     continue
+        if message_data != '':
             database_col_users.update_one(
                 database_find,
                 {'$set':
-                 {f'ordsky_data.{ctx.guild.id}': message_data}},
+                {f'ordsky_data.{ctx.guild.id}': message_data}},
                 upsert=True)
 
+        database_user = database_col_users.find_one(database_find)
+        try:
+            message_data = database_user['ordsky_data'][f'{ctx.guild.id}']
+        except KeyError:
+            embed = discord.Embed(
+                color=0xF1C40F,
+                description=':x: Har ikke nok meldingsdata ' +
+                            'for å generere ordsky')
+            embed.set_footer(
+                icon_url=ctx.author.avatar_url,
+                text=f'{ctx.author.name}#{ctx.author.discriminator}')
+            return await ctx.send(ctx.author.mention, embed=embed)
         database_message_data = message_data
 
         # Update status message
@@ -324,17 +323,6 @@ class Ordsky(commands.Cog):
                   'r', encoding='utf-8') as f:
             filtered_words = [line.split(',') for line in f.readlines()]
             filtered_words = filtered_words[0]
-
-        # Stop if no data
-        if text is '' or text is None:
-            embed = discord.Embed(
-                color=0xF1C40F,
-                description=':x: Har ikke nok meldingsdata ' +
-                            'for å generere ordsky')
-            embed.set_footer(
-                icon_url=ctx.author.avatar_url,
-                text=f'{ctx.author.name}#{ctx.author.discriminator}')
-            return await ctx.send(ctx.author.mention, embed=embed)
 
         # Fetch mask
         mask = array(Image.open('./assets/ordsky/mask/skyform.png'))
