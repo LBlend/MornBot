@@ -37,8 +37,7 @@ async def default_db_insert(ctx):
 
     database_col_users.insert_one(
         {'_id': ctx.author.id,
-         'ordsky_consent': False,
-         'ordsky_data': {f'{ctx.guild.id}': None}})
+         'ordsky_consent': False,})
 
 
 async def error_no_data(ctx):
@@ -225,12 +224,6 @@ class Ordsky(commands.Cog):
         if database_user is None:
             await default_db_insert(ctx)
             database_user = database_col_users.find_one(database_find)
-        if ctx.guild.id not in database_user['ordsky_data']:
-            database_col_users.update_one(
-                database_find,
-                {'$set':
-                 {f'ordsky_data.{ctx.guild.id}': None}},
-                upsert=True)
 
         # Refresh database
         database_user = database_col_users.find_one(database_find)
@@ -257,19 +250,27 @@ class Ordsky(commands.Cog):
             text=f'{ctx.author.name}#{ctx.author.discriminator}')
         status_msg = await ctx.send(embed=embed)
 
+        command_prefixes = ['§', '!', '.', '-', '€', '|', '$', '=', '?', '<', ':', '#', ',']
+
         # Fetch messages
         message_data = ''
-        if database_user['ordsky_data'][f'{ctx.guild.id}'] is None:
+        try:
+            database_user['ordsky_data'][f'{ctx.guild.id}']
             for channel in ctx.guild.text_channels:
                 if not channel.permissions_for(ctx.author).send_messages:
                     continue
                 try:
-                    async for message in channel.history(limit=2000):
+                    async for message in channel.history(limit=300):
+                        has_prefix = False
                         if message.author.id == ctx.author.id:
-                            message_data += '[' +\
-                                f'{str(message.created_at)[0:19]}] ' +\
-                                f'({message.channel.id}-{message.id}) ' +\
-                                f'{message.clean_content} '
+                            for prefix in command_prefixes:
+                                if prefix in message.clean_content[:3]:
+                                    has_prefix = True
+                            if has_prefix is False:
+                                message_data += '[' + \
+                                    f'{str(message.created_at)[0:19]}] ' + \
+                                    f'({message.channel.id}-{message.id}) ' + \
+                                    f'{message.clean_content} '
                 except:
                     continue
             database_col_users.update_one(
@@ -277,29 +278,31 @@ class Ordsky(commands.Cog):
                 {'$set':
                  {f'ordsky_data.{ctx.guild.id}': message_data}},
                 upsert=True)
-            database_message_data = message_data
 
-        else:
+        except KeyError:
             for channel in ctx.guild.text_channels:
                 if not channel.permissions_for(ctx.author).send_messages:
                     continue
                 try:
-                    async for message in channel.history(limit=300):
+                    async for message in channel.history(limit=2000):
                         if message.author.id == ctx.author.id:
-                            message_data += '[' + \
-                                f'{str(message.created_at)[0:19]}] ' + \
-                                f'({message.channel.id}-{message.id}) ' + \
-                                f'{message.clean_content} '
+                            for prefix in command_prefixes:
+                                if prefix in message.clean_content[:3]:
+                                    has_prefix = True
+                            if has_prefix is False:
+                                message_data += '[' + \
+                                    f'{str(message.created_at)[0:19]}] ' + \
+                                    f'({message.channel.id}-{message.id}) ' + \
+                                    f'{message.clean_content} '
                 except:
                     continue
-            database_message_data = database_user['ordsky_data']
-            [f'{ctx.guild.id}']
-            database_message_data += message_data
             database_col_users.update_one(
                 database_find,
                 {'$set':
-                 {f'ordsky_data.{ctx.guild.id}': database_message_data}},
+                 {f'ordsky_data.{ctx.guild.id}': message_data}},
                 upsert=True)
+
+        database_message_data = message_data
 
         # Update status message
         embed = discord.Embed(
@@ -313,6 +316,8 @@ class Ordsky(commands.Cog):
         # URL & emote filter
         text = sub(r'http\S+', '', database_message_data)
         text = sub(r':\S+', '', text)
+        text = sub(r'#\S+', '', text)
+        text = sub(r'@\S+', '', text)
 
         # Fetch pre-defined word list
         with open('./assets/ordsky/ordliste.txt',
