@@ -61,9 +61,37 @@ class Vær(commands.Cog):
                 data['sys']['sunset']).strftime('%H:%M')
             time_now = datetime.now().strftime('%d.%m.%Y %H:%M')
 
+            try:
+                data['rain']
+                is_rain = True
+            except KeyError:
+                is_rain = False
+            
+            try:
+                data['snow']
+                is_snow = True
+            except KeyError:
+                is_snow = False
+            
+            rain = ''
+            if is_rain:
+                for key, value in data['rain'].items():
+                    if key == '1h':
+                        rain += f'Siste timen: {value}mm\n'
+                    if key == '3h':
+                        rain += f'Siste 3 timene: {value}mm'
+
+            snow = ''
+            if is_snow:
+                for key, value in data['snow'].items():
+                    if key == '1h':
+                        rain += f'Siste timen: {value}mm\n'
+                    if key == '3h':
+                        rain += f'Siste 3 timene: {value}mm'
+
             embed = discord.Embed(
-                title=f':flag_{country_code}: {city_name}, ' +
-                f'{country_code.upper()} | {fetch_date} (Norsk Tid)',
+                title=f':flag_{country_code}: {city_name} ' +
+                f'| {fetch_date} (Norsk Tid)',
                 color=ctx.me.color, url=link, description=description)
             embed.set_author(
                 name='OpenWeatherMap',
@@ -75,7 +103,11 @@ class Vær(commands.Cog):
             embed.add_field(name='Vind', value=f'{wind_speed} m/s')
             embed.add_field(name='Luftfuktighet', value=f'{humidity}%')
             embed.add_field(name='Skyer', value=f'{cloudiness}%')
-            embed.add_field(name='Soloppgang (Norsk tid)', value=sunrise)
+            if rain != '':
+                embed.add_field(name='Nedbørsmengde', value=rain)
+            if snow != '':
+                embed.add_field(name='Snømengde', value=snow)
+            embed.add_field(name='Soloppgang (Norsk tid)', value=sunrise, inline=False)
             embed.add_field(name='Solnedgang (Norsk tid)', value=sunset)
             embed.set_footer(text=f'Tid i Norge nå: {time_now}')
             return await ctx.send(embed=embed)
