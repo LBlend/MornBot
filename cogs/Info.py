@@ -278,13 +278,13 @@ class Info(commands.Cog):
         if not bruker:
             bruker = ctx.author
 
-        app = ""
-        if str(bruker.mobile_status) != "offline":
-            app += "📱 "
-        if str(bruker.web_status) != "offline":
-            app += "🌐 "
-        if str(bruker.desktop_status) != "offline":
-            app += "💻"
+        app = ''
+        if str(bruker.mobile_status) != 'offline':
+            app += '📱 '
+        if str(bruker.web_status) != 'offline':
+            app += '🌐 '
+        if str(bruker.desktop_status) != 'offline':
+            app += '💻'
 
         join_index = sorted(
             ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
@@ -358,7 +358,7 @@ class Info(commands.Cog):
             f'#{creation_index} Eldste brukeren på serveren')
 
         if bruker.activities:
-            games = ""
+            games = ''
             for activity in bruker.activities:
                 games += f"{activity.name}\n"
             embed.add_field(name='Spiller:', value=games, inline=False)
