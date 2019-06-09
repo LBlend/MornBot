@@ -44,6 +44,8 @@ bot = commands.Bot(
 
 requirements = {
     'BotInfo': [website, github],
+    'Dagbok': mongodb_url,
+    'FunRepliesExample': mongodb_url,
     'Konverter': ksoft_authentication,
     'Ordsky': mongodb_url,
     'osu': osu_api_key,

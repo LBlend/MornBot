@@ -16,7 +16,7 @@ class Whatanime(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.guild)
-    @commands.command(aliases=['anime', 'ani', 'source', 'saus', 'sauce'])
+    @commands.command(aliases=['source', 'saus', 'sauce'])
     async def whatanime(self, ctx, bilde=None):
         """Finner ut hvilken anime et skjermbilde er tatt fra"""
 
