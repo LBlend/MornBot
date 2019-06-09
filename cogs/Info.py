@@ -67,6 +67,20 @@ class Info(commands.Cog):
         if roles == '':
             roles = '**Ingen roller**'
 
+        boosters = []
+        premium_subscribers = sorted(
+            ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
+        for booster in premium_subscribers:
+            boosters.append(booster.mention)
+        if boosters is []:
+            boosters = ['**Ingen boosters**']
+        boosters = ' '.join(boosters)
+        if len(boosters) > 1024:
+            boosters = f'Skriv `{prefix}boosters` for å se boosters'
+        if boosters == '':
+            boosters == '**Ingen boosters**'
+        
+
         text_channels = len(ctx.guild.text_channels)
         voice_channels = len(ctx.guild.voice_channels)
         categories = len(ctx.guild.categories)
@@ -124,10 +138,15 @@ class Info(commands.Cog):
                 'VIP_REGIONS': 'VIP',
                 'VANITY_URL': 'Egen URL',
                 'INVITE_SPLASH': 'Invitasjonsbilde',
-                'VERIFIED': 'Verfisert',
+                'VERIFIED': 'Verifisert',
+                'PARTNERED': 'Discord Partner',
                 'MORE_EMOJI': 'Ekstra emoji',
+                'DISCOVERABLE': '',
+                'COMMERCE': 'Butikkanaler',
+                'LURKABLE': 'Kan ses uten join',
+                'NEWS': 'Nyhetskanaler',
+                'BANNER': 'Banner',
                 'ANIMATED_ICON': 'Animert ikon',
-                'BANNER': 'Banner'
             }
             for feature in ctx.guild.features:
                 features_string += f'{features[feature]}\n'
@@ -157,9 +176,10 @@ class Info(commands.Cog):
         embed = discord.Embed(
             color=ctx.me.color,
             description=f'**Verifiseringskrav:** {verification}\n' +
-                        f'**Innholdsfilter:** {content}')
+                        f'**Innholdsfilter:** {content}\n' +
+                        f'**Boost Tier:** {ctx.guild.premium_tier}')
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
-        embed.set_thumbnail(url=ctx.guild.icon_url_as(format='png'))
+        embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
         embed.add_field(name='ID', value=ctx.guild.id)
         embed.add_field(name='Eier', value=ctx.guild.owner.mention)
         embed.add_field(name='Region', value=f'{flag} {region_name}')
@@ -169,8 +189,9 @@ class Info(commands.Cog):
             f'{since_created_days_string} siden')
         embed.add_field(
             name=f'Kanaler ({total_channels})',
-            value=f'Kategorier: **{categories}\n' +
-                  f'**Tekst: **{text_channels}**\nTale: **{voice_channels}**')
+            value=f'Tekst: **{text_channels}**\n' +
+            f'Tale: **{voice_channels}**\n' +
+            f'Kategorier: **{categories}**')
         embed.add_field(
             name=f'Medlemmer ({total_members})',
             value=f'Mennesker: **{int(total_members) - int(bot_members)}**\n' +
@@ -182,6 +203,10 @@ class Info(commands.Cog):
         embed.add_field(
             name=f'Roller ({len(ctx.guild.roles) - 1})', value=roles,
             inline=False)
+        if ctx.guild.premium_tier is not 0:
+            embed.add_field(
+                name=f'Boosters ({ctx.guild.premium_subscription_count})',
+                value=boosters, inline=False)
 
         if features_string != '':
             embed.add_field(name='Tillegsfunksjoner', value=features_string)
@@ -216,7 +241,33 @@ class Info(commands.Cog):
             color=ctx.me.color, description=roles)
         embed.set_author(
             name=f'Roller ({len(ctx.guild.roles) - 1}): {ctx.guild.name}')
-        embed.set_thumbnail(url=ctx.guild.icon_url_as(format='png'))
+        embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(aliases=['guildboosters', 'serverboosters'])
+    async def boosters(self, ctx):
+        """Viser boosters i en guild"""
+
+        boosters = []
+        premium_subscribers = sorted(
+            ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
+        for booster in premium_subscribers:
+            boosters.append(booster.mention)
+        if boosters is []:
+            boosters = ['**Ingen boosters**']
+        boosters = ' '.join(boosters)
+        if boosters == '':
+            boosters == '**Ingen boosters**'
+
+        embed = discord.Embed(
+            color=ctx.me.color, description=boosters)
+        embed.set_author(
+            name='Boosters ' +
+            f'({ctx.guild.premium_subscription_count}): {ctx.guild.name}')
+        embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -228,8 +279,8 @@ class Info(commands.Cog):
 
         embed = discord.Embed(
             color=ctx.me.color,
-            description=f'[Link]({ctx.guild.icon_url_as(format="png")})')
-        embed.set_image(url=ctx.guild.icon_url_as(format='png'))
+            description=f'[Link]({ctx.guild.icon_url_as(static_format="png")})')
+        embed.set_image(url=ctx.guild.icon_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -243,7 +294,7 @@ class Info(commands.Cog):
             return await Defaults.error_warning_send(
                 ctx, text='Serveren har ikke en invite splash', mention=False)
 
-        url = ctx.guild.banner_url_as(format='png')
+        url = ctx.guild.splash_url_as(format='png')
 
         embed = discord.Embed(
             color=ctx.me.color, description=f'[Link]({url})')
@@ -290,6 +341,8 @@ class Info(commands.Cog):
             ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
         creation_index = sorted(
             ctx.guild.members, key=lambda m: m.created_at).index(bruker) + 1
+        premium_index = sorted(
+            ctx.guild.premium_subscribers, key=lambda m: m.premium_since).index(bruker) + 1
 
         bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
         bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
@@ -303,6 +356,14 @@ class Info(commands.Cog):
             since_joined_days_string = 'dag'
         else:
             since_joined_days_string = 'dager'
+
+        if bruker.premium_since:
+            premium_since = bruker.premium_since.strftime('%d %b %Y %H:%M')
+            premium_since_days = (ctx.message.created_at - bruker.premium_since).days
+            if since_joined_days is 1:
+                premium_since_days_string = 'dag'
+            else:
+                premium_since_days_string = 'dager'
 
         roles = []
         for role in bruker.roles:
@@ -351,6 +412,13 @@ class Info(commands.Cog):
             name='Ble med i serveren',
             value=f'{bruker_joined_date}\n{since_joined_days} ' +
             f'{since_joined_days_string} siden')
+        if bruker.premium_since:
+            embed.add_field(
+                name='Boost',
+                value=f'{premium_since}\n{premium_since_days} ' +
+                f'{premium_since_days_string} siden\n' +
+                f'Booster #{premium_index} av serveren',
+                inline=False)
         embed.add_field(name=f'Roller ({len(bruker.roles) - 1})',
                         value=roles, inline=False)
         embed.set_footer(
@@ -361,7 +429,7 @@ class Info(commands.Cog):
             games = ''
             for activity in bruker.activities:
                 games += f"{activity.name}\n"
-            embed.add_field(name='Spiller:', value=games, inline=False)
+            embed.add_field(name='Spiller', value=games, inline=False)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
