@@ -67,6 +67,14 @@ class Misc(commands.Cog):
 
         await ctx.send("Du er død nå")
 
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command()
+    async def sql(self, ctx):
+        """Ber LBLend om å lære seg SQL"""
+
+        lblend = await self.bot.fetch_user(170506717140877312)
+        await ctx.send(f'{lblend.mention} LÆR DEG SQL NÅÅÅÅ!')
+
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['kukstørrelse', 'pikkstørrelse'])
