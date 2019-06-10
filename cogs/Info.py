@@ -343,8 +343,9 @@ class Info(commands.Cog):
             ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
         creation_index = sorted(
             ctx.guild.members, key=lambda m: m.created_at).index(bruker) + 1
-        premium_index = sorted(
-            ctx.guild.premium_subscribers, key=lambda m: m.premium_since).index(bruker) + 1
+        if bruker.premium_since:
+            premium_index = sorted(
+                ctx.guild.premium_subscribers, key=lambda m: m.premium_since).index(bruker) + 1
 
         bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
         bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
@@ -407,7 +408,7 @@ class Info(commands.Cog):
                 f'{bruker.display_name}', icon_url=bruker.avatar_url)
         embed.set_thumbnail(url=bruker.avatar_url_as(static_format='png'))
         embed.add_field(
-            name='Bruker lagd',
+            name='Opprettet',
             value=f'{bruker_created_date}\n{since_created_days} ' +
             f'{since_created_days_string} siden')
         embed.add_field(
@@ -650,7 +651,7 @@ class Info(commands.Cog):
             color=ctx.me.color, description=f'ID: {emoji.id}')
         embed.set_author(name=emoji.name, icon_url=emoji.url)
         embed.add_field(
-            name=f'Laget', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
+            name=f'Opprettet', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='Animert', value=animated)
         embed.add_field(
             name='Lagt til av',
