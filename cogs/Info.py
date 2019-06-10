@@ -184,7 +184,7 @@ class Info(commands.Cog):
         embed.add_field(name='Eier', value=ctx.guild.owner.mention)
         embed.add_field(name='Region', value=f'{flag} {region_name}')
         embed.add_field(
-            name='Server lagd',
+            name='Opprettet',
             value=f'{guild_created_date}\n{since_created_days} ' +
             f'{since_created_days_string} siden')
         embed.add_field(
@@ -541,10 +541,9 @@ class Info(commands.Cog):
 
         embed = discord.Embed(
             description=f'{rolle.mention}\n**ID:** {rolle.id}', color=color)
-        embed.add_field(name='Antall med rollen', value=len(rolle.members))
         embed.add_field(name='Fargekode', value=str(rolle.color))
         embed.add_field(
-            name='Laget den',
+            name='Opprettet',
             value=f'{rolle_created_date}\n{since_created_days} ' +
             f'{since_created_days_string} siden')
         embed.add_field(name='Posisjon', value=rolle.position)
@@ -588,7 +587,7 @@ class Info(commands.Cog):
         embed.set_author(name=kanal.name, icon_url=kanal.guild.icon_url)
         embed.add_field(name='Beskrivelse', value=description, inline=False)
         embed.add_field(
-            name='Laget', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+            name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='NSFW', value=nsfw)
         embed.add_field(name='Saktemodus', value=saktemodus)
         if kanal.category:
@@ -614,7 +613,7 @@ class Info(commands.Cog):
             color=ctx.me.color, description=f'ID: {kanal.id}')
         embed.set_author(name=kanal.name, icon_url=kanal.guild.icon_url)
         embed.add_field(
-            name='Laget', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+            name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(
             name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
         embed.add_field(name='Maksgrense', value=limit)
