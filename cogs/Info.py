@@ -23,8 +23,9 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=['serverinfo', 'si', 'gi'])
-    async def guildinfo(self, ctx):
+    @commands.command(
+        aliases=['guildinfo', 'server', 'serverinfo', 'si', 'gi'])
+    async def guild(self, ctx):
         """Viser info om guilden"""
 
         guild_created_date = ctx.guild.created_at.strftime('%d %b %Y %H:%M')
@@ -273,8 +274,9 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=['serverikon', 'servericon', 'guildicon'])
-    async def guildikon(self, ctx):
+    @commands.command(
+        aliases=['serverikon', 'servericon', 'guildicon', 'icon', 'guildikon'])
+    async def ikon(self, ctx):
         """Viser ikonet til serveren du er i"""
 
         embed = discord.Embed(
@@ -286,8 +288,8 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
-    async def guildsplash(self, ctx):
+    @commands.command(aliases=['guildsplash', 'serversplash'])
+    async def splash(self, ctx):
         """Viser invite splash til serveren"""
 
         if not ctx.guild.splash_url:
@@ -304,8 +306,8 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
-    async def guildbanner(self, ctx):
+    @commands.command(aliases=['guildbanner', 'serverbanner'])
+    async def banner(self, ctx):
         """Viser invite splash til serveren"""
 
         if not ctx.guild.banner_url:
@@ -322,8 +324,8 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=['userinfo', 'ui', 'bi'])
-    async def brukerinfo(self, ctx, *, bruker: discord.Member=None):
+    @commands.command(aliases=['userinfo', 'ui', 'brukerinfo', 'user'])
+    async def bruker(self, ctx, *, bruker: discord.Member=None):
         """Viser info om en bruker"""
 
         if not bruker:
@@ -435,7 +437,7 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
+    @commands.command(aliases=['userroles'])
     async def brukerroller(self, ctx, bruker: discord.Member=None):
         """Viser rollene til en bruker"""
 
@@ -474,7 +476,8 @@ class Info(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
+    @commands.command(
+        aliases=['profilbilde', 'brukeravatar', 'useravatar'])
     async def avatar(self, ctx, bruker: discord.Member=None):
         """Viser avataren til en bruker"""
 
@@ -495,8 +498,8 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(alises=['roleinfo'])
-    async def rolleinfo(self, ctx, *, rolle: discord.Role):
+    @commands.command(alises=['roleinfo', 'rolleinfo'])
+    async def rolle(self, ctx, *, rolle: discord.Role):
         """Viser info om en rolle"""
 
         if rolle.name == '@everyone':
@@ -558,8 +561,9 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=['tekstkanal', 'kanal'])
-    async def kanalinfo(self, ctx, *, kanal: discord.TextChannel):
+    @commands.command(
+        aliases=['kanal', 'channel', 'channelinfo', 'textchannel'])
+    async def tekstkanal(self, ctx, *, kanal: discord.TextChannel):
         """Viser info om en tekstkanal"""
 
         nsfw = 'Nei'
@@ -762,7 +766,7 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command()
+    @commands.command(aliases=['mostplayed'])
     async def mestspilt(self, ctx):
         """Sjekk hvilket spill som blir spilt mest på serveren"""
 
@@ -794,7 +798,7 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command()
+    @commands.command(aliases=['whoplays'])
     async def hvemspiller(self, ctx, *, spill: str):
         """Sjekk hvem spiller et spesifisert spik"""
 
