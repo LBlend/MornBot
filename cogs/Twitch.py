@@ -26,6 +26,8 @@ class Twitch(commands.Cog):
 
         async with ctx.channel.typing():
 
+            bruker = sub(r'\&|\?|\=', '', bruker)
+
             user_data = get(
                 f'https://api.twitch.tv/kraken/users/{bruker}?' +
                 f'client_id={twitch_api_key}').json()

@@ -5,6 +5,7 @@ from codecs import open
 from json import load as json_load
 
 from requests import get
+from urllib import parse
 from random import randint, choice
 from hashlib import md5
 from bs4 import BeautifulSoup
@@ -187,8 +188,9 @@ class Misc(commands.Cog):
         async with ctx.channel.typing():
 
             try:
-                data = get('https://api.urbandictionary.com/' +
-                           f'v0/define?term={ord}').json()
+                url = 'https://api.urbandictionary.com/v0/define?' + \
+                    parse.urlencode({'term': ord})
+                data = get(url).json()
                 urban_url = data['list'][0]['permalink']
             except IndexError:
                 return await Defaults.error_fatal_send(
@@ -196,12 +198,18 @@ class Misc(commands.Cog):
                     text='Fant ingen definisjon for dette ordet!',
                     mention=False)
 
-            word = data['list'][0]['word']
-            submitter = data['list'][0]['author']
-            definition = sub(';|\[|\]', '', data['list'][0]['definition'])
-            example = sub(';|\[|\]', '', data['list'][0]['example'])
-            upvotes = data['list'][0]['thumbs_up']
-            downvotes = data['list'][0]['thumbs_down']
+            index = 0
+            for definition in data['list'][index]:
+                definition = sub(r';|\[|\]', '', data['list'][index]['definition'])
+                example = sub(r';|\[|\]', '', data['list'][index]['example'])
+                if len(definition) < 1024 and len(example) < 1024:
+                    break
+                index += 1
+            word = data['list'][index]['word']
+            urban_url = data['list'][index]['permalink']
+            submitter = data['list'][index]['author']
+            upvotes = data['list'][index]['thumbs_up']
+            downvotes = data['list'][index]['thumbs_down']
 
             embed = discord.Embed(
                 title=word, color=ctx.me.color,
@@ -227,6 +235,8 @@ class Misc(commands.Cog):
         """Sjekk om en nettside er oppe"""
 
         async with ctx.channel.typing():
+
+            nettside = sub(r'\&|\?|\=', '', nettside)
 
             data = get(f'https://isitup.org/{nettside}')
             scraped = BeautifulSoup(data.text, 'html.parser')
@@ -303,6 +313,9 @@ class Misc(commands.Cog):
 
         async with ctx.channel.typing():
 
+            kontinent = sub(r'\&|\?|\=', '', kontinent)
+            by = sub(r'\&|\?|\=', '', by)
+
             try:
                 data = get(
                     'http://worldtimeapi.org/api/timezone/' +
@@ -349,6 +362,8 @@ class Misc(commands.Cog):
         """Se info om et land"""
 
         async with ctx.channel.typing():
+            
+            land = sub(r'\&|\?|\=', '', land)
 
             try:
                 data = get(
@@ -415,10 +430,13 @@ class Misc(commands.Cog):
     async def lmgtfy(self, ctx, mention: discord.Member=None, *, søkeord: str):
         """Fordi noen trenger en internett 101 leksjon"""
 
+        url = 'https://lmgtfy.com/?' + \
+            parse.urlencode({'q': søkeord})
+
         embed = discord.Embed(
             color=ctx.me.color,
             description='[Trykk her for løsningen ' +
-            f'på problemet ditt](https://lmgtfy.com/?q={søkeord})')
+            f'på problemet ditt]({url})')
         embed.set_image(
             url='http://ecx.images-amazon.com/images/I/' +
                 '51IESUsBdbL._SX258_BO1,204,203,200_.jpg')
