@@ -92,6 +92,39 @@ class Dagbok(commands.Cog):
         await ctx.send(embed=embed)
 
     @dagbok.command()
+    async def liste(self, ctx):
+        """Se hvilke dager som ligger i dagboka"""
+
+        database_find = {'_id': ctx.author.id}
+        database_user = database_col_dagbok.find_one(database_find)
+
+        if str(ctx.author.color) != '#000000':
+            color = ctx.author.color
+        else:
+            color = discord.Colour(0x99AAB5)
+
+        if database_user is None:
+            return await Defaults.error_warning_send(
+                ctx, text='Du ligger ikke i databasen. Skriv ' +
+                          f'`{prefix}dagbok på` for å legge deg inn')
+
+        entries = ''
+        try:
+            for key, value in database_user['data'].items():
+                if value != ctx.author.id:
+                    entries += f'{key}\n'
+        except KeyError:
+            return await Defaults.error_fatal_send(
+                    ctx, text='Fant ingen data. Sørg for at du skriver en ' +
+                            'dagboksmelding først (start melding med `kjære dagbok,`',
+                            mention=False)
+
+        embed = discord.Embed(
+            color=color, description=f'```\n{entries}```')
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @dagbok.command()
     async def dag(self, ctx, dato: str):
         """Hent opp dagboka di fra en dato"""
 
