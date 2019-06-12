@@ -499,7 +499,7 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(alises=['roleinfo', 'rolleinfo'])
+    @commands.command(aliases=['roleinfo', 'rolleinfo'])
     async def rolle(self, ctx, *, rolle: discord.Role):
         """Viser info om en rolle"""
 
