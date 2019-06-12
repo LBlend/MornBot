@@ -374,7 +374,6 @@ class DevTools(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.is_owner()
-    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def allemoji(self, ctx):
         """Se alle emoji båtten har tilgang til"""
