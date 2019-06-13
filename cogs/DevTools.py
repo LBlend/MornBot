@@ -127,7 +127,7 @@ class DevTools(commands.Cog):
 
                         embed = discord.Embed(
                             color=ctx.me.color,
-                            description=f'{cog} har blitt unloadet! :ok_hand:')
+                            description=f'{cog} har blitt skrudd av')
                         return await ctx.send(embed=embed)
 
             await Defaults.error_fatal_send(
@@ -155,7 +155,7 @@ class DevTools(commands.Cog):
 
                         embed = discord.Embed(
                             color=ctx.me.color,
-                            description=f'{cog} har blitt loadet! :ok_hand:')
+                            description=f'{cog} har blitt lastet inn!')
                         return await ctx.send(embed=embed)
 
             await Defaults.error_fatal_send(
@@ -215,7 +215,7 @@ class DevTools(commands.Cog):
 
             embed = discord.Embed(
                 color=ctx.me.color,
-                description='Reloadet alle cogs! :ok_hand:')
+                description='Lastet inn alle cogs!')
             await ctx.send(embed=embed)
         except:
             await Defaults.error_fatal_send(
@@ -238,7 +238,7 @@ class DevTools(commands.Cog):
 
             embed = discord.Embed(
                 color=ctx.me.color,
-                description='Reloadet alle cogs! :ok_hand:')
+                description='Lastet inn alle cogs på nytt!')
             await ctx.send(embed=embed)
         except:
             await Defaults.error_fatal_send(
@@ -378,7 +378,7 @@ class DevTools(commands.Cog):
     async def allemoji(self, ctx):
         """Se alle emoji båtten har tilgang til"""
 
-        embed = discord.Embed(title="Emoji", colour=ctx.me.color)
+        embed = discord.Embed(colour=ctx.me.color)
         await Defaults.set_footer(ctx, embed)
 
         emoji_string = ''
