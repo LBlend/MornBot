@@ -14,7 +14,7 @@ from re import sub, split
 from PIL import Image, ImageDraw, ImageFont
 from os import remove
 
-from .utils import Defaults
+from .utils import Defaults, LBlend_utils
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
@@ -163,13 +163,18 @@ class Misc(commands.Cog):
     async def owo(self, ctx, *, tekst: str):
         """Oversetter teksten din til owo"""
 
-        tekst = sub("'|,", "", str(tekst))
-        tekst = sub('r|l', 'w', tekst)
-        tekst = sub('R|L', 'W', tekst)
-        tekst = sub('n', 'ny', tekst)
-        tekst = sub('N', 'Ny', tekst)
-        tekst = sub('ove', 'uv', tekst)
-        # tekst = sub('!', ' (・`ω´・)', tekst) https://kaomoji.moe/
+        owo_rules = {
+            'r': 'w',
+            'l': 'w',
+            'R': 'W',
+            'L': 'W',
+            'n': 'ny',
+            'N': 'Ny',
+            'ove': 'uv'
+        }
+        for key, value in owo_rules.items():
+            tekst = sub(key, value, tekst)
+        # https://kaomoji.moe/
 
         if not tekst or len(tekst) >= 1000:
             return await Defaults.error_warning_send(
@@ -236,7 +241,7 @@ class Misc(commands.Cog):
 
         async with ctx.channel.typing():
 
-            nettside = sub(r'\&|\?|\=', '', nettside)
+            nettside = await LBlend_utils.input_sanitizer(nettside)
 
             data = get(f'https://isitup.org/{nettside}')
             scraped = BeautifulSoup(data.text, 'html.parser')
@@ -313,8 +318,8 @@ class Misc(commands.Cog):
 
         async with ctx.channel.typing():
 
-            kontinent = sub(r'\&|\?|\=', '', kontinent)
-            by = sub(r'\&|\?|\=', '', by)
+            kontinent = await LBlend_utils.input_sanitizer(kontinent)
+            by = await LBlend_utils.input_sanitizer(by)
 
             try:
                 data = get(
@@ -363,7 +368,7 @@ class Misc(commands.Cog):
 
         async with ctx.channel.typing():
             
-            land = sub(r'\&|\?|\=', '', land)
+            land = await LBlend_utils.input_sanitizer(land)
 
             try:
                 data = get(
