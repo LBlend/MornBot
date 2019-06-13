@@ -8,7 +8,7 @@ from requests import get
 from datetime import datetime
 from re import sub
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
@@ -148,7 +148,8 @@ class Konverter(commands.Cog):
 
         if verdi > 1000000000 or verdi < -1000000000:
             return await Defaults.error_warning_edit(
-                ctx, text='Tallet du har skrevet er for lavt/høyt!',
+                ctx, status_msg,
+                text='Tallet du har skrevet er for lavt/høyt!',
                 mention=False)
 
         try:
