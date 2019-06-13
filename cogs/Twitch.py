@@ -6,7 +6,7 @@ from json import load as json_load
 
 from requests import get
 
-from .utils import Defaults
+from .utils import Defaults, LBlend_utils
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
@@ -26,7 +26,7 @@ class Twitch(commands.Cog):
 
         async with ctx.channel.typing():
 
-            bruker = sub(r'\&|\?|\=', '', bruker)
+            bruker = await LBlend_utils.input_sanitizer(bruker)
 
             user_data = get(
                 f'https://api.twitch.tv/kraken/users/{bruker}?' +
