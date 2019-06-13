@@ -142,8 +142,7 @@ class Konverter(commands.Cog):
         except ValueError:
             return await Defaults.error_warning_edit(
                 ctx, status_msg,
-                text='Sjekk om du har skrevet riktige tall. ' +
-                     'Beregningen har gitt et usannsynlig svar\n\n' +
+                text='Sjekk om du har skrevet riktig tall\n\n' +
                      f'Skriv `{prefix}help {ctx.command}` for hjelp',
                 mention=False)
 
