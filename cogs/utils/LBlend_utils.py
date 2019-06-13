@@ -85,18 +85,15 @@ async def check_file_too_big(ctx, status_msg, file,
         return False
 
 
-async def default_db_insert(ctx):
-    """Standardmal for ny bruker i database"""
+async def input_sanitizer(text):
+    """Parses url parameters"""
 
-    with open('config.json', 'r', encoding='utf8') as f:
-        config = json_load(f)
-        mongodb_url = config['mongodb_url']
+    synonyms = {
+      '&': '%26',
+      '?': '%3F',
+      '=': '%3D'
+    }
+    for key, value in synonyms.items():
+      text = text.replace(key, value)
 
-    mongo = pymongo.MongoClient(mongodb_url)
-    database = mongo['discord']
-    database_col_users = database['users']
-
-    database_col_users.insert_one(
-        {'_id': ctx.author.id,
-         'ordsky_consent': False,
-         'ordsky_data': {f'{ctx.guild.id}': None}})
+    return text
