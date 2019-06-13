@@ -6,7 +6,7 @@ from json import load as json_load
 
 from requests import get
 
-from .utils import Defaults, LBlend_utils
+from cogs.utils import Defaults, LBlend_utils
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)

@@ -14,7 +14,7 @@ from re import sub, split
 from PIL import Image, ImageDraw, ImageFont
 from os import remove
 
-from .utils import Defaults, LBlend_utils
+from cogs.utils import Defaults, LBlend_utils
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)

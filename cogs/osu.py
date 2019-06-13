@@ -7,7 +7,7 @@ from json import load as json_load
 from requests import get
 import urllib.parse
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 
 with open('config.json', 'r', encoding='utf8') as f:

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 
 class ServerManagement(commands.Cog):

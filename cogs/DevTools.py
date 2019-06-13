@@ -8,7 +8,7 @@ import socket
 from requests import get
 from math import ceil
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 
 class DevTools(commands.Cog):

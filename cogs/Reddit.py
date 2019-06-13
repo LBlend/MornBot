@@ -8,7 +8,7 @@ import praw
 from random import randint, choice
 from datetime import datetime
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 with open('./config.json', 'r', encoding='utf8') as f:
     config = json_load(f)

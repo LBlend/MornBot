@@ -4,7 +4,7 @@ from codecs import open
 from json import load as json_load
 import pymongo
 
-from ..utils import Defaults
+from cogs.utils import Defaults
 
 
 async def download_photo(

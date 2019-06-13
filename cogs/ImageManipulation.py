@@ -4,7 +4,7 @@ from discord.ext import commands
 from os import remove
 from PIL import Image, ImageOps, ImageEnhance
 
-from .utils import Defaults, LBlend_utils
+from cogs.utils import Defaults, LBlend_utils
 
 
 class ImageManipulation(commands.Cog):

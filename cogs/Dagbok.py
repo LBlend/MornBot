@@ -5,7 +5,7 @@ import pymongo
 from json import load as json_load
 from os import remove
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)

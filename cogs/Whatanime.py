@@ -7,7 +7,7 @@ import os
 from datetime import timedelta
 from PIL import Image
 
-from .utils import LBlend_utils, Defaults
+from cogs.utils import LBlend_utils, Defaults
 
 
 class Whatanime(commands.Cog):

@@ -4,7 +4,7 @@ import traceback
 import sys
 from datetime import datetime
 
-from .utils import Defaults
+from cogs.utils import Defaults
 
 
 class Errors(commands.Cog):
