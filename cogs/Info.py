@@ -494,6 +494,8 @@ class Info(commands.Cog):
             color=color,
             description=f'[Link]({bruker.avatar_url_as(static_format="png")})')
         embed.set_image(url=bruker.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f'{bruker.name}#{bruker.discriminator}',
+        icon_url=bruker.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
