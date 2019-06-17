@@ -19,7 +19,7 @@ class ServerManagement(commands.Cog):
 
         await bruker.kick(reason=begrunnelse)
         await ctx.send(f'{bruker.mention} ' +
-                       f'({bruker.name}#{bruker.discriminator}) ' +
+                       f'`{bruker.name}#{bruker.discriminator}` ' +
                        'ble kastet ut av serveren')
 
     @commands.bot_has_permissions(ban_members=True)
@@ -32,7 +32,7 @@ class ServerManagement(commands.Cog):
 
         await bruker.ban(reason=begrunnelse)
         await ctx.send(f'{bruker.mention} ' +
-                       f'({bruker.name}#{bruker.discriminator}) ' +
+                       f'`{bruker.name}#{bruker.discriminator}` ' +
                        'ble utestengt fra serveren')
 
     @commands.bot_has_permissions(manage_messages=True)
@@ -49,7 +49,7 @@ class ServerManagement(commands.Cog):
                 mention=False)
 
         await ctx.channel.purge(limit=antall+1)
-        await ctx.send(content=f'Slettet {antall} meldinger!',
+        await ctx.send(content=f'Slettet `{antall}` meldinger!',
                        delete_after=3.0)
 
 
