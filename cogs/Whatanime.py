@@ -25,8 +25,7 @@ class Whatanime(commands.Cog):
         status_msg = await ctx.send(embed=embed)
 
         if not await LBlend_utils.download_photo(
-                ctx, status_msg,
-                link=bilde, max_file_size=8,
+                ctx, link=bilde, max_file_size=8,
                 meassurement_type='MB',
                 filepath=f'./assets/{ctx.author.id}_trace.png'):
             return
@@ -47,6 +46,7 @@ class Whatanime(commands.Cog):
                     file=new_file_size,
                     max_file_size=1,
                     meassurement_type='MB'):
+                await status_msg.delete()
                 return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
         with open(f'./assets/{ctx.author.id}_trace.png', 'rb') as f:
@@ -57,11 +57,12 @@ class Whatanime(commands.Cog):
 
         similarity = data['docs'][0]['similarity']
         if similarity < 0.85:
-            await Defaults.error_warning_edit(
-                ctx, status_msg,
+            await Defaults.error_warning_send(
+                ctx,
                 text='Saus ble funnet, men grunnet ' +
                      'lav likhetsprosent, er det høy sannsynlighet ' +
                      'for at dette ikke er riktig saus')
+            await status_msg.delete()
             return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
         try:
@@ -73,9 +74,9 @@ class Whatanime(commands.Cog):
             episode = data['docs'][0]['episode']
             time = int(data['docs'][0]['at'])
         except KeyError:
-            await Defaults.error_fatal_edit(
-                ctx, status_msg,
-                text='Fant ingen saus')
+            await Defaults.error_fatal_send(
+                ctx, text='Fant ingen saus')
+            await status_msg.delete()
             return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
         similarity_percent = round(similarity * 100, 2)
