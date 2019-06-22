@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from codecs import open
 from json import load as json_load
@@ -27,9 +27,8 @@ class Vær(commands.Cog):
         """Viser været i en valgt by"""
 
         if not by:
-            return await Defaults.error_warning_send(
-                ctx, text='Du må gi meg en by\n\n' +
-                          f'Skriv `{prefix}help {ctx.command}` for hjelp')
+            return await Defaults.error_warning_send(ctx, text='Du må gi meg en by\n\n' +
+                                                               f'Skriv `{prefix}help {ctx.command}` for hjelp')
 
         async with ctx.channel.typing():
 
@@ -40,25 +39,20 @@ class Vær(commands.Cog):
                 data = get(url).json()
                 city_id = str(data['id'])
             except KeyError:
-                return await Defaults.error_fatal_send(
-                    ctx, text='Kan ikke finne værdata for denne byen!',
-                    mention=False)
+                return await Defaults.error_fatal_send(ctx, text='Kan ikke finne værdata for denne byen!')
 
             link = f'https://openweathermap.org/city/{city_id}'
             city_name = data['name']
             country_code = data['sys']['country'].lower()
-            fetch_date = datetime.fromtimestamp(
-                data['dt']).strftime('%d.%m.%Y %H:%M')
+            fetch_date = datetime.fromtimestamp(data['dt']).strftime('%d.%m.%Y %H:%M')
             description = data['weather'][0]['description']
             temp_celcius = round((data['main']['temp']) - 273)
             temp_fahrenheit = round(1.8 * ((data['main']['temp']) - 273) + 32)
             wind_speed = data['wind']['speed']
             humidity = data['main']['humidity']
             cloudiness = data['clouds']['all']
-            sunrise = datetime.fromtimestamp(
-                data['sys']['sunrise']).strftime('%H:%M')
-            sunset = datetime.fromtimestamp(
-                data['sys']['sunset']).strftime('%H:%M')
+            sunrise = datetime.fromtimestamp(data['sys']['sunrise']).strftime('%H:%M')
+            sunset = datetime.fromtimestamp(data['sys']['sunset']).strftime('%H:%M')
             time_now = datetime.now().strftime('%d.%m.%Y %H:%M')
 
             try:
@@ -89,18 +83,12 @@ class Vær(commands.Cog):
                     if key == '3h':
                         rain += f'Siste 3 timene: {value}mm'
 
-            embed = discord.Embed(
-                title=f':flag_{country_code}: {city_name} ' +
-                f'| {fetch_date} (Norsk Tid)',
-                color=ctx.me.color, url=link, description=description)
-            embed.set_author(
-                name='OpenWeatherMap',
-                icon_url='https://pbs.twimg.com/profile_images/' +
-                         '720298646630084608/wb7LSoAc_400x400.jpg')
-            embed.add_field(
-                name='Temperatur',
-                value=f'{temp_celcius} °C\n{temp_fahrenheit} °F')
-            embed.add_field(name='Vind', value=f'{wind_speed} m/s')
+            embed = discord.Embed(title=f':flag_{country_code}: {city_name} ' + f'| {fetch_date} (Norsk Tid)',
+                                  color=ctx.me.color, url=link, description=description)
+            embed.set_author(name='OpenWeatherMap', icon_url='https://pbs.twimg.com/profile_images/' +
+                                                             '720298646630084608/wb7LSoAc_400x400.jpg')
+            embed.add_field(name='Temperatur', value=f'{temp_celcius}°C\n{temp_fahrenheit}°F')
+            embed.add_field(name='Vind', value=f'{wind_speed}m/s')
             embed.add_field(name='Luftfuktighet', value=f'{humidity}%')
             embed.add_field(name='Skyer', value=f'{cloudiness}%')
             if rain != '':
@@ -110,7 +98,7 @@ class Vær(commands.Cog):
             embed.add_field(name='Soloppgang (Norsk tid)', value=sunrise, inline=False)
             embed.add_field(name='Solnedgang (Norsk tid)', value=sunset)
             embed.set_footer(text=f'Tid i Norge nå: {time_now}')
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

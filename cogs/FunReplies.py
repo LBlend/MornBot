@@ -37,19 +37,15 @@ class FunReplies(commands.Cog):
         try:
             database_funreplies = database_col_funreplies.find_one(database_find)
         except:
-            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                                  'tilkobling til databasen. ' +
-                                  'Be boteier om å fikse dette')
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke tilkobling til databasen. ' +
+                                  f'Be boteier om å fikse dette')
 
         try:
             database_funreplies[f'{kanal.id}']
         except TypeError:
-            database_col_funreplies.insert_one(
-                {'_id': kanal.id, 'funreplies': True})
+            database_col_funreplies.insert_one({'_id': kanal.id, 'funreplies': True})
 
-        embed = discord.Embed(
-            color=ctx.me.color,
-            description=f'FunReplies er nå skrudd **på** for {kanal.mention}')
+        embed = discord.Embed(color=ctx.me.color, description=f'FunReplies er nå skrudd **på** for {kanal.mention}')
         await ctx.send(embed=embed)
 
     @funreplies.command()
@@ -63,15 +59,12 @@ class FunReplies(commands.Cog):
         try:
             database_funreplies = database_col_funreplies.find_one(database_find)
         except:
-            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                                  'tilkobling til databasen. ' +
+            return await ctx.send(f'{ctx.author.mention} Jeg har ikke tilkobling til databasen. ' +
                                   'Be boteier om å fikse dette')
 
         database_col_funreplies.delete_one(database_funreplies)
 
-        embed = discord.Embed(
-            color=ctx.me.color,
-            description=f'FunReplies er nå skrudd **av** for {kanal.mention}')
+        embed = discord.Embed(color=ctx.me.color, description=f'FunReplies er nå skrudd **av** for {kanal.mention}')
         await ctx.send(embed=embed)
 
     async def react(self, message):

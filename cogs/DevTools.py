@@ -1,7 +1,7 @@
-import discord
-import asyncio
 from discord.ext import commands
+import discord
 
+import asyncio
 from sys import exit
 from os import listdir, system
 import socket
@@ -122,19 +122,34 @@ class DevTools(commands.Cog):
                         try:
                             self.bot.unload_extension(f'cogs.{name}')
                         except:
-                            return await Defaults.error_fatal_send(
-                                ctx, text='Error!', mention=False)
+                            return await Defaults.error_fatal_send(ctx, text='Error!')
 
-                        embed = discord.Embed(
-                            color=ctx.me.color,
-                            description=f'{cog} har blitt skrudd av')
+                        embed = discord.Embed(color=ctx.me.color, description=f'{cog} har blitt skrudd av')
                         return await ctx.send(embed=embed)
 
-            await Defaults.error_fatal_send(
-                ctx, text=f'{cog} er ikke en cog', mention=False)
+            await Defaults.error_fatal_send(ctx, text=f'{cog} er ikke en cog')
         except:
-            return await Defaults.error_fatal_send(
-                ctx, text='Error!', mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Error!')
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.is_owner()
+    @commands.command(aliases=['disablecommand'])
+    async def unloadcommand(self, ctx, command: str):
+        """Slår av spesifisert command"""
+
+        command = self.bot.get_command(command)
+        command.enabled = False
+        await ctx.send(f'{command} har blitt skrudd på')
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.is_owner()
+    @commands.command(aliases=['enablecommand'])
+    async def loadcommand(self, ctx, command: str):
+        """Slår på spesifisert command"""
+
+        command = self.bot.get_command(command)
+        command.enabled = True
+        await ctx.send(f'{command} har blitt skrudd på')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
@@ -150,19 +165,14 @@ class DevTools(commands.Cog):
                         try:
                             self.bot.load_extension(f'cogs.{name}')
                         except:
-                            return await Defaults.error_fatal_send(
-                                ctx, text='Error!', mention=False)
+                            return await Defaults.error_fatal_send(ctx, text='Error!')
 
-                        embed = discord.Embed(
-                            color=ctx.me.color,
-                            description=f'{cog} har blitt lastet inn!')
+                        embed = discord.Embed(color=ctx.me.color, description=f'{cog} har blitt lastet inn!')
                         return await ctx.send(embed=embed)
 
-            await Defaults.error_fatal_send(
-                ctx, text=f'{cog} er ikke en cog', mention=False)
+            await Defaults.error_fatal_send(ctx, text=f'{cog} er ikke en cog')
         except:
-            return await Defaults.error_fatal_send(
-                ctx, text='Error!', mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Error!')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
@@ -178,16 +188,12 @@ class DevTools(commands.Cog):
                         try:
                             self.bot.reload_extension(f'cogs.{name}')
                         except:
-                            return await Defaults.error_fatal_send(
-                                ctx, text='Error!', mention=False)
+                            return await Defaults.error_fatal_send(ctx, text='Error!')
 
-                        embed = discord.Embed(
-                            color=ctx.me.color,
-                            description=f'{cog} har blitt lastet inn på nytt!')
+                        embed = discord.Embed(color=ctx.me.color, description=f'{cog} har blitt lastet inn på nytt!')
                         await ctx.send(embed=embed)
         except:
-            await Defaults.error_fatal_send(
-                ctx, text=f'{cog} er ikke en cog', mention=False)
+            await Defaults.error_fatal_send(ctx, text=f'{cog} er ikke en cog')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
@@ -210,16 +216,12 @@ class DevTools(commands.Cog):
                     try:
                         self.bot.load_extension(f'cogs.{name}')
                     except:
-                        await Defaults.error_fatal_send(
-                            ctx, text=f'{name} feilet', mention=False)
+                        await Defaults.error_fatal_send(ctx, text=f'{name} feilet')
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description='Lastet inn alle cogs!')
+            embed = discord.Embed(color=ctx.me.color, description='Lastet inn alle cogs!')
             await ctx.send(embed=embed)
         except:
-            await Defaults.error_fatal_send(
-                ctx, text='Error!', mention=False)
+            await Defaults.error_fatal_send(ctx, text='Error!')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
@@ -236,13 +238,10 @@ class DevTools(commands.Cog):
                     except:
                         pass
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description='Lastet inn alle cogs på nytt!')
+            embed = discord.Embed(color=ctx.me.color, description='Lastet inn alle cogs på nytt!')
             await ctx.send(embed=embed)
         except:
-            await Defaults.error_fatal_send(
-                ctx, text='Error!', mention=False)
+            await Defaults.error_fatal_send(ctx, text='Error!')
 
     @commands.is_owner()
     @commands.command()
@@ -307,15 +306,12 @@ class DevTools(commands.Cog):
         if not status_type:
             status_type = status_types['online']
         try:
-            await self.bot.change_presence(
-                status=status_type,
-                activity=discord.Activity(type=activity_type, name=message))
-            embed = discord.Embed(
-                color=ctx.me.color, description='Endret Presence! :ok_hand:')
+            await self.bot.change_presence(status=status_type,
+                                           activity=discord.Activity(type=activity_type, name=message))
+            embed = discord.Embed(color=ctx.me.color, description='Endret Presence! :ok_hand:')
             await ctx.send(embed=embed)
         except:
-            await Defaults.error_warning_send(
-                ctx, text='Error!', mention=False)
+            await Defaults.error_warning_send(ctx, text='Error!')
 
     @commands.bot_has_permissions(embed_links=True, add_reactions=True)
     @commands.is_owner()
@@ -331,27 +327,23 @@ class DevTools(commands.Cog):
         try:
             guild = await self.bot.fetch_guild(guild_id)
         except:
-            return await Defaults.error_fatal_send(
-                ctx, text='Båtten er ikke i denne guilden', mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Båtten er ikke i denne guilden')
 
-        comfirmation_msg = await ctx.send(
-            f'Vil du virkelig forlate {guild.name} (`{guild.id}`)?')
+        comfirmation_msg = await ctx.send(f'Vil du virkelig forlate {guild.name} (`{guild.id}`)?')
         await comfirmation_msg.add_reaction('✅')
 
         def comfirm(reaction, user):
             return user == ctx.author and str(reaction.emoji) == '✅'
 
         try:
-            reaction, user = await self.bot.wait_for(
-                'reaction_add', timeout=15.0, check=comfirm)
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=15.0, check=comfirm)
         except asyncio.TimeoutError:
             await ctx.message.delete()
             await comfirmation_msg.delete()
         else:
             await guild.leave()
             try:
-                embed = discord.Embed(
-                    color=ctx.me.color, description='Forlatt guild! :ok_hand:')
+                embed = discord.Embed(color=ctx.me.color, description='Forlatt guild! :ok_hand:')
                 await ctx.send(embed=embed)
             except:
                 pass
@@ -365,11 +357,9 @@ class DevTools(commands.Cog):
         try:
             self.bot.get_command(command).reset_cooldown(ctx)
         except AttributeError:
-            return await Defaults.error_fatal_send(
-                ctx, text=f'{command} er ikke en command', mention=False)
+            return await Defaults.error_fatal_send(ctx, text=f'{command} er ikke en command', mention=False)
 
-        embed = discord.Embed(
-            color=ctx.me.color, description='Fjernet cooldown! :ok_hand:')
+        embed = discord.Embed(color=ctx.me.color, description='Fjernet cooldown! :ok_hand:')
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)
@@ -393,6 +383,16 @@ class DevTools(commands.Cog):
         
         embed.description = emoji_string
         await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions()
+    @commands.is_owner()
+    @commands.command()
+    async def deletemsg(self, channel_id: int, message_id: int):
+        """Slett melding"""
+        
+        channel = self.bot.get_channel(channel_id)
+        msg = await channel.fetch_message(message_id)
+        await msg.delete()
 
 
 def setup(bot):

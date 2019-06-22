@@ -4,10 +4,10 @@ You can find it here
 https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9
 """
 
-import ast
+from discord.ext import commands
 import discord
 
-from discord.ext import commands
+import ast
 
 
 def insert_returns(body):

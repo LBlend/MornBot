@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from codecs import open
 from json import load as json_load
@@ -29,8 +29,7 @@ class Info(commands.Cog):
         """Viser info om guilden"""
 
         guild_created_date = ctx.guild.created_at.strftime('%d %b %Y %H:%M')
-        since_created_days = (
-                ctx.message.created_at - ctx.guild.created_at).days
+        since_created_days = (ctx.message.created_at - ctx.guild.created_at).days
 
         if since_created_days is 1:
             since_created_days_string = 'dag'
@@ -80,7 +79,6 @@ class Info(commands.Cog):
             boosters = f'Skriv `{prefix}boosters` for å se boosters'
         if boosters == '':
             boosters == '**Ingen boosters**'
-        
 
         text_channels = len(ctx.guild.text_channels)
         voice_channels = len(ctx.guild.voice_channels)
@@ -174,40 +172,29 @@ class Info(commands.Cog):
         }
         content = content_filter[str(ctx.guild.explicit_content_filter)]
 
-        embed = discord.Embed(
-            color=ctx.me.color,
-            description=f'**Verifiseringskrav:** {verification}\n' +
-                        f'**Innholdsfilter:** {content}\n' +
-                        f'**Boost Tier:** {ctx.guild.premium_tier}')
+        embed = discord.Embed(color=ctx.me.color, description=f'**Verifiseringskrav:** {verification}\n' +
+                                                              f'**Innholdsfilter:** {content}\n' +
+                                                              f'**Boost Tier:** {ctx.guild.premium_tier}')
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
         embed.add_field(name='ID', value=ctx.guild.id)
         embed.add_field(name='Eier', value=ctx.guild.owner.mention)
         embed.add_field(name='Region', value=f'{flag} {region_name}')
-        embed.add_field(
-            name='Opprettet',
-            value=f'{guild_created_date}\n{since_created_days} ' +
-            f'{since_created_days_string} siden')
-        embed.add_field(
-            name=f'Kanaler ({total_channels})',
-            value=f'Tekst: **{text_channels}**\n' +
-            f'Tale: **{voice_channels}**\n' +
-            f'Kategorier: **{categories}**')
-        embed.add_field(
-            name=f'Medlemmer ({total_members})',
-            value=f'Mennesker: **{int(total_members) - int(bot_members)}**\n' +
-                  f'Båtter: **{bot_members}**\n' +
-                  f'<:online:516328785910431754>{online_members} ' +
-                  f'<:idle:516328783347843082>{idle_members} ' +
-                  f'<:dnd:516328782844395579>{dnd_members} ' +
-                  f'<:offline:516328785407246356>{offline_members}')
-        embed.add_field(
-            name=f'Roller ({len(ctx.guild.roles) - 1})', value=roles,
-            inline=False)
+        embed.add_field(name='Opprettet', value=f'{guild_created_date}\n{since_created_days} ' +
+                                                f'{since_created_days_string} siden')
+        embed.add_field(name=f'Kanaler ({total_channels})', value=f'Tekst: **{text_channels}**\n' +
+                                                                  f'Tale: **{voice_channels}**\n' +
+                                                                  f'Kategorier: **{categories}**')
+        embed.add_field(name=f'Medlemmer ({total_members})',
+                        value=f'Mennesker: **{int(total_members) - int(bot_members)}**\n' +
+                              f'Båtter: **{bot_members}**\n' +
+                              f'<:online:516328785910431754>{online_members} ' +
+                              f'<:idle:516328783347843082>{idle_members} ' +
+                              f'<:dnd:516328782844395579>{dnd_members} ' +
+                              f'<:offline:516328785407246356>{offline_members}')
+        embed.add_field(name=f'Roller ({len(ctx.guild.roles) - 1})', value=roles, inline=False)
         if ctx.guild.premium_tier is not 0:
-            embed.add_field(
-                name=f'Boosters ({ctx.guild.premium_subscription_count})',
-                value=boosters, inline=False)
+            embed.add_field(name=f'Boosters ({ctx.guild.premium_subscription_count})', value=boosters, inline=False)
 
         if features_string != '':
             embed.add_field(name='Tillegsfunksjoner', value=features_string)
@@ -238,50 +225,41 @@ class Info(commands.Cog):
         if roles == '':
             roles = '**Ingen roller**'
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=roles)
-        embed.set_author(
-            name=f'Roller ({len(ctx.guild.roles) - 1}): {ctx.guild.name}')
+        embed = discord.Embed(color=ctx.me.color, description=roles)
+        embed.set_author(name=f'Roller ({len(ctx.guild.roles) - 1}): {ctx.guild.name}')
         embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=['guildboosters', 'serverboosters'])
+    @commands.command(aliases=['guildboosters', 'serverboosters', 'boosts'])
     async def boosters(self, ctx):
         """Viser boosters i en guild"""
 
+        if len(ctx.guild.premium_subscribers) == 0:
+            embed = discord.Embed(color=ctx.me.color, description='Ingen boosters :(')
+            return await ctx.send(embed=embed)
+
         boosters = []
-        premium_subscribers = sorted(
-            ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
+        premium_subscribers = sorted(ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
         for booster in premium_subscribers:
             boosters.append(booster.mention)
-        if boosters is []:
-            boosters = ['**Ingen boosters**']
         boosters = ' '.join(boosters)
-        if boosters == '':
-            boosters == '**Ingen boosters**'
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=boosters)
-        embed.set_author(
-            name='Boosters ' +
-            f'({ctx.guild.premium_subscription_count}): {ctx.guild.name}')
+        embed = discord.Embed(color=ctx.me.color, description=boosters)
+        embed.set_author(name=f'Boosters ({ctx.guild.premium_subscription_count}): {ctx.guild.name}')
         embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(
-        aliases=['serverikon', 'servericon', 'guildicon', 'icon', 'guildikon'])
+    @commands.command(aliases=['serverikon', 'servericon', 'guildicon', 'icon', 'guildikon'])
     async def ikon(self, ctx):
         """Viser ikonet til serveren du er i"""
 
-        embed = discord.Embed(
-            color=ctx.me.color,
-            description=f'[Link]({ctx.guild.icon_url_as(static_format="png")})')
+        embed = discord.Embed(color=ctx.me.color, description=f'[Lenke]({ctx.guild.icon_url_as(static_format="png")})')
         embed.set_image(url=ctx.guild.icon_url_as(static_format='png'))
         await ctx.send(embed=embed)
 
@@ -293,13 +271,11 @@ class Info(commands.Cog):
         """Viser invite splash til serveren"""
 
         if not ctx.guild.splash_url:
-            return await Defaults.error_warning_send(
-                ctx, text='Serveren har ikke en invite splash', mention=False)
+            return await Defaults.error_warning_send(ctx, text='Serveren har ikke en invite splash')
 
         url = ctx.guild.splash_url_as(format='png')
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=f'[Link]({url})')
+        embed = discord.Embed(color=ctx.me.color, description=f'[Lenke]({url})')
         embed.set_image(url=url)
         await ctx.send(embed=embed)
 
@@ -311,13 +287,11 @@ class Info(commands.Cog):
         """Viser invite splash til serveren"""
 
         if not ctx.guild.banner_url:
-            return await Defaults.error_warning_send(
-                ctx, text='Serveren har ikke et banner', mention=False)
+            return await Defaults.error_warning_send(ctx, text='Serveren har ikke et banner')
 
         url = ctx.guild.banner_url_as(format='png')
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=f'[Link]({url})')
+        embed = discord.Embed(color=ctx.me.color, description=f'[Lenke]({url})')
         embed.set_image(url=url)
         await ctx.send(embed=embed)
 
@@ -339,13 +313,10 @@ class Info(commands.Cog):
         if str(bruker.desktop_status) != 'offline':
             app += '💻'
 
-        join_index = sorted(
-            ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
-        creation_index = sorted(
-            ctx.guild.members, key=lambda m: m.created_at).index(bruker) + 1
+        join_index = sorted(ctx.guild.members, key=lambda m: m.joined_at).index(bruker) + 1
+        creation_index = sorted(ctx.guild.members, key=lambda m: m.created_at).index(bruker) + 1
         if bruker.premium_since:
-            premium_index = sorted(
-                ctx.guild.premium_subscribers, key=lambda m: m.premium_since).index(bruker) + 1
+            premium_index = sorted(ctx.guild.premium_subscribers, key=lambda m: m.premium_since).index(bruker) + 1
 
         bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
         bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
@@ -395,38 +366,23 @@ class Info(commands.Cog):
         }
         status = statuses[str(bruker.status)]
 
-        embed = discord.Embed(
-            color=color,
-            description=f'{bruker.mention}\nID: {bruker.id}\n{status}\n{app}')
+        embed = discord.Embed(color=color, description=f'{bruker.mention}\nID: {bruker.id}\n{status}\n{app}')
         if bruker.display_name == bruker.name:
-            embed.set_author(
-                name=f'{bruker.name}#{bruker.discriminator}',
-                icon_url=bruker.avatar_url)
+            embed.set_author(name=f'{bruker.name}#{bruker.discriminator}', icon_url=bruker.avatar_url)
         else:
-            embed.set_author(
-                name=f'{bruker.name}#{bruker.discriminator} | ' +
-                f'{bruker.display_name}', icon_url=bruker.avatar_url)
+            embed.set_author(name=f'{bruker.name}#{bruker.discriminator} | {bruker.display_name}',
+                             icon_url=bruker.avatar_url)
         embed.set_thumbnail(url=bruker.avatar_url_as(static_format='png'))
-        embed.add_field(
-            name='Opprettet',
-            value=f'{bruker_created_date}\n{since_created_days} ' +
-            f'{since_created_days_string} siden')
-        embed.add_field(
-            name='Ble med i serveren',
-            value=f'{bruker_joined_date}\n{since_joined_days} ' +
-            f'{since_joined_days_string} siden')
+        embed.add_field(name='Opprettet', value=f'{bruker_created_date}\n{since_created_days} ' +
+                                                f'{since_created_days_string} siden')
+        embed.add_field(name='Ble med i serveren', value=f'{bruker_joined_date}\n{since_joined_days} ' +
+                                                         f'{since_joined_days_string} siden')
         if bruker.premium_since:
-            embed.add_field(
-                name='Boost',
-                value=f'{premium_since}\n{premium_since_days} ' +
-                f'{premium_since_days_string} siden\n' +
-                f'Booster #{premium_index} av serveren',
-                inline=False)
-        embed.add_field(name=f'Roller ({len(bruker.roles) - 1})',
-                        value=roles, inline=False)
-        embed.set_footer(
-            text=f'#{join_index} Medlem av serveren | ' +
-            f'#{creation_index} Eldste brukeren på serveren')
+            embed.add_field(name='Boost', value=f'{premium_since}\n{premium_since_days} ' +
+                                                f'{premium_since_days_string} siden\n' +
+                                                f'Booster #{premium_index} av serveren', inline=False)
+        embed.add_field(name=f'Roller ({len(bruker.roles) - 1})', value=roles, inline=False)
+        embed.set_footer(text=f'#{join_index} Medlem av serveren | #{creation_index} Eldste brukeren på serveren')
 
         if bruker.activities:
             games = ''
@@ -465,20 +421,17 @@ class Info(commands.Cog):
         embed = discord.Embed(
             color=color, description=roles)
         if bruker.display_name == bruker.name:
-            embed.set_author(
-                name=f'Roller: {bruker.name}#{bruker.discriminator}',
-                icon_url=bruker.avatar_url_as(static_format='png'))
+            embed.set_author(name=f'Roller: {bruker.name}#{bruker.discriminator}',
+                             icon_url=bruker.avatar_url_as(static_format='png'))
         else:
-            embed.set_author(
-                name=f'Roller: {bruker.name}#{bruker.discriminator} | ' +
-                f'{bruker.display_name}', icon_url=bruker.avatar_url)
+            embed.set_author(name=f'Roller: {bruker.name}#{bruker.discriminator} | {bruker.display_name}',
+                             icon_url=bruker.avatar_url)
         embed.set_thumbnail(url=bruker.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(
-        aliases=['profilbilde', 'brukeravatar', 'useravatar'])
+    @commands.command(aliases=['profilbilde', 'brukeravatar', 'useravatar'])
     async def avatar(self, ctx, bruker: discord.Member=None):
         """Viser avataren til en bruker"""
 
@@ -490,12 +443,9 @@ class Info(commands.Cog):
         else:
             color = discord.Colour(0x99AAB5)
 
-        embed = discord.Embed(
-            color=color,
-            description=f'[Link]({bruker.avatar_url_as(static_format="png")})')
+        embed = discord.Embed(color=color, description=f'[Lenke]({bruker.avatar_url_as(static_format="png")})')
         embed.set_image(url=bruker.avatar_url_as(static_format='png'))
-        embed.set_footer(text=f'{bruker.name}#{bruker.discriminator}',
-        icon_url=bruker.avatar_url)
+        embed.set_footer(text=f'{bruker.name}#{bruker.discriminator}', icon_url=bruker.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -506,9 +456,7 @@ class Info(commands.Cog):
         """Viser info om en rolle"""
 
         if rolle.name == '@everyone':
-            return await Defaults.error_fatal_send(
-                ctx,
-                text='Skriv inn en annen rolle enn @everyone', mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Skriv inn en annen rolle enn @everyone')
 
         if str(rolle.color) != '#000000':
             color = rolle.color
@@ -548,24 +496,19 @@ class Info(commands.Cog):
         embed = discord.Embed(
             description=f'{rolle.mention}\n**ID:** {rolle.id}', color=color)
         embed.add_field(name='Fargekode', value=str(rolle.color))
-        embed.add_field(
-            name='Opprettet',
-            value=f'{rolle_created_date}\n{since_created_days} ' +
-            f'{since_created_days_string} siden')
+        embed.add_field(name='Opprettet', value=f'{rolle_created_date}\n{since_created_days} ' +
+                                                f'{since_created_days_string} siden')
         embed.add_field(name='Posisjon', value=rolle.position)
         embed.add_field(name='Nevnbar', value=mentionable)
         embed.add_field(name='Vises separat i medlemsliste', value=hoisted)
-        embed.add_field(
-            name=f'Brukere med rollen ({len(rolle.members)})',
-            value=members, inline=False)
+        embed.add_field(name=f'Brukere med rollen ({len(rolle.members)})', value=members, inline=False)
         embed.set_footer(text=rolle.guild.name, icon_url=rolle.guild.icon_url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(
-        aliases=['kanal', 'channel', 'channelinfo', 'textchannel'])
+    @commands.command(aliases=['kanal', 'channel', 'channelinfo', 'textchannel'])
     async def tekstkanal(self, ctx, *, kanal: discord.TextChannel):
         """Viser info om en tekstkanal"""
 
@@ -589,18 +532,15 @@ class Info(commands.Cog):
         if len(members) > 1024:
             members = 'For mange for å vise her'
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=f'{kanal.mention}\nID: {kanal.id}')
+        embed = discord.Embed(color=ctx.me.color, description=f'{kanal.mention}\nID: {kanal.id}')
         embed.set_author(name=kanal.name, icon_url=kanal.guild.icon_url)
         embed.add_field(name='Beskrivelse', value=description, inline=False)
-        embed.add_field(
-            name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='NSFW', value=nsfw)
         embed.add_field(name='Saktemodus', value=saktemodus)
         if kanal.category:
             embed.add_field(name='Kategori', value=kanal.category.name)
-        embed.add_field(
-            name=f'Antall med tilgang ({len(kanal.members)})', value=members)
+        embed.add_field(name=f'Antall med tilgang ({len(kanal.members)})', value=members)
         embed.set_footer(text=kanal.guild.name, icon_url=kanal.guild.icon_url)
         await ctx.send(embed=embed)
 
@@ -616,20 +556,16 @@ class Info(commands.Cog):
         else:
             limit = f'{kanal.user_limit} personer'
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=f'ID: {kanal.id}')
+        embed = discord.Embed(color=ctx.me.color, description=f'ID: {kanal.id}')
         embed.set_author(name=kanal.name, icon_url=kanal.guild.icon_url)
-        embed.add_field(
-            name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
-        embed.add_field(
-            name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
+        embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
         embed.add_field(name='Maksgrense', value=limit)
         if kanal.category:
             embed.add_field(name='Kategori', value=kanal.category.name)
         embed.add_field(name=f'Antall koblet til', value=len(kanal.members))
         embed.set_footer(text=kanal.guild.name, icon_url=kanal.guild.icon_url)
         await ctx.send(embed=embed)
-
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -644,24 +580,18 @@ class Info(commands.Cog):
 
         emoji_2 = await emoji.guild.fetch_emoji(emoji.id)
         try:
-            emoji_creator = f'{emoji_2.user.name}#{emoji_2.user.discriminator}'
+            emoji_creator = f'{emoji_2.mention}\n{emoji_2.user.name}#{emoji_2.user.discriminator}'
         except AttributeError:
-            emoji_creator = 'Jeg trenger `manage_emojis`-' +\
-                            'tillatelsen for å hente dette'
+            emoji_creator = 'Jeg trenger `manage_emojis`-tillatelsen for å hente dette'
 
-        embed = discord.Embed(
-            color=ctx.me.color, description=f'ID: {emoji.id}')
+        embed = discord.Embed(color=ctx.me.color, description=f'ID: {emoji.id}')
         embed.set_author(name=emoji.name, icon_url=emoji.url)
-        embed.add_field(
-            name=f'Opprettet', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name=f'Opprettet', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='Animert', value=animated)
-        embed.add_field(
-            name='Lagt til av',
-            value=emoji_creator)
+        embed.add_field(name='Lagt til av', value=emoji_creator)
         embed.set_image(url=emoji.url)
         embed.set_footer(text=emoji.guild.name, icon_url=emoji.guild.icon_url)
         await ctx.send(embed=embed)
-    
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -708,10 +638,7 @@ class Info(commands.Cog):
         pagecount = ceil(len(ctx.guild.members) / 10)
 
         if side > pagecount:
-            embed = discord.Embed(
-                color=0xFF0000,
-                description=':x: Ugyldig sidetall')
-            return await ctx.send(embed=embed)
+            return await Defaults.error_fatal_send(ctx, text='Ugyldig sidetall')
 
         members = sorted(
             ctx.guild.members,
@@ -720,12 +647,10 @@ class Info(commands.Cog):
             bruker = ctx.guild.get_member(member.id)
             bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
-            formatted_string += f'#{bruker_index} {bruker.mention} ' +\
-                f'- {bruker_created_date}\n'
+            formatted_string += f'#{bruker_index} {bruker.mention} - {bruker_created_date}\n'
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(
-            name='Eldste Discordbrukerene på serveren', value=formatted_string)
+        embed.add_field(name='Eldste Discordbrukerene på serveren', value=formatted_string)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
         await ctx.send(embed=embed)
 
@@ -757,12 +682,10 @@ class Info(commands.Cog):
             bruker = ctx.guild.get_member(member.id)
             bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
-            formatted_string += f'#{bruker_index} {bruker.mention} ' +\
-                f'- {bruker_joined_date}\n'
+            formatted_string += f'#{bruker_index} {bruker.mention} - {bruker_joined_date}\n'
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(
-            name='Første Discordbrukerene på serveren', value=formatted_string)
+        embed.add_field(name='Første Discordbrukerene på serveren', value=formatted_string)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
         await ctx.send(embed=embed)
 
@@ -785,17 +708,16 @@ class Info(commands.Cog):
             spill[member.activity.name] += 1
 
         if spill == {}:
-            return await ctx.send('Det er ingen som spiller noe akkurat nå')
+            embed = discord.Embed(color=ctx.me.color, description='Det er ingen som spiller noe akkurat nå')
+            return await ctx.send(embed=embed)
 
         gamelist = sorted(spill.items(), key=itemgetter(1), reverse=True)
         formatted_string = ''
         for game in gamelist[0:10]:
             formatted_string += f'**{game[0]}**: {game[1]}\n'
 
-        embed = discord.Embed(
-            color=ctx.me.color,
-            title='De mest spilte spillene på serveren for øyeblikket',
-            description=formatted_string)
+        embed = discord.Embed(color=ctx.me.color, title='De mest spilte spillene på serveren for øyeblikket',
+                              description=formatted_string)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -816,19 +738,15 @@ class Info(commands.Cog):
                 users.append(f'{member.name}#{member.discriminator}')
 
         if users == []:
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description='Det er ingen som spiller dette spillet')
+            embed = discord.Embed(color=ctx.me.color, description='Det er ingen som spiller dette spillet')
             return await ctx.send(embed=embed)
 
         formatted_string = ''
         for user in users[0:10]:
             formatted_string += f'• {user}\n'
 
-        embed = discord.Embed(
-            color=ctx.me.color,
-            title=f'Disse spiller {spill} for øyeblikket (maks 10)',
-            description=formatted_string)
+        embed = discord.Embed(color=ctx.me.color, title=f'Disse spiller {spill} for øyeblikket (maks 10)',
+                              description=formatted_string)
         await ctx.send(embed=embed)
 
 

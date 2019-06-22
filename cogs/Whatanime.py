@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from base64 import standard_b64encode
 from requests import get, post
@@ -24,10 +24,8 @@ class Whatanime(commands.Cog):
         await Defaults.set_footer(ctx, embed)
         status_msg = await ctx.send(embed=embed)
 
-        if not await LBlend_utils.download_photo(
-                ctx, link=bilde, max_file_size=8,
-                meassurement_type='MB',
-                filepath=f'./assets/{ctx.author.id}_trace.png'):
+        if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
+                                                 filepath=f'./assets/{ctx.author.id}_trace.png'):
             return
 
         filesize = os.path.getsize(f'./assets/{ctx.author.id}_trace.png')
@@ -39,29 +37,21 @@ class Whatanime(commands.Cog):
             img = img.resize((base_width, height_size), Image.ANTIALIAS)
             img.save(f'./assets/{ctx.author.id}_trace.png')
 
-            new_file_size = os.path.getsize(
-                f'./assets/{ctx.author.id}_trace.png')
-            if await LBlend_utils.check_file_too_big(
-                    ctx, status_msg,
-                    file=new_file_size,
-                    max_file_size=1,
-                    meassurement_type='MB'):
+            new_file_size = os.path.getsize(f'./assets/{ctx.author.id}_trace.png')
+            if await LBlend_utils.check_file_too_big(ctx, status_msg, file=new_file_size,
+                                                     max_file_size=1, meassurement_type='MB'):
                 await status_msg.delete()
                 return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
         with open(f'./assets/{ctx.author.id}_trace.png', 'rb') as f:
             base = standard_b64encode(f.read())
-            data = post(
-                'https://trace.moe/api/search',
-                data={'image': base}).json()
+            data = post('https://trace.moe/api/search', data={'image': base}).json()
 
         similarity = data['docs'][0]['similarity']
         if similarity < 0.85:
-            await Defaults.error_warning_send(
-                ctx,
-                text='Saus ble funnet, men grunnet ' +
-                     'lav likhetsprosent, er det høy sannsynlighet ' +
-                     'for at dette ikke er riktig saus')
+            await Defaults.error_warning_send(ctx, text='Saus ble funnet, men grunnet ' +
+                                                        'lav likhetsprosent, er det høy sannsynlighet ' +
+                                                        'for at dette ikke er riktig saus')
             await status_msg.delete()
             return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
@@ -74,8 +64,7 @@ class Whatanime(commands.Cog):
             episode = data['docs'][0]['episode']
             time = int(data['docs'][0]['at'])
         except KeyError:
-            await Defaults.error_fatal_send(
-                ctx, text='Fant ingen saus')
+            await Defaults.error_fatal_send(ctx, text='Fant ingen saus')
             await status_msg.delete()
             return os.remove(f'./assets/{ctx.author.id}_trace.png')
 
@@ -87,12 +76,9 @@ class Whatanime(commands.Cog):
         thumbnail_data = get(
             f'https://api.jikan.moe/v3/anime/{mal_id}/pictures').json()
 
-        embed = discord.Embed(
-            title=title_romaji, color=ctx.me.color,
-            url=f'https://anilist.co/anime/{anilist_id}',
-            description=f'{title_native}\n{title_english}')
-        embed.set_author(
-            name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        embed = discord.Embed(title=title_romaji, color=ctx.me.color, url=f'https://anilist.co/anime/{anilist_id}',
+                              description=f'{title_native}\n{title_english}')
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
         try:
             thumbnail = thumbnail_data['pictures'][0]['small']
             embed.set_thumbnail(url=thumbnail)
@@ -101,27 +87,25 @@ class Whatanime(commands.Cog):
         embed.add_field(name='Episode', value=str(episode))
         embed.add_field(name='Tidspunkt', value=str(formatted_time))
         embed.add_field(name='Likhet %', value=f'{similarity_percent}%')
-        embed.add_field(
-            name='Lenker',
-            value=f'[MAL](https://myanimelist.net/anime/{mal_id}) | ' +
-            f'[Anilist](https://anilist.co/anime/{anilist_id})')
+        embed.add_field(name='Lenker', value=f'[MAL](https://myanimelist.net/anime/{mal_id}) | ' +
+                                             f'[Anilist](https://anilist.co/anime/{anilist_id})')
         await ctx.send(content=ctx.author.mention, embed=embed)
         await status_msg.delete()
 
-        return os.remove(f'./assets/{ctx.author.id}_trace.png')
+        os.remove(f'./assets/{ctx.author.id}_trace.png')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
     @commands.command()
     async def tracelimit(self, ctx):
+        """Sjekk trace.moe API rate limit"""
+
         data = get('https://trace.moe/api/me').json()
         limit = data['limit']
         limit_ttl = data['limit_ttl']
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(
-            name='Limits',
-            value=f'{limit} requests\n{limit_ttl} sekunder til resettelse')
+        embed.add_field(name='Limits', value=f'{limit} requests\n{limit_ttl} sekunder til resettelse')
         await ctx.send(embed=embed)
 
 

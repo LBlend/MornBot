@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from codecs import open
 from json import load as json_load
@@ -59,35 +59,23 @@ class BotInfo(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color, url=website)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        embed.add_field(
-            name='Dev',
-            value=f'{dev.mention}\n{dev.name}#{dev.discriminator}')
-        embed.add_field(
-            name='Oppetid', value=f'{days}d {hours}t {minutes}m {seconds}s')
-        embed.add_field(
-            name='Ping', value=f'{int(self.bot.latency * 1000)}ms')
+        embed.add_field(name='Dev', value=f'{dev.mention}\n{dev.name}#{dev.discriminator}')
+        embed.add_field(name='Oppetid', value=f'{days}d {hours}t {minutes}m {seconds}s')
+        embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)}ms')
         embed.add_field(name='Servere', value=len(self.bot.guilds))
         embed.add_field(name='Discord.py Versjon', value=discord.__version__)
         embed.add_field(name='Python Versjon', value=platform.python_version())
-        embed.add_field(
-            name='Ressursbruk',
-            value=f'RAM: {memory_usage} MiB\nCPU: {cpu_percent}%')
-        embed.add_field(
-            name='Maskin',
-            value=f'{platform.system()} {platform.release()}')
-        embed.add_field(
-            name=f'Brukere ({len(total_members)})',
-            value=f'<:online:516328785910431754>{len(online_members)} ' +
-                  f'<:idle:516328783347843082>{len(idle_members)} ' +
-                  f'<:dnd:516328782844395579>{len(dnd_members)} ' +
-                  f'<:offline:516328785407246356>{len(offline_members)}')
-        embed.add_field(
-            name='Lenker',
-            value='[Inviter](https://discordapp.com/oauth2/authorize?client_' +
-                  f'id={self.bot.user.id}&permissions=388174&scope=bot) ' +
-                  f'| [Nettside]({website}) | [Kildekode]({github})')
-        embed.set_footer(
-            text=dev.name, icon_url=dev.avatar_url)
+        embed.add_field(name='Ressursbruk', value=f'RAM: {memory_usage} MiB\nCPU: {cpu_percent}%')
+        embed.add_field(name='Maskin', value=f'{platform.system()} {platform.release()}')
+        embed.add_field(name=f'Brukere ({len(total_members)})',
+                        value=f'<:online:516328785910431754>{len(online_members)} ' +
+                              f'<:idle:516328783347843082>{len(idle_members)} ' +
+                              f'<:dnd:516328782844395579>{len(dnd_members)} ' +
+                              f'<:offline:516328785407246356>{len(offline_members)}')
+        embed.add_field(name='Lenker', value='[Inviter](https://discordapp.com/oauth2/authorize?client_' +
+                                             f'id={self.bot.user.id}&permissions=388174&scope=bot) ' +
+                                             f'| [Nettside]({website}) | [Kildekode]({github})')
+        embed.set_footer(text=dev.name, icon_url=dev.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -98,11 +86,9 @@ class BotInfo(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        embed.add_field(
-            name='Invitasjonslink',
-            value='[Klikk her](https://discordapp.com/oauth2/authorize?clien' +
-                  f't_id={self.bot.user.id}&permissions=388174&scope=bot) ' +
-                  'for å invitere meg til serveren din')
+        embed.add_field(name='Invitasjonslink', value='[Klikk her](https://discordapp.com/oauth2/authorize?clien' +
+                                                      f't_id={self.bot.user.id}&permissions=388174&scope=bot) ' +
+                                                      'for å invitere meg til serveren din')
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -118,9 +104,7 @@ class BotInfo(commands.Cog):
         minutes, seconds = divmod(remainder, 60)
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(
-            name='Oppetid',
-            value=f'{days}d, {hours}t, {minutes}m, {seconds}s')
+        embed.add_field(name='Oppetid', value=f'{days}d, {hours}t, {minutes}m, {seconds}s')
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -140,13 +124,9 @@ class BotInfo(commands.Cog):
         """Sender link til Github-repoet mitt"""
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.set_thumbnail(
-            url='https://cdn2.iconfinder.com/data/icons/black-' +
-                'white-social-media/64/social_media_logo_github-512.png')
-        embed.add_field(
-            name='Github Repo',
-            value=f'[Klikk her]({github}) ' +
-            'for å se den dritt skrevne kildekoden min')
+        embed.set_thumbnail(url='https://cdn2.iconfinder.com/data/icons/black-' +
+                                'white-social-media/64/social_media_logo_github-512.png')
+        embed.add_field(name='Github Repo', value=f'[Klikk her]({github}) for å se den dritt skrevne kildekoden min')
         await ctx.send(embed=embed)
 
 

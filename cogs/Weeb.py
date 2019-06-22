@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from requests import get
 
@@ -18,19 +18,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Jeg vet du er ensom, ' +
-                                'men du kan ikke klappe deg selv')
+                embed = discord.Embed(description='Jeg vet du er ensom, men du kan ikke klappe deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/pat').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description=f'{ctx.author.mention} klappet {bruker.mention}')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} klappet {bruker.mention}')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -42,19 +38,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Jeg vet du er ensom, ' +
-                                'men du kan ikke klemme deg selv')
+                embed = discord.Embed(description='Jeg vet du er ensom, men du kan ikke klemme deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/hug').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color, description=f'{ctx.author.mention} ' +
-                                            f'ga {bruker.mention} en klem')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} ga {bruker.mention} en klem')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -66,19 +58,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Jeg vet du er ensom, ' +
-                                'men du kan ikke kose med deg selv')
+                embed = discord.Embed(description='Jeg vet du er ensom, men du kan ikke kose med deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/cuddle').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color, description=f'{ctx.author.mention} ' +
-                                            f'ga {bruker.mention} en klem')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} ga {bruker.mention} en klem')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -90,19 +78,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Jeg vet du er ensom, ' +
-                                'men du kan ikke poke deg selv')
+                embed = discord.Embed(description='Jeg vet du er ensom, men du kan ikke poke deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/poke').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description=f'{ctx.author.mention} poket {bruker.mention}')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} poket {bruker.mention}')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -114,19 +98,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Jeg vet du er ensom, ' +
-                                'men du kan ikke kysse deg selv')
+                embed = discord.Embed(description='Jeg vet du er ensom, men du kan ikke kysse deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/kiss').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description=f'{ctx.author.mention} kysset {bruker.mention}')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} kysset {bruker.mention}')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -138,19 +118,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Jeg vet du er ensom, ' +
-                                'men du kan ikke kile deg selv')
+                embed = discord.Embed(description='Jeg vet du er ensom, men du kan ikke kile deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/tickle').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description=f'{ctx.author.mention} kilte {bruker.mention}')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} kilte {bruker.mention}')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -163,17 +139,15 @@ class Weeb(commands.Cog):
 
             if bruker == ctx.author:
                 embed = discord.Embed(
-                    description='Jeg vet du har lav selvtillit, ' +
-                                'men du kan ikke kalle deg selv en BAKA')
+                    description='Jeg vet du har lav selvtillit, men du kan ikke kalle deg selv en BAKA')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/baka').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color, description=f'{bruker.mention} er en BAKA')
+            embed = discord.Embed(color=ctx.me.color, description=f'{bruker.mention} er en BAKA')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -185,18 +159,15 @@ class Weeb(commands.Cog):
         async with ctx.channel.typing():
 
             if bruker == ctx.author:
-                embed = discord.Embed(
-                    description='Vi er imot selvskading. Ikke klask deg selv')
+                embed = discord.Embed(description='Vi er imot selvskading. Ikke klask deg selv')
                 return await ctx.send(embed=embed)
 
             data = get('https://nekos.life/api/v2/img/slap').json()
             returned_data = data['url']
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description=f'{ctx.author.mention} klasket {bruker.mention}')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} klasket {bruker.mention}')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -211,7 +182,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -227,7 +198,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -243,7 +214,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -259,7 +230,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -275,7 +246,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
@@ -291,18 +262,14 @@ class Weeb(commands.Cog):
             returned_data = data['url']
 
             if not bruker == ctx.author:
-                embed = discord.Embed(
-                    color=ctx.me.color,
-                    description=f'{ctx.author.mention} har en fetisj ' +
-                                'og pisker seg selv')
+                embed = discord.Embed(color=ctx.me.color,
+                                      description=f'{ctx.author.mention} har en fetisj og pisker seg selv')
                 embed.set_image(url=returned_data)
-                return await ctx.send(embed=embed)
+                await ctx.send(embed=embed)
 
-            embed = discord.Embed(
-                color=ctx.me.color,
-                description=f'{ctx.author.mention} pisket {bruker.mention}')
+            embed = discord.Embed(color=ctx.me.color, description=f'{ctx.author.mention} pisket {bruker.mention}')
             embed.set_image(url=returned_data)
-            return await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
         
 
 def setup(bot):

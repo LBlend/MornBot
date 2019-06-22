@@ -13,16 +13,17 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        print(f'{datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | '
-              f'{ctx.command} - ' +
-              f'{ctx.author.name}#{ctx.author.discriminator} ' +
-              f'({ctx.author.id}) | ' +
+        print(f'{datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | {ctx.command} - ' +
+              f'{ctx.author.name}#{ctx.author.discriminator} ({ctx.author.id}) | ' +
               f'{ctx.guild.id}-{ctx.channel.id}-{ctx.message.id}')
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+
         if hasattr(ctx.command, 'on_error'):
             return
+
+        self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
 
         ignored = commands.CommandNotFound
         send_help = (commands.MissingRequiredArgument,
@@ -39,44 +40,31 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.BotMissingPermissions):
             permissions = ', '.join(error.missing_perms)
-            return await ctx.send(
-                f'Jeg mangler følgende tillatelser:\n\n```{permissions}```')
+            return await ctx.send(f'Jeg mangler følgende tillatelser:\n\n```{permissions}```')
 
         elif isinstance(error, commands.NotOwner):
-            return await Defaults.error_fatal_send(
-                ctx, text='Du er ikke båtteier', mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Du er ikke båtteier')
 
         elif isinstance(error, commands.MissingPermissions):
             permissions = ', '.join(error.missing_perms)
-            return await Defaults.error_warning_send(
-                ctx,
-                text='Du mangler følgende ' +
-                     f'tillatelser:\n\n```{permissions}```',
-                mention=False)
+            return await Defaults.error_warning_send(ctx,
+                                                     text=f'Du mangler følgende tillatelser:\n\n```{permissions}```')
 
         elif isinstance(error, commands.CommandOnCooldown):
-            return await Defaults.error_warning_send(
-                ctx,
-                text='Kommandoen har nettopp blitt brukt. Prøv igjen om ' +
-                     f'`{error.retry_after:.1f}` sekunder.')
+            return await Defaults.error_warning_send(ctx, text='Kommandoen har nettopp blitt brukt. Prøv igjen om ' +
+                                                               f'`{error.retry_after:.1f}` sekunder.')
 
         elif isinstance(error, commands.NSFWChannelRequired):
-            return await Defaults.error_fatal_send(
-                ctx, text='Du må være i en NSFW-Kanal', mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Du må være i en NSFW-Kanal')
 
         elif isinstance(error, commands.NoPrivateMessage):
             try:
-                return await Defaults.error_fatal_send(
-                    ctx,
-                    text=f'`{ctx.command}` kan ikke brukes i DMs',
-                    mention=False)
+                return await Defaults.error_fatal_send(ctx, text=f'`{ctx.command}` kan ikke brukes i DMs')
             except:
                 pass
 
-        print('Ignoring exception in command {}:'.format(ctx.command),
-              file=sys.stderr)
-        traceback.print_exception(type(error), error, error.__traceback__,
-                                  file=sys.stderr)
+        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 def setup(bot):

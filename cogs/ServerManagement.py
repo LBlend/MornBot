@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from cogs.utils import Defaults
 
@@ -13,14 +13,11 @@ class ServerManagement(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['spark'])
-    async def kick(
-            self, ctx, bruker: discord.Member, *, begrunnelse: str=None):
+    async def kick(self, ctx, bruker: discord.Member, *, begrunnelse: str=None):
         """Kaster ut en bruker fra serveren"""
 
         await bruker.kick(reason=begrunnelse)
-        await ctx.send(f'{bruker.mention} ' +
-                       f'`{bruker.name}#{bruker.discriminator}` ' +
-                       'ble kastet ut av serveren')
+        await ctx.send(f'{bruker.mention} `{bruker.name}#{bruker.discriminator}` ble kastet ut av serveren')
 
     @commands.bot_has_permissions(ban_members=True)
     @commands.has_permissions(ban_members=True)
@@ -31,9 +28,7 @@ class ServerManagement(commands.Cog):
         """Utesteng en bruker fra serveren"""
 
         await bruker.ban(reason=begrunnelse)
-        await ctx.send(f'{bruker.mention} ' +
-                       f'`{bruker.name}#{bruker.discriminator}` ' +
-                       'ble utestengt fra serveren')
+        await ctx.send(f'{bruker.mention} `{bruker.name}#{bruker.discriminator}` ble utestengt fra serveren')
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.has_permissions(manage_messages=True)
@@ -43,14 +38,10 @@ class ServerManagement(commands.Cog):
         """Sletter de siste antall meldingene du spesifiser"""
 
         if antall > 100:
-            return await Defaults.error_warning_send(
-                ctx,
-                text='Du kan ikke slette mer enn 100 meldinger om gangen',
-                mention=False)
+            return await Defaults.error_warning_send(ctx, text='Du kan ikke slette mer enn 100 meldinger om gangen')
 
         await ctx.channel.purge(limit=antall+1)
-        await ctx.send(content=f'Slettet `{antall}` meldinger!',
-                       delete_after=3.0)
+        await ctx.send(content=f'Slettet `{antall}` meldinger!', delete_after=3.0)
 
 
 def setup(bot):

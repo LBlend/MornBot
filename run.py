@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from codecs import open
 from json import load as json_load
@@ -37,10 +37,7 @@ if activity_type.lower() in activities:
 else:
     activity_type = 0
 
-bot = commands.Bot(
-    command_prefix=commands.when_mentioned_or(prefix),
-    prefix=prefix,
-    case_insensitive=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), prefix=prefix, case_insensitive=True)
 
 requirements = {
     'BotInfo': [website, github],
@@ -65,11 +62,11 @@ for file in listdir('cogs'):
             if type(required) is list:
                 for requirement in required:
                     if requirement is '':
-                        print(f'Slo av {name} pga manglende verdi ' +
-                              'satt i config.json')
+                        print(f'Slo av {name} pga manglende verdi satt i config.json')
         except KeyError:
             pass
         bot.load_extension(f'cogs.{name}')
+
 
 @bot.event
 async def on_ready():
@@ -81,9 +78,6 @@ async def on_ready():
     print(f'ID:              {bot.user.id}')
     print(f'Version:         {discord.__version__}')
     print('...............................................................\n')
-    await bot.change_presence(activity=discord.Activity(
-        type=activity_type,
-        name=presence),
-        status=discord.Status.online)
+    await bot.change_presence(activity=discord.Activity(type=activity_type,name=presence), status=discord.Status.online)
 
 bot.run(token, bot=True, reconnect=True)

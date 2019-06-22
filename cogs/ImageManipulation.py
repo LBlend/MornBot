@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from os import remove
 from PIL import Image, ImageOps, ImageEnhance
@@ -21,8 +21,8 @@ class ImageManipulation(commands.Cog):
             bruker = ctx.author
 
         async with ctx.channel.typing():
-            await bruker.avatar_url_as(format='png').save(
-                fp=f'./assets/{bruker.id}_raw.png')
+
+            await bruker.avatar_url_as(format='png').save(fp=f'./assets/{bruker.id}_raw.png')
 
             raw_image = Image.open(f'./assets/{bruker.id}_raw.png')
             image_edit = raw_image.convert('RGBA')
@@ -57,15 +57,13 @@ class ImageManipulation(commands.Cog):
 
         async with ctx.channel.typing():
 
-            if not await LBlend_utils.download_photo(
-                    ctx, link=bilde, max_file_size=8, meassurement_type='MB',
-                    filepath=f'./assets/{ctx.author.id}_raw.png'):
+            if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
+                                                     filepath=f'./assets/{ctx.author.id}_raw.png'):
                 return
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
             image_edit = raw_image.convert('RGB')
-            image_edit.save(
-                f'./assets/{ctx.author.id}_edit.jpg', quality=5)
+            image_edit.save(f'./assets/{ctx.author.id}_edit.jpg', quality=5)
 
             f = discord.File(f'./assets/{ctx.author.id}_edit.jpg')
             embed = discord.Embed(color=ctx.me.color)
@@ -89,9 +87,8 @@ class ImageManipulation(commands.Cog):
 
         async with ctx.channel.typing():
 
-            if not await LBlend_utils.download_photo(
-                    ctx, link=bilde, max_file_size=8, meassurement_type='MB',
-                    filepath=f'./assets/{ctx.author.id}_raw.png'):
+            if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
+                                                     filepath=f'./assets/{ctx.author.id}_raw.png'):
                 return
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
@@ -121,9 +118,8 @@ class ImageManipulation(commands.Cog):
 
         async with ctx.channel.typing():
 
-            if not await LBlend_utils.download_photo(
-                    ctx, link=bilde, max_file_size=8, meassurement_type='MB',
-                    filepath=f'./assets/{ctx.author.id}_raw.png'):
+            if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
+                                                     filepath=f'./assets/{ctx.author.id}_raw.png'):
                 return
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
@@ -147,16 +143,14 @@ class ImageManipulation(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(
-        aliases=['svarthvitt', 'svart-hvitt', 'grayscale', 'greyscale'])
+    @commands.command(aliases=['svarthvitt', 'svart-hvitt', 'grayscale', 'greyscale'])
     async def grå(self, ctx, bilde=None):
         """Gjør bildet svart-hvitt"""
 
         async with ctx.channel.typing():
 
-            if not await LBlend_utils.download_photo(
-                    ctx, link=bilde, max_file_size=8, meassurement_type='MB',
-                    filepath=f'./assets/{ctx.author.id}_raw.png'):
+            if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
+                                                     filepath=f'./assets/{ctx.author.id}_raw.png'):
                 return
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
@@ -186,9 +180,8 @@ class ImageManipulation(commands.Cog):
 
         async with ctx.channel.typing():
 
-            if not await LBlend_utils.download_photo(
-                    ctx, link=bilde, max_file_size=8, meassurement_type='MB',
-                    filepath=f'./assets/{ctx.author.id}_raw.jpg'):
+            if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
+                                                     filepath=f'./assets/{ctx.author.id}_raw.jpg'):
                 return
 
             raw_image = Image.open(f'./assets/{ctx.author.id}_raw.jpg')

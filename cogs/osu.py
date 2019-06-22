@@ -1,8 +1,9 @@
-import discord
 from discord.ext import commands
+import discord
 
 from codecs import open
 from json import load as json_load
+import locale
 
 from requests import get
 import urllib.parse
@@ -14,6 +15,8 @@ with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
     prefix = config['prefix']
     osu_api_key = config['osu_api_key']
+
+locale.setlocale(locale.LC_ALL, '')
 
 gamemodes = {
     'taiko': '1',
@@ -44,71 +47,66 @@ class Osu(commands.Cog):
             osu_user = bruker
 
             try:
-                url = 'https://osu.ppy.sh/api/get_user?' + \
-                      urllib.parse.urlencode({
-                          'u': osu_user,
-                          'm': gamemode,
-                          'k': osu_api_key})
+                url = 'https://osu.ppy.sh/api/get_user?' + urllib.parse.urlencode(
+                    {
+                        'u': osu_user,
+                        'm': gamemode,
+                        'k': osu_api_key
+                     })
                 data = get(url).json()
 
                 osu_user_id = data[0]['user_id']
 
             except IndexError:
-                return await Defaults.error_fatal_send(
-                    ctx, text='Fant ikke bruker!\n\n' +
-                         f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                    mention=False)
+                return await Defaults.error_fatal_send(ctx, text='Fant ikke bruker!\n\n ' +
+                                                                 f'Skriv `{prefix}help {ctx.command}` for hjelp')
 
             user_url = f'https://osu.ppy.sh/users/{osu_user_id}'
             profile_pic = f'http://a.ppy.sh/{osu_user_id}'
             username = data[0]['username']
-            rank = data[0]['pp_rank']
+            rank = int(data[0]['pp_rank'])
+            rank = locale.format_string('%d', rank, grouping=True)
 
             if rank == '#0':
-                return await Defaults.error_fatal_send(
-                    ctx, text='Brukeren har ikke spilt nok!', mention=False)
+                return await Defaults.error_fatal_send(ctx, text='Brukeren har ikke spilt nok!')
 
             level = str(round(float(data[0]['level']), 2))
-            country_rank = data[0]['pp_country_rank']
+            country_rank = int(data[0]['pp_country_rank'])
+            country_rank = locale.format_string('%d', country_rank, grouping=True)
             country = data[0]['country']
             pp = round(float(data[0]['pp_raw']))
+            pp = locale.format_string('%d', pp, grouping=True)
             acc = round(float(data[0]['accuracy']), 2)
             ss_ranks = data[0]['count_rank_ss']
             ssh_ranks = data[0]['count_rank_ssh']
             s_ranks = data[0]['count_rank_s']
             sh_ranks = data[0]['count_rank_sh']
             a_ranks = data[0]['count_rank_a']
-            playcount = data[0]['playcount']
+            playcount = int(data[0]['playcount'])
+            playcount = locale.format_string('%d', playcount, grouping=True)
             join_date = data[0]['join_date']
             hours_played = round((int(data[0]['total_seconds_played']) / 60) / 60)
 
-            embed = discord.Embed(
-                title=username, color=0xCC5288, url=user_url,
-                description=f'<:ScoreSSPlus:476372071014727706>{ssh_ranks} ' +
-                f'<:ScoreSS:476372071316848640>{ss_ranks} ' +
-                f'<:ScoreSPlus:476372071342145536>{sh_ranks} ' +
-                f'<:ScoreS:476372070989692929>{s_ranks} ' +
-                f'<:ScoreA:476372070976978955>{a_ranks}')
-            embed.set_author(
-                name='osu!',
-                icon_url='https://upload.wikimedia.org/wikipedia/commons/' +
-                         'd/d3/Osu%21Logo_%282015%29.png')
+            embed = discord.Embed(title=username, color=0xCC5288, url=user_url,
+                                  description=f'<:ScoreSSPlus:476372071014727706>{ssh_ranks} ' +
+                                              f'<:ScoreSS:476372071316848640>{ss_ranks} ' +
+                                              f'<:ScoreSPlus:476372071342145536>{sh_ranks} ' +
+                                              f'<:ScoreS:476372070989692929>{s_ranks} ' +
+                                              f'<:ScoreA:476372070976978955>{a_ranks}')
+            embed.set_author(name='osu!', icon_url='https://upload.wikimedia.org/wikipedia/commons/' +
+                                                   'd/d3/Osu%21Logo_%282015%29.png')
             embed.set_thumbnail(url=profile_pic)
-            embed.add_field(name='Global Ranking', value=f'#{rank}')
-            embed.add_field(
-                name='Country Ranking',
-                value=f':flag_{country.lower()}:#{country_rank}')
+            embed.add_field(name='Global Ranking', value=rank)
+            embed.add_field(name='Country Ranking', value=f':flag_{country.lower()}: {country_rank}')
             embed.add_field(name='PP', value=pp)
             embed.add_field(name='Accuracy', value=f'{acc}%')
             embed.add_field(name='Level', value=level)
             embed.add_field(name='Play Count', value=playcount)
 
             #   Ja, dette er ekte. Ikke klag, det funker
-            embed.set_footer(
-                text='Joined: ' +
-                     f'{join_date[8:10]}.{join_date[5:7]}.{join_date[:4]} ' +
-                     f'{join_date[11:]} | Hours played: {hours_played}')
-            return await ctx.send(embed=embed)
+            embed.set_footer(text=f'Joined: {join_date[8:10]}.{join_date[5:7]}.{join_date[:4]} ' +
+                                  f'{join_date[11:]} | Hours played: {hours_played}')
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

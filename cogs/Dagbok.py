@@ -35,11 +35,8 @@ class Dagbok(commands.Cog):
 
             date = message.created_at.strftime('%d-%m-%Y')
             
-            database_col_dagbok.update_one(
-                database_find,
-                {'$set':
-                        {f'data.{date}': message.clean_content}},
-                upsert=True)
+            database_col_dagbok.update_one(database_find,
+                                           {'$set': {f'data.{date}': message.clean_content}}, upsert=True)
 
             try:
                 await message.add_reaction('✅')
@@ -61,14 +58,12 @@ class Dagbok(commands.Cog):
         database_find = {'_id': ctx.author.id}
         database_user = database_col_dagbok.find_one(database_find)
         if database_user is not None:
-            embed = discord.Embed(
-                description='Du ligger allerede i databasen')
+            embed = discord.Embed(description='Du ligger allerede i databasen')
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
 
         database_col_dagbok.insert_one({'_id': ctx.author.id})
-        embed = discord.Embed(
-            description=':white_check_mark: Du er nå i lagt inn i databasen')
+        embed = discord.Embed(description=':white_check_mark: Du er nå i lagt inn i databasen')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -79,15 +74,13 @@ class Dagbok(commands.Cog):
         database_find = {'_id': ctx.author.id}
         database_user = database_col_dagbok.find_one(database_find)
         if database_user is None:
-            embed = discord.Embed(
-                description='Du lå ikke i databasen fra før av')
+            embed = discord.Embed(description='Du lå ikke i databasen fra før av')
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
 
         database_col_dagbok.delete_one(database_user)
 
-        embed = discord.Embed(
-            description=':white_check_mark: Dine data har blitt slettet!')
+        embed = discord.Embed(description=':white_check_mark: Dine data har blitt slettet!')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -104,9 +97,8 @@ class Dagbok(commands.Cog):
             color = discord.Colour(0x99AAB5)
 
         if database_user is None:
-            return await Defaults.error_warning_send(
-                ctx, text='Du ligger ikke i databasen. Skriv ' +
-                          f'`{prefix}dagbok på` for å legge deg inn')
+            return await Defaults.error_warning_send(ctx, text='Du ligger ikke i databasen. ' +
+                                                               f'`Skriv {prefix}dagbok på` for å legge deg inn')
 
         entries = ''
         try:
@@ -114,13 +106,10 @@ class Dagbok(commands.Cog):
                 if value != ctx.author.id:
                     entries += f'{key}\n'
         except KeyError:
-            return await Defaults.error_fatal_send(
-                    ctx, text='Fant ingen data. Sørg for at du skriver en ' +
-                            'dagboksmelding først (start melding med `kjære dagbok,`',
-                            mention=False)
+            return await Defaults.error_fatal_send(ctx, text='Fant ingen data. Sørg for at du skriver en ' +
+                                                             'dagboksmelding først (start melding med `kjære dagbok,`',)
 
-        embed = discord.Embed(
-            color=color, description=f'```\n{entries}```')
+        embed = discord.Embed(color=color, description=f'```\n{entries}```')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -137,22 +126,17 @@ class Dagbok(commands.Cog):
             color = discord.Colour(0x99AAB5)
 
         if database_user is None:
-            return await Defaults.error_warning_send(
-                ctx, text='Du ligger ikke i databasen. Skriv ' +
-                          f'`{prefix}dagbok på` for å legge deg inn')
+            return await Defaults.error_warning_send(ctx, text='Du ligger ikke i databasen. ' +
+                                                               f'Skriv `{prefix}dagbok på` for å legge deg inn')
         try:
             data = database_user['data'][f'{dato}']
-            embed = discord.Embed(
-                color=color, description=data)
-            embed.set_footer(
-                text=f'{ctx.author.name}#{ctx.author.discriminator} | {dato}',
-                icon_url=ctx.author.avatar_url)
+            embed = discord.Embed(color=color, description=data)
+            embed.set_footer(text=f'{ctx.author.name}#{ctx.author.discriminator} | {dato}',
+                             icon_url=ctx.author.avatar_url)
             return await ctx.send(embed=embed)
         except:
-            await Defaults.error_fatal_send(
-                ctx, text='Fant ingen data fra denne datoen. Dobbelsjekk ' +
-                          'om du har skrevet riktig dato `DD-MM-YYYY`',
-                          mention=False)
+            await Defaults.error_fatal_send(ctx, text='Fant ingen data fra denne datoen. Dobbelsjekk ' +
+                                                      'om du har skrevet riktig dato `DD-MM-YYYY`')
 
     @dagbok.command()
     async def data(self, ctx):
@@ -162,37 +146,26 @@ class Dagbok(commands.Cog):
         database_user = database_col_dagbok.find_one(database_find)
 
         if database_user is None:
-            return await Defaults.error_warning_send(
-                ctx, text='Jeg har ingen data om deg')
+            return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg')
             
         raw_data = ''
         try:
             database_user['data']
         except KeyError:
-            return await Defaults.error_warning_send(
-                ctx, text='Jeg har ingen data om deg')
+            return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg')
 
         for key, value in database_user['data'].items():
             raw_data += f'({key})\n{value}\n\n'
 
-        with open(f'./assets/{ctx.author.id}.txt',
-                  'a+', encoding='utf-8') as f:
+        with open(f'./assets/{ctx.author.id}.txt', 'a+', encoding='utf-8') as f:
             f.write(raw_data)
 
         try:
-            await ctx.author.send(
-                file=discord.File(f'./assets/{ctx.author.id}.txt'))
-            embed = discord.Embed(
-                color=0x0085ff,
-                description=':white_check_mark: Dine data har ' +
-                            'blitt sendt i DM!')
+            await ctx.author.send(file=discord.File(f'./assets/{ctx.author.id}.txt'))
+            embed = discord.Embed(color=0x0085ff, description=':white_check_mark: Dine data har ' +
+                                                              'blitt sendt i DM!')
         except:
-            await Defaults.error_fatal_send(
-                ctx,
-                text='Sending av data feilet! Sjekk om du har blokkert meg')
-
-        await Defaults.set_footer(ctx, embed)
-        await ctx.send(embed=embed)
+            await Defaults.error_fatal_send(ctx, text='Sending av data feilet! Sjekk om du har blokkert meg')
 
         try:
             remove(f'./assets/{ctx.author.id}.txt')
