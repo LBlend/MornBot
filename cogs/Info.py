@@ -693,14 +693,25 @@ class Info(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['mostplayed'])
-    async def mestspilt(self, ctx):
+    async def mestspilt(self, ctx, *side: int):
         """Sjekk hvilket spill som blir spilt mest på serveren"""
+
+        if side is ():
+            side = 1
+        else:
+            side = side[0]
+
+        if side <= 0:
+            side = 1
+
+        start_index = (side - 1) * 10
+        end_index = side * 10
 
         spill = {}
         for member in ctx.guild.members:
             if member.bot:
                 continue
-            if member.activity is None:
+            if member.activity is None or member.activity.name == 'Spotify':
                 continue
             if member.activity.name not in spill:
                 spill[member.activity.name] = 1
@@ -712,12 +723,15 @@ class Info(commands.Cog):
             return await ctx.send(embed=embed)
 
         gamelist = sorted(spill.items(), key=itemgetter(1), reverse=True)
+        pagecount = ceil(len(gamelist) / 10)
+
         formatted_string = ''
-        for game in gamelist[0:10]:
+        for game in gamelist[start_index:end_index]:
             formatted_string += f'**{game[0]}**: {game[1]}\n'
 
         embed = discord.Embed(color=ctx.me.color, title='De mest spilte spillene på serveren for øyeblikket',
                               description=formatted_string)
+        embed.set_footer(text=f'Side: {side}/{pagecount}')
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -742,10 +756,10 @@ class Info(commands.Cog):
             return await ctx.send(embed=embed)
 
         formatted_string = ''
-        for user in users[0:10]:
+        for user in users[0:15]:
             formatted_string += f'• {user}\n'
 
-        embed = discord.Embed(color=ctx.me.color, title=f'Disse spiller {spill} for øyeblikket (maks 10)',
+        embed = discord.Embed(color=ctx.me.color, title=f'Disse spiller {spill} for øyeblikket (maks 15)',
                               description=formatted_string)
         await ctx.send(embed=embed)
 
