@@ -45,8 +45,8 @@ class Memes(commands.Cog):
         async with ctx.channel.typing():
             
             font = './assets/fonts/Roboto_Mono/RobotoMono-Medium.ttf'
-            top_text, top_font = format_text(dorli_tekst, 1200, font)
-            bottom_text, bottom_font = format_text(bra_tekst, 1200, font)
+            top_text, top_font = format_text(dorli_tekst, 1000, font)
+            bottom_text, bottom_font = format_text(bra_tekst, 1000, font)
 
             image = Image.open(f'./assets/desanti.png').convert('RGBA')
             color = (0, 0, 0, 255)
