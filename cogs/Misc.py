@@ -470,8 +470,6 @@ class Misc(commands.Cog):
             except:
                 pass
 
-            return
-
 
 def setup(bot):
     bot.add_cog(Misc(bot))
