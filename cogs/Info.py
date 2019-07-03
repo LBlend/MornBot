@@ -221,6 +221,9 @@ class Info(commands.Cog):
             roles = ['**Ingen Roller**']
         roles.reverse()
         roles = ', '.join(roles)
+        
+        roles = roles.replace(", --", "\n--")
+        roles = roles.replace("--, ", "--\n")
 
         if roles == '':
             roles = '**Ingen roller**'
