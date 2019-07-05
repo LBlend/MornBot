@@ -23,8 +23,7 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(
-        aliases=['guildinfo', 'server', 'serverinfo', 'si', 'gi'])
+    @commands.command(aliases=['guildinfo', 'server', 'serverinfo', 'si', 'gi'])
     async def guild(self, ctx):
         """Viser info om guilden"""
 
@@ -58,8 +57,6 @@ class Info(commands.Cog):
         for role in ctx.guild.roles:
             if role.name != '@everyone':
                 roles.append(role.name)
-        if roles is []:
-            roles = ['**Ingen Roller**']
         roles.reverse()
         roles = ', '.join(roles)
         if len(roles) > 1024:
@@ -72,8 +69,6 @@ class Info(commands.Cog):
             ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
         for booster in premium_subscribers:
             boosters.append(booster.mention)
-        if boosters is []:
-            boosters = ['**Ingen boosters**']
         boosters = ' '.join(boosters)
         if len(boosters) > 1024:
             boosters = f'Skriv `{prefix}boosters` for å se boosters'
@@ -346,8 +341,6 @@ class Info(commands.Cog):
         for role in bruker.roles:
             if role.name != '@everyone':
                 roles.append(role.name)
-        if not roles:
-            roles = ['**Ingen Roller**']
         roles.reverse()
         roles = ', '.join(roles)
 
@@ -408,8 +401,6 @@ class Info(commands.Cog):
         for role in bruker.roles:
             if role.name != '@everyone':
                 roles.append(role.name)
-        if roles is []:
-            roles = ['**Ingen Roller**']
         roles.reverse()
         roles = ', '.join(roles)
 
@@ -487,8 +478,6 @@ class Info(commands.Cog):
         members = []
         for member in rolle.members:
             members.append(member.mention)
-        if members is []:
-            members = ['**Ingen Medlemmer**']
         members = ' '.join(members)
 
         if len(members) > 1024:
@@ -603,9 +592,7 @@ class Info(commands.Cog):
     async def guildemoji(self, ctx):
         """Viser alle emoji som serveren har"""
 
-        embed = discord.Embed(
-            title=f"Emoji",
-            colour=ctx.me.color)
+        embed = discord.Embed(title=f"Emoji", colour=ctx.me.color)
         embed.set_footer(text=ctx.guild.name, icon_url=ctx.guild.icon_url)
 
         emoji_string = ''
@@ -678,9 +665,7 @@ class Info(commands.Cog):
         formatted_string = ''
         pagecount = ceil(len(ctx.guild.members) / 10)
 
-        members = sorted(
-            ctx.guild.members,
-            key=lambda m: m.joined_at)[start_index:end_index]
+        members = sorted(ctx.guild.members, key=lambda m: m.joined_at)[start_index:end_index]
         for member in members:
             bruker = ctx.guild.get_member(member.id)
             bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
