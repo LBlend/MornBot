@@ -17,7 +17,7 @@ class AntiSelfBot(commands.Cog, command_attrs=dict(hidden=True)):
     async def on_member_join(self, member):
         if member.guild.id != 297798952538079233:
             return
-        name_match = re.findall(r'\d{3}', member.name[-3:])
+        name_match = re.findall(r'[A-Z]+[a-z]+[0-9a-f]{4}', member.name)
         creation_match = (datetime.now() - member.created_at).days
         if name_match != [] and not member.avatar and creation_match < 31:
             role = member.guild.get_role(588432481297104949)
