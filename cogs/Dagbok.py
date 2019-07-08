@@ -4,6 +4,9 @@ import discord
 import pymongo
 from json import load as json_load
 from os import remove
+from math import ceil
+import json
+import asyncio
 
 from cogs.utils import Defaults
 
@@ -78,14 +81,31 @@ class Dagbok(commands.Cog):
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
 
-        database_col_dagbok.delete_one(database_user)
+        embed = discord.Embed(color=ctx.me.color, description='Er du sikker? Reager med ✅ innen 30s har gått for å ' +
+                                                              'bekrefte\n\n**Dette vil slette alle dine data og ' +
+                                                              'stoppe loggingen av fremtidige meldinger frem til du ' +
+                                                              'skrur den på igjen.** Om du vil hente ut data før du ' +
+                                                              f'sletter, kan du skrive `{prefix}dagbok data`')
+        confirmation_msg = await ctx.send(embed=embed)
+        await confirmation_msg.add_reaction('✅')
 
-        embed = discord.Embed(description=':white_check_mark: Dine data har blitt slettet!')
-        await Defaults.set_footer(ctx, embed)
-        await ctx.send(embed=embed)
+        def comfirm(reaction, user):
+            return user == ctx.author and str(reaction.emoji) == '✅'
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=comfirm)
+        except asyncio.TimeoutError:
+            embed = discord.Embed(color=ctx.me.color, description=f'Ingen svar ble gitt innen tiden!')
+            await confirmation_msg.edit(embed=embed)
+            await confirmation_msg.remove_reaction('✅', ctx.me)
+        else:
+            database_col_dagbok.delete_one(database_user)
+            embed = discord.Embed(description=':white_check_mark: Dine data har blitt slettet!')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
 
     @dagbok.command()
-    async def liste(self, ctx):
+    async def liste(self, ctx, *side: int):
         """Se hvilke dager som ligger i dagboka"""
 
         database_find = {'_id': ctx.author.id}
@@ -98,19 +118,38 @@ class Dagbok(commands.Cog):
 
         if database_user is None:
             return await Defaults.error_warning_send(ctx, text='Du ligger ikke i databasen. ' +
-                                                               f'`Skriv {prefix}dagbok på` for å legge deg inn')
+                                                               f'Skriv `{prefix}dagbok på` for å legge deg inn')
 
-        entries = ''
+        entries = []
         try:
             for key, value in database_user['data'].items():
                 if value != ctx.author.id:
-                    entries += f'{key}\n'
+                    entries.append(key)
         except KeyError:
             return await Defaults.error_fatal_send(ctx, text='Fant ingen data. Sørg for at du skriver en ' +
                                                              'dagboksmelding først (start melding med `kjære dagbok,`',)
 
-        embed = discord.Embed(color=color, description=f'```\n{entries}```')
-        await Defaults.set_footer(ctx, embed)
+        if side is ():
+            side = 1
+        else:
+            side = side[0]
+
+        if side <= 0:
+            side = 1
+
+        start_index = (side - 1) * 10
+        end_index = side * 10
+
+        pagecount = ceil(len(entries) / 10)
+
+        if side > pagecount:
+            return await Defaults.error_fatal_send(ctx, text='Ugyldig sidetall')
+
+        entries = '\n'.join(entries[start_index:end_index])
+
+        embed = discord.Embed(color=color, description=f'```{entries}```')
+        embed.set_author(name=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar_url)
+        embed.set_footer(text=f'Side: {side}/{pagecount}')
         await ctx.send(embed=embed)
 
     @dagbok.command()
@@ -147,23 +186,20 @@ class Dagbok(commands.Cog):
 
         if database_user is None:
             return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg')
-            
-        raw_data = ''
+
         try:
             database_user['data']
         except KeyError:
             return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg')
 
-        for key, value in database_user['data'].items():
-            raw_data += f'({key})\n{value}\n\n'
-
-        with open(f'./assets/{ctx.author.id}.txt', 'a+', encoding='utf-8') as f:
-            f.write(raw_data)
+        with open(f'./assets/{ctx.author.id}.json', 'w') as f:
+            json.dump(database_user, f, indent=4)
 
         try:
-            await ctx.author.send(file=discord.File(f'./assets/{ctx.author.id}.txt'))
+            await ctx.author.send(file=discord.File(f'./assets/{ctx.author.id}.json'))
             embed = discord.Embed(color=0x0085ff, description=':white_check_mark: Dine data har ' +
                                                               'blitt sendt i DM!')
+            await ctx.send(embed=embed)
         except:
             await Defaults.error_fatal_send(ctx, text='Sending av data feilet! Sjekk om du har blokkert meg')
 
