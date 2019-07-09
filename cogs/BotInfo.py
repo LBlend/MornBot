@@ -9,6 +9,8 @@ import platform
 from os import getpid
 from psutil import Process
 
+from cogs.utils import Defaults
+
 with open('config.json', 'r', encoding='utf8') as f:
     config = json_load(f)
     prefix = config['prefix']
@@ -58,6 +60,7 @@ class BotInfo(commands.Cog):
                     offline_members.append(member.id)
 
         embed = discord.Embed(color=ctx.me.color, url=website)
+        embed.set_author(name=dev.name, icon_url=dev.avatar_url)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name='Dev', value=f'{dev.mention}\n{dev.name}#{dev.discriminator}')
         embed.add_field(name='Oppetid', value=f'{days}d {hours}t {minutes}m {seconds}s')
@@ -75,7 +78,7 @@ class BotInfo(commands.Cog):
         embed.add_field(name='Lenker', value='[Inviter](https://discordapp.com/oauth2/authorize?client_' +
                                              f'id={self.bot.user.id}&permissions=388174&scope=bot) ' +
                                              f'| [Nettside]({website}) | [Kildekode]({github})')
-        embed.set_footer(text=dev.name, icon_url=dev.avatar_url)
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -89,6 +92,7 @@ class BotInfo(commands.Cog):
         embed.add_field(name='Invitasjonslink', value='[Klikk her](https://discordapp.com/oauth2/authorize?clien' +
                                                       f't_id={self.bot.user.id}&permissions=388174&scope=bot) ' +
                                                       'for å invitere meg til serveren din')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -105,6 +109,7 @@ class BotInfo(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color)
         embed.add_field(name='Oppetid', value=f'{days}d, {hours}t, {minutes}m, {seconds}s')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -115,6 +120,7 @@ class BotInfo(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color)
         embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)}ms')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -127,6 +133,7 @@ class BotInfo(commands.Cog):
         embed.set_thumbnail(url='https://cdn2.iconfinder.com/data/icons/black-' +
                                 'white-social-media/64/social_media_logo_github-512.png')
         embed.add_field(name='Github Repo', value=f'[Klikk her]({github}) for å se den dritt skrevne kildekoden min')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
 

@@ -114,16 +114,20 @@ class Misc(commands.Cog):
             embed.add_field(name='Kukstørrelse', value=f'18.1 cm lang\n16.5 cm girth')
         else:
             embed.add_field(name='Kukstørrelse', value=f'{dick_size} cm\n8{dick_drawing}D')
-        
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def roll(self, ctx):
         """Gir deg et tilfeldig tall"""
 
-        await ctx.send(str(randint(0, 100)))
+        embed = discord.Embed(color=ctx.me.color, description=randint(0, 100))
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(name='8ball')
     async def ball8(self, ctx, *, spørsmål: str):
@@ -144,7 +148,9 @@ class Misc(commands.Cog):
             'I følge mine beregninger... nei'
         ]
 
-        await ctx.send(choice(answers))
+        embed = discord.Embed(color=ctx.me.color, description=choice(answers))
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -260,6 +266,7 @@ class Misc(commands.Cog):
                 embed.color = 0xff0000
 
             embed.add_field(name='Status', value=status)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -382,8 +389,7 @@ class Misc(commands.Cog):
             else:
                 language = main_language
 
-            embed = discord.Embed(title=f':flag_{country_code}: {name}',
-                                  color=ctx.me.color, timestamp=datetime.utcnow())
+            embed = discord.Embed(title=f':flag_{country_code}: {name}', color=ctx.me.color)
             if name == native_name:
                 embed.description = native_name
             embed.set_thumbnail(url=flag)
@@ -393,6 +399,7 @@ class Misc(commands.Cog):
             embed.add_field(name='Valuta', value=f'{currency_name}\n{currency_abbreviation}')
             embed.add_field(name='Befolkningstall', value=population)
             embed.add_field(name='Størrelse', value=f'{area}km')
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -405,6 +412,7 @@ class Misc(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color, description=f'[Trykk her for løsningen på problemet ditt]({url})')
         embed.set_image(url='http://ecx.images-amazon.com/images/I/51IESUsBdbL._SX258_BO1,204,203,200_.jpg')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)

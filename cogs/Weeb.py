@@ -3,6 +3,8 @@ import discord
 
 from requests import get
 
+from cogs.utils import Defaults
+
 
 class Weeb(commands.Cog):
     def __init__(self, bot):
@@ -147,6 +149,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color, description=f'{bruker.mention} er en BAKA')
             embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -182,6 +185,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -198,6 +202,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -214,6 +219,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -230,6 +236,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -246,6 +253,7 @@ class Weeb(commands.Cog):
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
+            await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)

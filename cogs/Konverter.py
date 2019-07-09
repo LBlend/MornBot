@@ -47,6 +47,7 @@ class Konverter(commands.Cog):
         temp_celcius = locale.format_string('%d', temp_celcius, grouping=True)
 
         embed = discord.Embed(color=ctx.me.color, description=f'`{tall}°F` :arrow_right: `{temp_celcius}°C`')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -73,6 +74,7 @@ class Konverter(commands.Cog):
         temp_fahrenheit = locale.format_string('%d', temp_fahrenheit, grouping=True)
 
         embed = discord.Embed(color=ctx.me.color, description=f'`{tall}°C`:arrow_right:`{temp_fahrenheit}°F`')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -109,6 +111,7 @@ class Konverter(commands.Cog):
             text = 'Dette er en sunn BMI. Bra Jobba!'
 
         embed.add_field(name='BMI', value=f'`{bmi}`\n{text}')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -151,6 +154,7 @@ class Konverter(commands.Cog):
             embed = discord.Embed(color=ctx.me.color,
                                   description=f'`{verdi} {fra_valuta}`:arrow_right:`{value} {til_valuta}`',
                                   timestamp=datetime.utcnow())
+            await Defaults.set_footer(ctx, embed)
             await status_msg.edit(embed=embed)
 
         except KeyError:
@@ -204,6 +208,7 @@ class Konverter(commands.Cog):
         bananas = locale.format_string('%d', bananas, grouping=True)
 
         embed = discord.Embed(color=ctx.me.color, description=f'`{tall}{meassurement_type}`:arrow_right:`{bananas}🍌`')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
 
