@@ -26,16 +26,6 @@ class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @staticmethod
-    def crabrave(topptekst, bunntekst, ctx):
-
-        r = get(f'https://dustie.xyz/api/crabs/?text={topptekst},{bunntekst}',
-                stream=True, headers={'User-agent': 'Mozilla/5.0'})
-
-        with open(f'./assets/{ctx.author.id}_crab.mp4', 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
-
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['santi'])
@@ -78,35 +68,6 @@ class Memes(commands.Cog):
                 remove(f'./assets/{ctx.author.id}_edit.png')
             except:
                 pass
-
-    @commands.bot_has_permissions(embed_links=True, attach_files=True)
-    @commands.cooldown(1, 30, commands.BucketType.guild)
-    @commands.command(aliases=['gone', 'crab', 'crabrave'])
-    async def borte(self, ctx, topptekst: str, bunntekst: str):
-        """crab mem"""
-
-        embed = discord.Embed(description='Generer video :hourglass:')
-        await Defaults.set_footer(ctx, embed)
-        status_msg = await ctx.send(embed=embed)
-
-        topptekst = await LBlend_utils.input_sanitizer(topptekst)
-        bunntekst = await LBlend_utils.input_sanitizer(bunntekst)
-
-        if len(topptekst) > 17 or len(bunntekst) > 17:
-            await Defaults.error_warning_edit(ctx, status_msg, text='Tekstene kan ikke være over 17 tegn')
-            return await self.bot.get_command('borte').reset_cooldown(ctx)
-
-        task = functools.partial(Memes.crabrave, topptekst, bunntekst, ctx)
-        await self.bot.loop.run_in_executor(None, task)
-
-        f = discord.File(f'./assets/{ctx.author.id}_crab.mp4')
-        await ctx.send(file=f)
-
-        await status_msg.delete()
-        try:
-            remove(f'./assets/{ctx.author.id}_crab.mp4')
-        except:
-            pass
 
 
 def setup(bot):
