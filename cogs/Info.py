@@ -580,7 +580,7 @@ class Info(commands.Cog):
         except AttributeError:
             emoji_creator = 'Jeg trenger `manage_emojis`-tillatelsen for å hente dette'
 
-        embed = discord.Embed(color=ctx.me.color, description=f'{emoji.name}\nID: {emoji.id}')
+        embed = discord.Embed(color=ctx.me.color, description=f'**{emoji.name}**\nID: {emoji.id}')
         embed.set_author(name=emoji.guild.name, icon_url=emoji.guild.icon_url)
         embed.add_field(name=f'Opprettet', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='Animert', value=animated)
