@@ -47,8 +47,6 @@ class ImageManipulation(commands.Cog):
             except:
                 pass
 
-            return
-
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['needsmorejpeg', 'jpg', 'jpeg'])
