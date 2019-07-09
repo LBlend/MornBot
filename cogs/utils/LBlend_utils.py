@@ -67,3 +67,28 @@ async def input_sanitizer(text):
         text = text.replace(key, value)
 
     return text
+
+
+async def check_file_too_big(ctx, status_msg, file, max_file_size: int, meassurement_type: str):
+    """Checks file size and send error message if True"""
+
+    meassurement = meassurement_type
+    max_file_size_actual = max_file_size
+    meassurements = {
+        "B": 1,
+        "KB": 1000,
+        "MB": 1000000,
+        "GB": 1000000000
+    }
+    meassurement_type = meassurements[meassurement_type]
+
+    max_file_size = max_file_size * meassurement_type
+
+    if file > max_file_size:
+        await Defaults.error_fatal_edit(
+            ctx, status_msg,
+            text='Filen er for stort. Prøv et bilde som er mindre enn ' +
+                 f'mer enn {max_file_size_actual} {meassurement}')
+        return True
+    else:
+        return False
