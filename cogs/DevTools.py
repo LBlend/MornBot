@@ -329,8 +329,8 @@ class DevTools(commands.Cog):
         except:
             return await Defaults.error_fatal_send(ctx, text='Båtten er ikke i denne guilden')
 
-        comfirmation_msg = await ctx.send(f'Vil du virkelig forlate {guild.name} (`{guild.id}`)?')
-        await comfirmation_msg.add_reaction('✅')
+        confirmation_msg = await ctx.send(f'Vil du virkelig forlate {guild.name} (`{guild.id}`)?')
+        await confirmation_msg.add_reaction('✅')
 
         def comfirm(reaction, user):
             return user == ctx.author and str(reaction.emoji) == '✅'
@@ -339,7 +339,7 @@ class DevTools(commands.Cog):
             reaction, user = await self.bot.wait_for('reaction_add', timeout=15.0, check=comfirm)
         except asyncio.TimeoutError:
             await ctx.message.delete()
-            await comfirmation_msg.delete()
+            await confirmation_msg.delete()
         else:
             await guild.leave()
             try:
