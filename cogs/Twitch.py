@@ -56,7 +56,7 @@ class Twitch(commands.Cog):
             embed.set_thumbnail(url=profile_pic)
             embed.add_field(name='Bio', value=bio, inline=False)
             embed.add_field(name='Følgere', value=follow_count)
-            embed.add_field(name='Bruker lagd', value=creation_date_formatted)
+            embed.add_field(name='Opprettet', value=creation_date_formatted)
             await Defaults.set_footer(ctx, embed)
 
             try:
