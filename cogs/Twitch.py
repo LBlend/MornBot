@@ -54,9 +54,9 @@ class Twitch(commands.Cog):
             embed.set_author(name='Twitch', icon_url='http://www.gamergiving.org/wp-content/' +
                                                      'uploads/2016/03/twitch11.png')
             embed.set_thumbnail(url=profile_pic)
-            embed.add_field(name='Bio', value=bio, inline=False)
-            embed.add_field(name='Følgere', value=follow_count)
-            embed.add_field(name='Opprettet', value=creation_date_formatted)
+            embed.add_field(name='📝 Bio', value=bio, inline=False)
+            embed.add_field(name='👥 Følgere', value=follow_count)
+            embed.add_field(name='📅 Opprettet', value=creation_date_formatted)
             await Defaults.set_footer(ctx, embed)
 
             try:
@@ -68,7 +68,7 @@ class Twitch(commands.Cog):
             except TypeError:
                 return await ctx.send(embed=embed)
 
-            embed.add_field(name=':red_circle: Sender direkte nå', value=f'**Antall som ser på:**\n{views}\n\n' +
+            embed.add_field(name='🔴 Sender direkte nå', value=f'**Antall som ser på:**\n{views}\n\n' +
                                                                          f'**Tittel:**\n{livestream_title}\n\n' +
                                                                          f'**Spill:**\n{livestream_game}', inline=False)
             embed.set_image(url=livestream_preview)

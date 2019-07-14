@@ -47,7 +47,6 @@ class Vær(commands.Cog):
             fetch_date = datetime.fromtimestamp(data['dt']).strftime('%d.%m.%Y %H:%M')
             description = data['weather'][0]['description']
             temp_celcius = round((data['main']['temp']) - 273)
-            temp_fahrenheit = round(1.8 * ((data['main']['temp']) - 273) + 32)
             wind_speed = data['wind']['speed']
             humidity = data['main']['humidity']
             cloudiness = data['clouds']['all']
@@ -71,33 +70,33 @@ class Vær(commands.Cog):
             if is_rain:
                 for key, value in data['rain'].items():
                     if key == '1h':
-                        rain += f'Siste timen: {value}mm\n'
+                        rain += f'Siste timen: {value} mm\n'
                     if key == '3h':
-                        rain += f'Siste 3 timene: {value}mm'
+                        rain += f'Siste 3 timene: {value} mm'
 
             snow = ''
             if is_snow:
                 for key, value in data['snow'].items():
                     if key == '1h':
-                        rain += f'Siste timen: {value}mm\n'
+                        rain += f'Siste timen: {value} mm\n'
                     if key == '3h':
-                        rain += f'Siste 3 timene: {value}mm'
+                        rain += f'Siste 3 timene: {value} mm'
 
-            embed = discord.Embed(title=f':flag_{country_code}: {city_name} ' + f'| {fetch_date} (Norsk Tid)',
+            embed = discord.Embed(title=f':flag_{country_code}: {city_name} ' + f'| {fetch_date} (Norske Tider)',
                                   color=ctx.me.color, url=link, description=description)
             embed.set_author(name='OpenWeatherMap', icon_url='https://pbs.twimg.com/profile_images/' +
                                                              '720298646630084608/wb7LSoAc_400x400.jpg')
-            embed.add_field(name='Temperatur', value=f'{temp_celcius}°C\n{temp_fahrenheit}°F')
-            embed.add_field(name='Vind', value=f'{wind_speed}m/s')
-            embed.add_field(name='Luftfuktighet', value=f'{humidity}%')
-            embed.add_field(name='Skyer', value=f'{cloudiness}%')
+            embed.add_field(name='🌡️ Temperatur', value=f'{temp_celcius} °C')
+            embed.add_field(name='💨 Vind', value=f'{wind_speed} m/s')
+            embed.add_field(name='💦 Luftfuktighet', value=f'{humidity}%')
             if rain != '':
-                embed.add_field(name='Nedbørsmengde', value=rain)
+                embed.add_field(name='🌧️ Nedbørsmengde', value=rain)
             if snow != '':
-                embed.add_field(name='Snømengde', value=snow)
-            embed.add_field(name='Soloppgang (Norsk tid)', value=sunrise, inline=False)
-            embed.add_field(name='Solnedgang (Norsk tid)', value=sunset)
-            embed.set_footer(text=f'Tid i Norge nå: {time_now}')
+                embed.add_field(name='🌨️ Snømengde', value=snow)
+            embed.add_field(name='☁️ Skyer', value=f'{cloudiness}%')
+            embed.add_field(name='🌅 Soloppgang', value=sunrise)
+            embed.add_field(name='🌇 Solnedgang', value=sunset)
+            embed.set_footer(text=f'🕓 Klokka i Norge nå: {time_now}')
             await ctx.send(embed=embed)
 
 

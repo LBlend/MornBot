@@ -41,12 +41,12 @@ class Konverter(commands.Cog):
         if tall > 1000000000 or tall < -1000000000:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
-        temp_celcius = round((float(tall) - 32) / 9 * 5, 2)
+        temp_celcius = (tall - 32) / 9 * 5
 
-        tall = locale.format_string('%d', tall, grouping=True)
-        temp_celcius = locale.format_string('%d', temp_celcius, grouping=True)
+        tall = locale.format_string('%.2f', tall, grouping=True)
+        temp_celcius = locale.format_string('%.2f', temp_celcius, grouping=True)
 
-        embed = discord.Embed(color=ctx.me.color, description=f'`{tall}°F` :arrow_right: `{temp_celcius}°C`')
+        embed = discord.Embed(color=ctx.me.color, description=f'`{tall} °F` ➡️ `{temp_celcius} °C`')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -68,12 +68,12 @@ class Konverter(commands.Cog):
         if tall > 1000000000 or tall < -1000000000:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
-        temp_fahrenheit = round((float(tall) * 9) / 5 + 32, 2)
+        temp_fahrenheit = (tall * 9) / 5 + 32
 
-        tall = locale.format_string('%d', tall, grouping=True)
-        temp_fahrenheit = locale.format_string('%d', temp_fahrenheit, grouping=True)
+        tall = locale.format_string('%.2f', tall, grouping=True)
+        temp_fahrenheit = locale.format_string('%.2f', temp_fahrenheit, grouping=True)
 
-        embed = discord.Embed(color=ctx.me.color, description=f'`{tall}°C`:arrow_right:`{temp_fahrenheit}°F`')
+        embed = discord.Embed(color=ctx.me.color, description=f'`{tall} °C` ➡️ `{temp_fahrenheit} °F`')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -100,7 +100,7 @@ class Konverter(commands.Cog):
         if høyde_meter > 1000000000 or høyde_meter < -1000000000:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
-        bmi = round(vekt_kg / (høyde_meter * høyde_meter), 2)
+        bmi = round(vekt_kg / (høyde_meter * høyde_meter))
 
         embed = discord.Embed(color=ctx.me.color)
         if bmi < 18.5:
@@ -120,47 +120,42 @@ class Konverter(commands.Cog):
     async def valuta(self, ctx, til_valuta, verdi, fra_valuta):
         """Se hvor mye noe er verdt i en annen valuta"""
 
-        embed = discord.Embed(description='Laster...')
-        status_msg = await ctx.send(embed=embed)
+        async with ctx.channel.typing():
 
-        if ',' in verdi:
-            verdi = sub(',', '.', verdi)
+            if ',' in verdi:
+                verdi = sub(',', '.', verdi)
 
-        try:
-            verdi = float(verdi)
-        except ValueError:
-            return await Defaults.error_warning_edit(ctx, status_msg,
-                                                     text='Sjekk om du har skrevet riktig tall\n\n' +
-                                                          f'Skriv `{prefix}help {ctx.command}` for hjelp')
+            try:
+                verdi = float(verdi)
+            except ValueError:
+                return await Defaults.error_warning_send(ctx, text='Sjekk om du har skrevet riktig tall\n\n' +
+                                                                f'Skriv `{prefix}help {ctx.command}` for hjelp')
 
-        if verdi > 1000000000 or verdi < -1000000000:
-            return await Defaults.error_warning_edit(ctx, status_msg, text='Tallet du har skrevet er for lavt/høyt!')
+            if verdi > 1000000000 or verdi < -1000000000:
+                return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
-        fra_valuta = fra_valuta.upper()
-        til_valuta = til_valuta.upper()
+            fra_valuta = fra_valuta.upper()
+            til_valuta = til_valuta.upper()
 
-        try:
-            data = get('https://api.ksoft.si/kumo/currency', headers={'Authorization': 'Bearer ' + ksoft_auth},
-                       params={
-                           'from': fra_valuta,
-                           'to': til_valuta,
-                           'value': verdi}).json()
+            try:
+                data = get('https://api.ksoft.si/kumo/currency', headers={'Authorization': 'Bearer ' + ksoft_auth},
+                        params={
+                            'from': fra_valuta,
+                            'to': til_valuta,
+                            'value': verdi}).json()
 
-            verdi = locale.format_string('%d', verdi, grouping=True)
+                verdi = locale.format_string('%.2f', verdi, grouping=True)
+                value = locale.format_string('%.2f', data['value'], grouping=True)
 
-            value = round(data['value'], 2)
-            value = locale.format_string('%d', value, grouping=True)
+                embed = discord.Embed(color=ctx.me.color,
+                                    description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
+                                    timestamp=datetime.utcnow())
+                await Defaults.set_footer(ctx, embed)
+                await ctx.send(embed=embed)
 
-            embed = discord.Embed(color=ctx.me.color,
-                                  description=f'`{verdi} {fra_valuta}`:arrow_right:`{value} {til_valuta}`',
-                                  timestamp=datetime.utcnow())
-            await Defaults.set_footer(ctx, embed)
-            await status_msg.edit(embed=embed)
-
-        except KeyError:
-            return await Defaults.error_warning_edit(ctx, status_msg,
-                                                     text='Sjekk om du har satt gyldige valutaer\n\n' +
-                                                          f'Skriv `{prefix}help {ctx.command}` for hjelp')
+            except KeyError:
+                return await Defaults.error_warning_send(ctx, text='Sjekk om du har satt gyldige valutaer\n\n' +
+                                                                f'Skriv `{prefix}help {ctx.command}` for hjelp')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -202,12 +197,12 @@ class Konverter(commands.Cog):
                                                                'mm\ncm\nm\nkm\n```')
 
         size_km = tall / måleenhet
-        bananas = round(size_km / 0.0001778, 2)
+        bananas = size_km / 0.0001778
 
-        tall = locale.format_string('%d', tall, grouping=True)
-        bananas = locale.format_string('%d', bananas, grouping=True)
+        tall = locale.format_string('%.2f', tall, grouping=True)
+        bananas = locale.format_string('%.2f', bananas, grouping=True)
 
-        embed = discord.Embed(color=ctx.me.color, description=f'`{tall}{meassurement_type}`:arrow_right:`{bananas}🍌`')
+        embed = discord.Embed(color=ctx.me.color, description=f'`{tall} {meassurement_type}` ➡️ `{bananas} 🍌`')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 

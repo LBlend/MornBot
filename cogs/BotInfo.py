@@ -64,11 +64,11 @@ class BotInfo(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name='Dev', value=f'{dev.mention}\n{dev.name}#{dev.discriminator}')
         embed.add_field(name='Oppetid', value=f'{days}d {hours}t {minutes}m {seconds}s')
-        embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)}ms')
+        embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)} ms')
         embed.add_field(name='Servere', value=len(self.bot.guilds))
         embed.add_field(name='Discord.py Versjon', value=discord.__version__)
         embed.add_field(name='Python Versjon', value=platform.python_version())
-        embed.add_field(name='Ressursbruk', value=f'RAM: {memory_usage} MiB\nCPU: {cpu_percent}%')
+        embed.add_field(name='Ressursbruk', value=f'RAM: {memory_usage} MB\nCPU: {cpu_percent}%')
         embed.add_field(name='Maskin', value=f'{platform.system()} {platform.release()}')
         embed.add_field(name=f'Brukere ({len(total_members)})',
                         value=f'<:online:516328785910431754>{len(online_members)} ' +
@@ -89,7 +89,7 @@ class BotInfo(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        embed.add_field(name='Invitasjonslink', value='[Klikk her](https://discordapp.com/oauth2/authorize?clien' +
+        embed.add_field(name='📩 Invitasjonslenke', value='[Klikk her](https://discordapp.com/oauth2/authorize?clien' +
                                                       f't_id={self.bot.user.id}&permissions=388174&scope=bot) ' +
                                                       'for å invitere meg til serveren din')
         await Defaults.set_footer(ctx, embed)
@@ -108,7 +108,7 @@ class BotInfo(commands.Cog):
         minutes, seconds = divmod(remainder, 60)
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(name='Oppetid', value=f'{days}d, {hours}t, {minutes}m, {seconds}s')
+        embed.add_field(name='🔌 Oppetid', value=f'{days}d, {hours}t, {minutes}m, {seconds}s')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -119,7 +119,7 @@ class BotInfo(commands.Cog):
         """Sjekk pingen til båtten"""
 
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)}ms')
+        embed.add_field(name='📶 Ping', value=f'{int(self.bot.latency * 1000)} ms')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -132,7 +132,7 @@ class BotInfo(commands.Cog):
         embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url='https://cdn2.iconfinder.com/data/icons/black-' +
                                 'white-social-media/64/social_media_logo_github-512.png')
-        embed.add_field(name='Github Repo', value=f'[Klikk her]({github}) for å se den dritt skrevne kildekoden min')
+        embed.add_field(name='🔗 Github Repo', value=f'[Klikk her]({github}) for å se den dritt skrevne kildekoden min')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 

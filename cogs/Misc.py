@@ -201,10 +201,7 @@ class Misc(commands.Cog):
                 data = get(url).json()
                 urban_url = data['list'][0]['permalink']
             except IndexError:
-                return await Defaults.error_fatal_send(
-                    ctx,
-                    text='Fant ingen definisjon for dette ordet!',
-                    mention=False)
+                return await Defaults.error_fatal_send(ctx, text='Fant ingen definisjon for dette ordet!')
 
             index = 0
             for definition in data['list'][index]:
@@ -259,13 +256,13 @@ class Misc(commands.Cog):
                 for i in ping.split():
                     if i.isdigit():
                         pinglist.append(i)
-                embed.add_field(name='Ping', value=f'{pinglist[0]} ms')
+                embed.add_field(name='📶 Ping', value=f'{pinglist[0]} ms')
                 embed.color = 0x2ECC71
             else:
                 status = 'Nede!'
                 embed.color = 0xff0000
 
-            embed.add_field(name='Status', value=status)
+            embed.add_field(name='🔌 Status', value=status)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -299,7 +296,7 @@ class Misc(commands.Cog):
                 return await Defaults.error_warning_send(ctx, text='Du er ikke koblet til en talekanal')
 
             link = f'https://canary.discordapp.com/channels/{ctx.guild.id}/{voice_channel_id}'
-            embed = discord.Embed(title=f'Videochat: {ctx.author.voice.channel.name}', color=ctx.me.color,
+            embed = discord.Embed(title=f'📷 Videochat: {ctx.author.voice.channel.name}', color=ctx.me.color,
                                   description=f'[Trykk her for å bli med i videochat]({link})')
             await ctx.send(embed=embed)
 
@@ -340,7 +337,7 @@ class Misc(commands.Cog):
             embed.add_field(name='Sommertid', value=daylight_savings)
             embed.add_field(name='UTC tidssone', value=timezone_utc)
             embed.add_field(name='Standard tidssone for sted', value=timezone_local)
-            embed.set_footer(text='Klokka i din tidssone ->')
+            embed.set_footer(text='🕓 Klokka i din tidssone ->')
             await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -362,6 +359,7 @@ class Misc(commands.Cog):
             try:
                 country_code = data[0]['alpha2Code'].lower()
                 capital = data[0]['capital']
+                region = data[0]['region']
                 sub_region = data[0]['subregion']
                 population = data[0]['population']
                 population = locale.format_string('%d', population, grouping=True)
@@ -388,17 +386,27 @@ class Misc(commands.Cog):
                 language = f'{main_language}\n{main_language_natvive}'
             else:
                 language = main_language
+            
+            regions = {
+                'Africa': '🌍',
+                'Americas': '🌎',
+                'Asia': '🌏',
+                'Europe': '🌍',
+                'Oceania': '🌏' 
+            }
+            region_globe = regions[region]
 
             embed = discord.Embed(title=f':flag_{country_code}: {name}', color=ctx.me.color)
-            if name == native_name:
-                embed.description = native_name
+            if name != native_name:
+                embed.description = f'**{native_name}**\n'
+            embed.description += '*Info hentet fra [restcountries.eu](https://restcountries.eu)*'
             embed.set_thumbnail(url=flag)
-            embed.add_field(name='Hovedstad', value=capital)
-            embed.add_field(name='Region', value=sub_region)
-            embed.add_field(name='Språk', value=language)
-            embed.add_field(name='Valuta', value=f'{currency_name}\n{currency_abbreviation}')
-            embed.add_field(name='Befolkningstall', value=population)
-            embed.add_field(name='Størrelse', value=f'{area}km')
+            embed.add_field(name='📍 Hovedstad', value=capital)
+            embed.add_field(name=f'{region_globe} Region', value=sub_region)
+            embed.add_field(name='🗣️ Språk', value=language)
+            embed.add_field(name='💴 Valuta', value=f'{currency_name}\n{currency_abbreviation}')
+            embed.add_field(name='👥 Befolkningstall', value=population)
+            embed.add_field(name='📏 Størrelse', value=f'{area} km')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -422,7 +430,7 @@ class Misc(commands.Cog):
         """Se hvor mye du matcher med en annen"""
 
         if not bruker:
-            return await Defaults.error_fatal_send(ctx, text='Du må gi meg en bruker')
+            return await Defaults.error_warning_send(ctx, text='Du må gi meg en bruker')
         if bruker == ctx.author:
             return await Defaults.error_warning_send(ctx, text='Jeg vet du er ensom, men du kan '
                                                                'ikke matche med deg selv')

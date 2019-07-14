@@ -135,7 +135,7 @@ class Info(commands.Cog):
                 'VERIFIED': 'Verifisert',
                 'PARTNERED': 'Discord Partner',
                 'MORE_EMOJI': 'Ekstra emoji',
-                'DISCOVERABLE': '',
+                'DISCOVERABLE': 'Fremhevet',
                 'COMMERCE': 'Butikkanaler',
                 'LURKABLE': 'Kan ses uten join',
                 'NEWS': 'Nyhetskanaler',
@@ -177,12 +177,12 @@ class Info(commands.Cog):
         embed.add_field(name='Region', value=f'{flag} {region_name}')
         embed.add_field(name='Opprettet', value=f'{guild_created_date}\n{since_created_days} ' +
                                                 f'{since_created_days_string} siden')
-        embed.add_field(name=f'Kanaler ({total_channels})', value=f'Tekst: **{text_channels}**\n' +
-                                                                  f'Tale: **{voice_channels}**\n' +
-                                                                  f'Kategorier: **{categories}**')
+        embed.add_field(name=f'Kanaler ({total_channels})', value=f'💬 Tekst: **{text_channels}**\n' +
+                                                                  f'🔊 Tale: **{voice_channels}**\n' +
+                                                                  f'🗃️ Kategorier: **{categories}**')
         embed.add_field(name=f'Medlemmer ({total_members})',
-                        value=f'Mennesker: **{int(total_members) - int(bot_members)}**\n' +
-                              f'Båtter: **{bot_members}**\n' +
+                        value=f'👤 Mennesker: **{int(total_members) - int(bot_members)}**\n' +
+                              f'🤖 Båtter: **{bot_members}**\n' +
                               f'<:online:516328785910431754>{online_members} ' +
                               f'<:idle:516328783347843082>{idle_members} ' +
                               f'<:dnd:516328782844395579>{dnd_members} ' +
@@ -722,7 +722,7 @@ class Info(commands.Cog):
         for game in gamelist[start_index:end_index]:
             formatted_string += f'**{game[0]}**: {game[1]}\n'
 
-        embed = discord.Embed(color=ctx.me.color, title='De mest spilte spillene på serveren for øyeblikket',
+        embed = discord.Embed(color=ctx.me.color, title='🎮 De mest spilte spillene på serveren for øyeblikket',
                               description=formatted_string)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
@@ -753,7 +753,7 @@ class Info(commands.Cog):
         for user in users[0:15]:
             formatted_string += f'• {user}\n'
 
-        embed = discord.Embed(color=ctx.me.color, title=f'Disse spiller {spill} for øyeblikket (maks 15)',
+        embed = discord.Embed(color=ctx.me.color, title=f'🎮 Disse spiller {spill} for øyeblikket (maks 15)',
                               description=formatted_string)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         await Defaults.set_footer(ctx, embed)

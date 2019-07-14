@@ -50,10 +50,10 @@ class Reddit(commands.Cog):
 
             embed = discord.Embed(title=f'/r/{sub.display_name}', color=ctx.me.color,
                                   url=f'https://www.reddit.com/r/{sub.display_name}')
-            embed.add_field(name='Abonnenter', value=subscribers)
-            embed.add_field(name='Opprettet', value=created_at)
-            embed.add_field(name='NSFW', value=nsfw)
-            embed.add_field(name='Beskrivelse', value=sub.public_description, inline=False)
+            embed.add_field(name='👥 Abonnenter', value=subscribers)
+            embed.add_field(name='📅 Opprettet', value=created_at)
+            embed.add_field(name='🔞 NSFW', value=nsfw)
+            embed.add_field(name='📝 Beskrivelse', value=sub.public_description, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -90,16 +90,16 @@ class Reddit(commands.Cog):
             if notable_mentions is not '':
                 embed.description = notable_mentions
             embed.set_thumbnail(url=bruker.icon_img)
-            embed.add_field(name='Post Karma', value=link_karma, inline=False)
-            embed.add_field(name='Comment Karma', value=comment_karma, inline=False)
-            embed.add_field(name='Opprettet', value=created_at)
+            embed.add_field(name='📄 Post Karma', value=link_karma, inline=False)
+            embed.add_field(name='📃 Comment Karma', value=comment_karma, inline=False)
+            embed.add_field(name='📅 Opprettet', value=created_at)
             if bruker.trophies() != []:
                 trophies = []
                 for trophy in bruker.trophies():
                     trophies.append(trophy.name)
                 trophies = ', '.join(trophies)
                 if len(trophies) < 1000:
-                    embed.add_field(name='Trofeer', value=trophies, inline=False)
+                    embed.add_field(name='🏆 Trofeer', value=trophies, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -136,7 +136,7 @@ class Reddit(commands.Cog):
             except IndexError:
                 return await Defaults.error_fatal_send(ctx, text='Fant ingen posts')
 
-            embed = discord.Embed(title=f'Tilfeldig bildepost fra /r/{sub.display_name}',
+            embed = discord.Embed(title=f'📷 Tilfeldig bildepost fra /r/{sub.display_name}',
                                   color=ctx.me.color, url=submission.url)
             embed.set_image(url=submission.url)
             await Defaults.set_footer(ctx, embed)

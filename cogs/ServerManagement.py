@@ -41,7 +41,7 @@ class ServerManagement(commands.Cog):
             return await Defaults.error_warning_send(ctx, text='Du kan ikke slette mer enn 100 meldinger om gangen')
 
         await ctx.channel.purge(limit=antall+1)
-        await ctx.send(content=f'Slettet `{antall}` meldinger!', delete_after=3.0)
+        await ctx.send(content=f'🗑️ Slettet `{antall}` meldinger!', delete_after=3.0)
 
 
 def setup(bot):
