@@ -1,5 +1,4 @@
 *.json
-*.example
 *.pyc
 __pycache__/
 .vscode/
