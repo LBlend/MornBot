@@ -13,7 +13,9 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        print(f'{datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | {ctx.command} - ' +
+        status = {False: "✔", True: "❌"}
+        print(f'{datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | ' +
+              f'{ctx.command} {status[ctx.command_failed]} - ' +
               f'{ctx.author.name}#{ctx.author.discriminator} ({ctx.author.id}) | ' +
               f'{ctx.guild.id}-{ctx.channel.id}-{ctx.message.id}')
 
@@ -25,7 +27,7 @@ class Errors(commands.Cog):
 
         self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
 
-        ignored = commands.CommandNotFound
+        ignored = (commands.CommandNotFound, commands.CheckFailure)
         send_help = (commands.MissingRequiredArgument,
                      commands.TooManyArguments,
                      commands.BadArgument)
