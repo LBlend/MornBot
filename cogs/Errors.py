@@ -21,11 +21,11 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-
+        
+        self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
+        
         if hasattr(ctx.command, 'on_error'):
             return
-
-        self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
 
         ignored = (commands.CommandNotFound, commands.CheckFailure)
         send_help = (commands.MissingRequiredArgument,
