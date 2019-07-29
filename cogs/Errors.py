@@ -20,10 +20,10 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
 
+        self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
+
         if hasattr(ctx.command, 'on_error'):
             return
-
-        self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
 
         ignored = commands.CommandNotFound
         send_help = (commands.MissingRequiredArgument,
@@ -36,6 +36,7 @@ class Errors(commands.Cog):
             return
 
         elif isinstance(error, send_help):
+            self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
             return await ctx.send_help(ctx.command)
 
         elif isinstance(error, commands.BotMissingPermissions):
@@ -63,7 +64,7 @@ class Errors(commands.Cog):
             except:
                 pass
 
-        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+        print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
