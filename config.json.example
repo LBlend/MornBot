@@ -11,5 +11,6 @@
     "twitch_api_key": "",
     "ksoft_authentication": "",
     "reddit_client_id": "",
-    "reddit_secret": ""
+    "reddit_secret": "",
+    "cog_check": {"386655733107785738":  ["Eval"] }
 }

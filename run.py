@@ -26,6 +26,7 @@ with open('config.json', 'r', encoding='utf8') as f:
     ksoft_authentication = config['ksoft_authentication']
     reddit_client_id = config['reddit_client_id']
     reddit_secret = config['reddit_secret']
+    cog_check = config['cog_check']
 
 activities = {
     'playing': 0,
@@ -78,6 +79,16 @@ async def on_ready():
     print(f'ID:              {bot.user.id}')
     print(f'Version:         {discord.__version__}')
     print('...............................................................\n')
-    await bot.change_presence(activity=discord.Activity(type=activity_type,name=presence), status=discord.Status.online)
+    await bot.change_presence(activity=discord.Activity(type=activity_type, name=presence),
+                              status=discord.Status.online)
+
+
+@bot.check
+async def cog_blacklist(ctx):
+    try:
+        return ctx.cog.qualified_name not in cog_check[str(ctx.guild.id)]
+    except KeyError:
+        return True
+
 
 bot.run(token, bot=True, reconnect=True)
