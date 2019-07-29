@@ -42,7 +42,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix), prefix=pre
 requirements = {
     'BotInfo': [website, github],
     'Dagbok': mongodb_url,
-    'FunRepliesExample': mongodb_url,
+    'FunReplies': mongodb_url,
     'Konverter': ksoft_authentication,
     'Ordsky': mongodb_url,
     'osu': osu_api_key,
