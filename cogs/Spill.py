@@ -2,7 +2,6 @@ from discord.ext import commands
 import discord
 
 import asyncio
-import time
 import random
 
 from cogs.utils import Defaults
@@ -35,11 +34,12 @@ class Spill(commands.Cog):
         try:
             path = languages[språk]
         except KeyError:
-            for key, value in languages.items():
+            for key in languages.keys():
                 available_languages.append(key)
-            available_languages = ', '.join(available_languages)
+            available_languages = '\n'.join(available_languages)
             self.bot.get_command('skrivetest topp200').reset_cooldown(ctx)
-            return await Defaults.error_warning_send(ctx, text=f'Du må velge et språk fra listen\n```{available_languages}```')
+            return await Defaults.error_warning_send(ctx, text='Du må velge et språk fra listen\n +'
+                                                               f'```\n{available_languages}\n```')
 
         random_num = random.randint(30, 70)
         with open(f'./assets/{path}_words.txt', 'r', encoding='utf-8') as f:
@@ -58,7 +58,9 @@ class Spill(commands.Cog):
         else:
             color = discord.Colour(0x99AAB5)
 
-        embed = discord.Embed(color=color, description=f'Testen starter når en tekst kommer opp og ender når du har sendt meldingen. Du har `{int(timeout)}` sekunder på deg\n\nTesten starter om 5 sekunder...')
+        embed = discord.Embed(color=color, description='Testen starter når en tekst kommer opp og ender når du har ' +
+                                                       f'sendt meldingen. Du har `{int(timeout)}` sekunder på deg\n\n' +
+                                                       'Testen starter om 5 sekunder...')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -83,7 +85,7 @@ class Spill(commands.Cog):
 
             if wpm > 200:
                 self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
-                return await Defaults.error_warning_send(ctx, text='Eh... Tror ærlig ikke at du skriver så fort asså 😄')
+                return await Defaults.error_warning_send(ctx, text='Tror ærlig ikke at du skriver så fort asså 😄')
 
             index = 0
             wrong_words = 0
@@ -98,7 +100,10 @@ class Spill(commands.Cog):
                 index += 1
 
             embed = discord.Embed(color=color, title='Resultat',
-            description=f'**WPM:** `{wpm}`\n**CPM:** `{cpm}`\n**Tid:** `{counter}` sekunder\n**Lengde:** `{length_words}` ord (`{length_chars}` tegn)\n**Feil:** `{wrong_words}`')
+                                  description=f'**WPM:** `{wpm}`\n**CPM:** `{cpm}`\n' +
+                                              f'**Tid:** `{counter}` sekunder\n' +
+                                              f'**Lengde:** `{length_words}` ord (`{length_chars}` tegn)\n' +
+                                              f'**Feil:** `{wrong_words}`')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -107,5 +112,3 @@ class Spill(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Spill(bot))
-
-    

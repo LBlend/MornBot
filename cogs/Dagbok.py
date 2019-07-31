@@ -120,11 +120,8 @@ class Dagbok(commands.Cog):
             return await Defaults.error_warning_send(ctx, text='Du ligger ikke i databasen. ' +
                                                                f'Skriv `{prefix}dagbok på` for å legge deg inn')
 
-        entries = []
         try:
-            for key, value in database_user['data'].items():
-                if value != ctx.author.id:
-                    entries.append(key)
+            entries = list(database_user['data'].keys())
         except KeyError:
             return await Defaults.error_fatal_send(ctx, text='Fant ingen data. Sørg for at du skriver en ' +
                                                              'dagboksmelding først (start melding med `kjære dagbok,`',)
@@ -147,7 +144,7 @@ class Dagbok(commands.Cog):
 
         entries = '\n'.join(entries[start_index:end_index])
 
-        embed = discord.Embed(color=color, description=f'```{entries}```')
+        embed = discord.Embed(color=color, description=f'```\n{entries}\n```')
         embed.set_author(name=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar_url)
         embed.set_footer(text=f'Side: {side}/{pagecount}')
         await ctx.send(embed=embed)

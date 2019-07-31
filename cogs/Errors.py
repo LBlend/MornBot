@@ -43,15 +43,16 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.BotMissingPermissions):
             permissions = ', '.join(error.missing_perms)
-            return await ctx.send(f'Jeg mangler følgende tillatelser:\n\n```{permissions}```')
+            return await Defaults.error_warning_send(ctx, text=f'Jeg mangler følgende tillatelser:\n\n' +
+                                                               f'```\n{permissions}\n```')
 
         elif isinstance(error, commands.NotOwner):
             return await Defaults.error_fatal_send(ctx, text='Du er ikke båtteier')
 
         elif isinstance(error, commands.MissingPermissions):
             permissions = ', '.join(error.missing_perms)
-            return await Defaults.error_warning_send(ctx,
-                                                     text=f'Du mangler følgende tillatelser:\n\n```{permissions}```')
+            return await Defaults.error_warning_send(ctx, text=f'Du mangler følgende tillatelser:\n\n' +
+                                                               f'```\n{permissions}\n```')
 
         elif isinstance(error, commands.CommandOnCooldown):
             return await Defaults.error_warning_send(ctx, text='Kommandoen har nettopp blitt brukt. Prøv igjen om ' +
