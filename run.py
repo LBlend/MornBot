@@ -84,10 +84,12 @@ async def on_ready():
 
 
 @bot.check
-async def cog_blacklist(ctx):
+async def cog_blacklist(ctx):  
     try:
         return ctx.cog.qualified_name not in cog_check[str(ctx.guild.id)]
     except KeyError:
+        return True
+    except AttributeError:
         return True
 
 
