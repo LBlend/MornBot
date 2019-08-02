@@ -65,19 +65,31 @@ class Misc(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
+    @commands.command(hidden=True)
     async def drepmeg(self, ctx):
         """Dreper deg"""
 
         await ctx.send("Du er død nå")
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command()
+    @commands.command(hidden=True)
     async def sql(self, ctx):
         """Ber LBLend om å lære seg SQL"""
 
         lblend = await self.bot.fetch_user(170506717140877312)
         await ctx.send(f'{lblend.mention} LÆR DEG SQL NÅÅÅÅ!')
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(hidden=True)
+    async def pitbull(self, ctx):
+        
+        await ctx.send(f'https://imgur.com/RuS84tz\nPitbuller er grusomme dyr.\nPitbuller spiser bl.a. `prefix`spedbarn.')
+
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(hidden=True)
+    async def spedbarn(self, ctx):
+        
+        await ctx.send(f'https://imgur.com/Rbgxs0t\nSpedbarn er grusomme\nDe griner og driter overalt')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
