@@ -83,13 +83,13 @@ class Misc(commands.Cog):
     @commands.command(hidden=True)
     async def pitbull(self, ctx):
         
-        await ctx.send(f'https://imgur.com/RuS84tz\nPitbuller er grusomme dyr.\nPitbuller spiser bl.a. `prefix`spedbarn.')
+        await ctx.send(f'https://imgur.com/RuS84tz\nPitbuller er grusomme dyr.\nPitbuller spiser bl.a. `{prefix}`spedbarn.')
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(hidden=True)
     async def spedbarn(self, ctx):
         
-        await ctx.send(f'https://imgur.com/Rbgxs0t\nSpedbarn er grusomme\nDe griner og driter overalt')
+        await ctx.send('https://imgur.com/Rbgxs0t\nSpedbarn er grusomme\nDe griner og driter overalt')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
