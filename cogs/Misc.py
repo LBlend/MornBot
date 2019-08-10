@@ -112,7 +112,7 @@ class Misc(commands.Cog):
         elif bruker.id == 202745416062599168:
             dick_size = 0
         elif bruker.id == 142580278940925953:
-            dick_size = 14
+            dick_size = 12
         else:
             dick_size = hash_dicksize(user_id, 25, 2)
 
@@ -456,9 +456,9 @@ class Misc(commands.Cog):
 
             if bruker.id == self.bot.user.id:
                 match_percent = 100
-            elif ctx.author.id == 516234701221134346 and bruker.id == 142580278940925953:
+            elif ctx.author.id == 127934026467115008 and bruker.id == 142580278940925953:
                 match_percent = 100
-            elif ctx.author.id == 142580278940925953 and bruker.id == 516234701221134346:
+            elif ctx.author.id == 142580278940925953 and bruker.id == 127934026467115008:
                 match_percent = 100
 
             await ctx.author.avatar_url_as(format='png').save(
