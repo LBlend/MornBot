@@ -88,11 +88,11 @@ class Osu(commands.Cog):
             hours_played = round((int(data[0]['total_seconds_played']) / 60) / 60)
 
             embed = discord.Embed(title=username, color=0xCC5288, url=user_url,
-                                  description=f'<:ScoreSSPlus:476372071014727706>{ssh_ranks} ' +
-                                              f'<:ScoreSS:476372071316848640>{ss_ranks} ' +
-                                              f'<:ScoreSPlus:476372071342145536>{sh_ranks} ' +
-                                              f'<:ScoreS:476372070989692929>{s_ranks} ' +
-                                              f'<:ScoreA:476372070976978955>{a_ranks}')
+                                  description=f'<:GradeSSSilver:609830030402387981>{ssh_ranks} ' +
+                                              f'<:GradeSS:609830028842237962>{ss_ranks} ' +
+                                              f'<:GradeSSilver:609830028913672193>{sh_ranks} ' +
+                                              f'<:GradeS:609830028729122843>{s_ranks} ' +
+                                              f'<:GradeA:609830029177913344>{a_ranks}')
             embed.set_author(name='osu!', icon_url='https://upload.wikimedia.org/wikipedia/commons/' +
                                                    'd/d3/Osu%21Logo_%282015%29.png')
             embed.set_thumbnail(url=profile_pic)
