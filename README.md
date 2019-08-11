@@ -15,7 +15,7 @@ Before you can run the bot you need to set up some stuff
 Install the required modules
 
 ```
-python -m pip install -r requiremenets.txt
+python -m pip install -r requirements.txt
 ```
 
 Rename the [config.json.example](config.json.example) to **config.json** and fill in the following:
