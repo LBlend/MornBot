@@ -14,6 +14,8 @@ with open('config.json', 'r', encoding='utf8') as f:
 
 
 async def set_profile_color(color):
+    """Converts anilist colors to hext"""
+
     colors = {
         'blue': 0x3db4f2,
         'purple': 0xc063ff,
@@ -32,6 +34,8 @@ async def set_profile_color(color):
 
 
 async def convert_media_format(media_format):
+    """Formats media format names"""
+
     media_formats = {
         'TV': 'TV-Serie',
         'TV_SHORT': 'Kort TV-Serie',
@@ -49,6 +53,8 @@ async def convert_media_format(media_format):
 
 
 async def convert_status(status):
+    """Formats status names"""
+
     statuses = {
         'FINISHED': 'Fullført',
         'RELEASING': 'Pågående',
@@ -69,10 +75,12 @@ class Anime(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.group()
     async def anilist(self, ctx):
+        """Se informasjon om noe fra Anilist"""
+
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
-    @anilist.command()
+    @anilist.command(aliases=['anime', 'animeprofile'])
     async def animeprofil(self, ctx, *, bruker: str):
         """Viser animeinformasjon til en Anilist-profil"""
 
@@ -137,7 +145,7 @@ class Anime(commands.Cog):
             color = await set_profile_color(color)
 
             embed = discord.Embed(title=user_name, color=color, url=url)
-            embed.set_author(name='Anilist', icon_url='https://avatars3.githubusercontent.com/u/18018524?s=200&v=4')
+            embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
             embed.set_thumbnail(url=profile_pic)
             embed.add_field(name='Gj.snittlig vurdering', value=anime_mean_score)
             embed.add_field(name='Antall dager sett', value=days_watched)
@@ -213,7 +221,7 @@ class Anime(commands.Cog):
             color = await set_profile_color(color)
 
             embed = discord.Embed(title=user_name, color=color, url=url)
-            embed.set_author(name='Anilist', icon_url='https://avatars3.githubusercontent.com/u/18018524?s=200&v=4')
+            embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
             embed.set_thumbnail(url=profile_pic)
             embed.add_field(name='Gj.snittlig vurdering', value=manga_mean_score)
             embed.add_field(name='Antall kapitler lest', value=chapters_read)
@@ -404,7 +412,7 @@ class Anime(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def manga(self, ctx, *, manganavn: str):
-        """Viser informasjon om en anime"""
+        """Viser informasjon om en manga"""
 
         async with ctx.channel.typing():
 
