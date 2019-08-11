@@ -13,7 +13,7 @@ with open('config.json', 'r', encoding='utf8') as f:
     prefix = config['prefix']
 
 
-async def set_profile_color(color):
+async def set_color(color):
     """Converts anilist colors to hext"""
 
     colors = {
@@ -142,7 +142,7 @@ class Anime(commands.Cog):
                 anime_mean_score = '**Ingen**'
 
             color = data['options']['profileColor']
-            color = await set_profile_color(color)
+            color = await set_color(color)
 
             embed = discord.Embed(title=user_name, color=color, url=url)
             embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
@@ -218,7 +218,7 @@ class Anime(commands.Cog):
                 manga_mean_score = '**Ingen**'
 
             color = data['options']['profileColor']
-            color = await set_profile_color(color)
+            color = await set_color(color)
 
             embed = discord.Embed(title=user_name, color=color, url=url)
             embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
@@ -255,6 +255,7 @@ class Anime(commands.Cog):
                     meanScore
                     coverImage {
                         large
+                        color
                     }
                     startDate {
                         year
@@ -315,6 +316,13 @@ class Anime(commands.Cog):
             cover_image = data['coverImage']['large']
             banner_image = data['bannerImage']
             mean_score = data['meanScore']
+
+            color = data['coverImage']['color']
+            if not color:
+                color = 0x02A9FF
+            else:
+                color = color.replace('#', '0x')
+                color = int(color, 0)
 
             title_romaji = data['title']['romaji']
             title_native = data['title']['native']
@@ -384,7 +392,7 @@ class Anime(commands.Cog):
             media_format = data['format']
             media_format = await convert_media_format(media_format)
 
-            embed = discord.Embed(color=0x02A9FF, title=title_romaji, url=url,
+            embed = discord.Embed(color=color, title=title_romaji, url=url,
                                   description=f'{title_native}\n{title_english}')
             embed.set_thumbnail(url=cover_image)
             embed.add_field(name='Format', value=media_format)
@@ -431,6 +439,7 @@ class Anime(commands.Cog):
                         meanScore
                         coverImage {
                             large
+                            color
                         }
                         startDate {
                             year
@@ -485,6 +494,13 @@ class Anime(commands.Cog):
             banner_image = data['bannerImage']
             mean_score = data['meanScore']
 
+            color = data['coverImage']['color']
+            if not color:
+                color = 0x02A9FF
+            else:
+                color = color.replace('#', '0x')
+                color = int(color, 0)
+
             title_romaji = data['title']['romaji']
             title_native = data['title']['native']
             title_english = data['title']['english']
@@ -532,7 +548,7 @@ class Anime(commands.Cog):
             media_format = data['format']
             media_format = await convert_media_format(media_format)
 
-            embed = discord.Embed(color=0x02A9FF, title=title_romaji, url=url,
+            embed = discord.Embed(color=color, title=title_romaji, url=url,
                                   description=f'{title_native}\n{title_english}')
             embed.set_thumbnail(url=cover_image)
             embed.add_field(name='Format', value=media_format)
