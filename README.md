@@ -32,19 +32,16 @@ The other fields are only required for certain commands to work. These commands 
 
 If you for some reason want to clean up my shitty code/contribute then these are the requirements:
 
-* Code should meet the PEP8 standard, max 120 char length
+* Code meets the PEP8 standard (max 120 char length)
 * Use single quotes unless it's necessary to use double quotation marks
-* Multi-line comments should use double quotation marks
-* Var names should be lowercase. Split word with `_`
+* Use double quotation marks for multi-line comments 
+* Use snake_case var names
+* Var names that are not exposed to the user through e.g. help messages should be in english
+* Use embeds unless you have a good reason for not doing so. Default embed color should be set to `ctx.me.color`
 
-It is preferred that you also consider the following, however it is not required:
-
-* Use embeds, default embed color should be set to `ctx.me.color`
-* All responses should be in norwegian
+This is not required, but preferred:
+* Messages and all text exposed to the user should be in norwegian
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
-
-
