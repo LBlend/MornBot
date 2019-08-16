@@ -64,8 +64,7 @@ class Twitch(commands.Cog):
                 return await ctx.send(embed=embed)
 
             embed.add_field(name='🔴 Sender direkte nå', value=f'**Antall som ser på:**\n{views}\n\n' +
-                                                                         f'**Tittel:**\n{livestream_title}\n\n' +
-                                                                         f'**Spill:**\n{livestream_game}', inline=False)
+                            f'**Tittel:**\n{livestream_title}\n\n**Spill:**\n{livestream_game}', inline=False)
             embed.set_image(url=livestream_preview)
             await ctx.send(embed=embed)
 

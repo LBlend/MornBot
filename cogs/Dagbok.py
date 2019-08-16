@@ -2,7 +2,6 @@ from discord.ext import commands
 import discord
 
 import pymongo
-from json import load as json_load
 from os import remove
 from math import ceil
 import json
@@ -79,7 +78,7 @@ class Dagbok(commands.Cog):
                                                               'bekrefte\n\n**Dette vil slette alle dine data og ' +
                                                               'stoppe loggingen av fremtidige meldinger frem til du ' +
                                                               'skrur den på igjen.** Om du vil hente ut data før du ' +
-                                                              f'sletter, kan du skrive `{prefix}dagbok data`')
+                                                              f'sletter, kan du skrive `{self.bot.prefix}dagbok data`')
         confirmation_msg = await ctx.send(embed=embed)
         await confirmation_msg.add_reaction('✅')
 
@@ -112,7 +111,7 @@ class Dagbok(commands.Cog):
 
         if database_user is None:
             return await Defaults.error_warning_send(ctx, text='Du ligger ikke i databasen. ' +
-                                                               f'Skriv `{prefix}dagbok på` for å legge deg inn')
+                                                               f'Skriv `{self.bot.prefix}dagbok på` for å legge deg inn')
 
         try:
             entries = list(database_user['data'].keys())
@@ -157,7 +156,7 @@ class Dagbok(commands.Cog):
 
         if database_user is None:
             return await Defaults.error_warning_send(ctx, text='Du ligger ikke i databasen. ' +
-                                                               f'Skriv `{prefix}dagbok på` for å legge deg inn')
+                                                               f'Skriv `{self.bot.prefix}dagbok på` for å legge deg inn')
         try:
             data = database_user['data'][f'{dato}']
             embed = discord.Embed(color=color, description=data)

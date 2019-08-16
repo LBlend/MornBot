@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+import discord
 
 from requests import post
 from re import sub

@@ -118,7 +118,7 @@ class Info(commands.Cog):
             region_name = str(ctx.guild.region).title()
 
         features_string = ''
-        if ctx.guild.features != []:
+        if ctx.guild.features is not []:
             features = {
                 'VIP_REGIONS': 'VIP',
                 'VANITY_URL': 'Egen URL',
@@ -512,7 +512,7 @@ class Info(commands.Cog):
 
         description = '**Ingen**'
         if kanal.topic:
-         description = kanal.topic
+            description = kanal.topic
 
         members = []
         for member in kanal.members:
@@ -738,7 +738,7 @@ class Info(commands.Cog):
                 spill = member.activity.name
                 users.append(f'{member.name}#{member.discriminator}')
 
-        if users == []:
+        if users is []:
             embed = discord.Embed(color=ctx.me.color, description='Det er ingen som spiller dette spillet')
             return await ctx.send(embed=embed)
 

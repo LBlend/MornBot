@@ -84,6 +84,7 @@ async def on_ready():
 
 database_col_cog_check = pymongo.MongoClient(bot.database)['discord']['cog_check']
 
+
 @bot.check
 async def cog_blacklist(ctx):
     cog_check = database_col_cog_check.find_one({'_id': ctx.guild.id})

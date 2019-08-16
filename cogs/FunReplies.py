@@ -2,7 +2,6 @@ from discord.ext import commands
 import discord
 
 import pymongo
-from json import load as json_load
 
 
 class FunReplies(commands.Cog):

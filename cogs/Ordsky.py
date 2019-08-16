@@ -4,7 +4,6 @@ from discord.ext import commands
 import pymongo
 
 from codecs import open
-from json import load as json_load
 import json
 
 from PIL import Image
@@ -58,7 +57,7 @@ class Ordsky(commands.Cog):
 
         if database_user is None:
             self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
-            database_user = self.database_col_ordsky.find_one(database_find)
+            self.database_col_ordsky.find_one(database_find)
             self.database_col_ordsky.update_one(database_find, {'$set': {'ordsky_consent': True}})
         else:
             self.database_col_ordsky.update_one(database_find, {'$set': {'ordsky_consent': True}})
@@ -150,7 +149,7 @@ class Ordsky(commands.Cog):
 
         if database_user is None:
             self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
-            database_user = self.database_col_ordsky.find_one(database_find)
+            self.database_col_ordsky.find_one(database_find)
 
         database_user = self.database_col_ordsky.find_one(database_find)
 

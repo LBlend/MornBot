@@ -82,8 +82,7 @@ class BotInfo(commands.Cog):
         embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name='📩 Invitasjonslenke', value='[Klikk her](https://discordapp.com/oauth2/authorize?client' +
-                                                          f'_id={self.bot.user.id}&permissions=388174&scope=bot) ' +
-                                                          'for å invitere meg til serveren din')
+                        f'_id={self.bot.user.id}&permissions=388174&scope=bot)for å invitere meg til serveren din')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 

@@ -112,7 +112,7 @@ class ServerManagement(commands.Cog):
         except TypeError:
             return await Defaults.error_warning_send(ctx, text='Det er ingen avskrudde cogs')
         
-        if disabled == []:
+        if disabled is []:
             return await Defaults.error_warning_send(ctx, text='Det er ingen avskrudde cogs')
 
         disabled = '\n'.join(disabled)
@@ -120,7 +120,6 @@ class ServerManagement(commands.Cog):
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
-
 
 
 def setup(bot):

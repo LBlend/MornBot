@@ -125,7 +125,7 @@ class Konverter(commands.Cog):
                 verdi = float(verdi)
             except ValueError:
                 return await Defaults.error_warning_send(ctx, text='Sjekk om du har skrevet riktig tall\n\n' +
-                                                                f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+                                                         f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
             if verdi > 1000000000 or verdi < -1000000000:
                 return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
@@ -152,7 +152,7 @@ class Konverter(commands.Cog):
 
             except KeyError:
                 return await Defaults.error_warning_send(ctx, text='Sjekk om du har satt gyldige valutaer\n\n' +
-                                                                f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+                                                         f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -189,7 +189,7 @@ class Konverter(commands.Cog):
         meassurement_type = måleenhet
         try:
             måleenhet = meassurements[måleenhet]
-        except:
+        except KeyError:
             return await Defaults.error_warning_send(ctx, text='Ugyldig måleenhet. Prøv en av følgende ```\n' +
                                                                'mm\ncm\nm\nkm\n```')
 
