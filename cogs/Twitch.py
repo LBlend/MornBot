@@ -1,18 +1,11 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
 import locale
 
 from requests import get
 
 from cogs.utils import Defaults, LBlend_utils
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    twitch_api_key = config['twitch_api_key']
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -29,6 +22,8 @@ class Twitch(commands.Cog):
 
         async with ctx.channel.typing():
 
+            twitch_api_key = self.bot.api_keys['twitch_api_key']
+
             bruker = await LBlend_utils.input_sanitizer(bruker)
 
             user_data = get(f'https://api.twitch.tv/kraken/users/{bruker}?client_id={twitch_api_key}').json()
@@ -38,8 +33,8 @@ class Twitch(commands.Cog):
             try:
                 profile_pic = user_data['logo']
             except KeyError:
-                return await Defaults.error_fatal_send(ctx, text='Fant ikke bruker!\n\n' +
-                                                                 f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                return await Defaults.error_fatal_send(ctx, text='Fant ikke bruker!\n\nSkriv ' +
+                                                                 f'`{self.bot.prefix}help {ctx.command}` for hjelp')
 
             username = user_data['display_name']
             name = user_data['name']

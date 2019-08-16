@@ -308,7 +308,7 @@ class DevTools(commands.Cog):
         try:
             await self.bot.change_presence(status=status_type,
                                            activity=discord.Activity(type=activity_type, name=message))
-            embed = discord.Embed(color=ctx.me.color, description='Endret Presence! :ok_hand:')
+            embed = discord.Embed(color=ctx.me.color, description='Endret Presence!')
             await ctx.send(embed=embed)
         except:
             await Defaults.error_warning_send(ctx, text='Error!')
@@ -343,7 +343,7 @@ class DevTools(commands.Cog):
         else:
             await guild.leave()
             try:
-                embed = discord.Embed(color=ctx.me.color, description='Forlatt guild! :ok_hand:')
+                embed = discord.Embed(color=ctx.me.color, description='Forlatt guild!')
                 await ctx.send(embed=embed)
             except:
                 pass
@@ -359,7 +359,7 @@ class DevTools(commands.Cog):
         except AttributeError:
             return await Defaults.error_fatal_send(ctx, text=f'{command} er ikke en command', mention=False)
 
-        embed = discord.Embed(color=ctx.me.color, description='Fjernet cooldown! :ok_hand:')
+        embed = discord.Embed(color=ctx.me.color, description='Fjernet cooldown!')
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True, external_emojis=True)

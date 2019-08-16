@@ -1,19 +1,10 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
-
 from math import ceil
 from operator import itemgetter
 
 from cogs.utils import Defaults
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    website = config['website']
-    github = config['github']
 
 
 class Info(commands.Cog):
@@ -60,7 +51,7 @@ class Info(commands.Cog):
         roles.reverse()
         roles = ', '.join(roles)
         if len(roles) > 1024:
-            roles = f'Skriv `{prefix}guildroller` for å se rollene'
+            roles = f'Skriv `{self.bot.prefix}guildroller` for å se rollene'
         if roles == '':
             roles = '**Ingen roller**'
 
@@ -71,7 +62,7 @@ class Info(commands.Cog):
             boosters.append(booster.mention)
         boosters = ' '.join(boosters)
         if len(boosters) > 1024:
-            boosters = f'Skriv `{prefix}boosters` for å se boosters'
+            boosters = f'Skriv `{self.bot.prefix}boosters` for å se boosters'
         if boosters == '':
             boosters = '**Ingen boosters**'
 
@@ -169,7 +160,8 @@ class Info(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color, description=f'**Verifiseringskrav:** {verification}\n' +
                                                               f'**Innholdsfilter:** {content}\n' +
-                                                              f'**Boost Tier:** {ctx.guild.premium_tier}')
+                                                              f'**Boost Tier:** {ctx.guild.premium_tier}\n' +
+                                                              f'**Emoji:** {len(ctx.guild.emojis)}')
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         embed.set_thumbnail(url=ctx.guild.icon_url_as(static_format='png'))
         embed.add_field(name='ID', value=ctx.guild.id)
@@ -183,10 +175,10 @@ class Info(commands.Cog):
         embed.add_field(name=f'Medlemmer ({total_members})',
                         value=f'👤 Mennesker: **{int(total_members) - int(bot_members)}**\n' +
                               f'🤖 Båtter: **{bot_members}**\n' +
-                              f'<:online:516328785910431754>{online_members} ' +
-                              f'<:idle:516328783347843082>{idle_members} ' +
-                              f'<:dnd:516328782844395579>{dnd_members} ' +
-                              f'<:offline:516328785407246356>{offline_members}')
+                              f'{self.bot.emoji["online"]}{online_members} ' +
+                              f'{self.bot.emoji["idle"]}{idle_members} ' +
+                              f'{self.bot.emoji["dnd"]}{dnd_members} ' +
+                              f'{self.bot.emoji["offline"]}{offline_members}')
         embed.add_field(name=f'Roller ({len(ctx.guild.roles) - 1})', value=roles, inline=False)
         if ctx.guild.premium_tier is not 0:
             embed.add_field(name=f'Boosters ({ctx.guild.premium_subscription_count})', value=boosters, inline=False)
@@ -241,7 +233,8 @@ class Info(commands.Cog):
         boosters = []
         premium_subscribers = sorted(ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
         for booster in premium_subscribers:
-            boosters.append(booster.mention)
+            date = booster.premium_since.strftime('%d.%m.%Y %H:%M')
+            boosters.append(f'{booster.mention} - {date}')
         boosters = ' '.join(boosters)
 
         embed = discord.Embed(color=ctx.me.color, description=boosters)
@@ -352,7 +345,7 @@ class Info(commands.Cog):
         roles = ', '.join(roles)
 
         if len(roles) > 1024:
-            roles = f'Skriv `{prefix}{ctx.command}` for å se rollene'
+            roles = f'Skriv `{self.bot.prefix}{ctx.command}` for å se rollene'
         if roles == '':
             roles = '**Ingen roller**'
 

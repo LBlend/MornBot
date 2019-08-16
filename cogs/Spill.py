@@ -42,7 +42,7 @@ class Spill(commands.Cog):
                                                                f'```\n{available_languages}\n```')
 
         random_num = random.randint(30, 70)
-        with open(f'./assets/{path}_words.txt', 'r', encoding='utf-8') as f:
+        with open(f'./assets/skrivetest/{path}_words.txt', 'r', encoding='utf-8') as f:
             words = [line.split(',') for line in f.readlines()]
             words = words[0]
             random.shuffle(words)

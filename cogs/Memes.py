@@ -5,11 +5,7 @@ from os import remove
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
-from requests import get
-import shutil
-import functools
-
-from cogs.utils import Defaults, LBlend_utils
+from cogs.utils import Defaults
 
 
 def format_text(text, textbox_width, font_ttf):
@@ -38,7 +34,7 @@ class Memes(commands.Cog):
             top_text, top_font = format_text(dorli_tekst, 1000, font)
             bottom_text, bottom_font = format_text(bra_tekst, 1000, font)
 
-            image = Image.open(f'./assets/desanti.png').convert('RGBA')
+            image = Image.open(f'./assets/meme_templates/desanti.png').convert('RGBA')
             color = (0, 0, 0, 255)
 
             top = Image.new('RGBA', (638, 688), (255, 255, 255, 255))
@@ -55,17 +51,17 @@ class Memes(commands.Cog):
             draw.multiline_text(font_size, bottom_text, font=bottom_font, fill=color, align='center')
             image.paste(bottom, (654, 701))
 
-            image.save(f'./assets/{ctx.author.id}_edit.png')
+            image.save(f'./assets/temp/{ctx.author.id}_edit.png')
 
-            f = discord.File(f'./assets/{ctx.author.id}_edit.png')
+            f = discord.File(f'./assets/temp/{ctx.author.id}_edit.png')
             embed = discord.Embed()
             embed.set_image(url=f'attachment://{ctx.author.id}_edit.png')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed, file=f)
 
             try:
-                remove(f'./assets/{ctx.author.id}_raw.png')
-                remove(f'./assets/{ctx.author.id}_edit.png')
+                remove(f'./assets/temp/{ctx.author.id}_raw.png')
+                remove(f'./assets/temp/{ctx.author.id}_edit.png')
             except:
                 pass
 
@@ -81,7 +77,7 @@ class Memes(commands.Cog):
             top_text, top_font = format_text(dorli_tekst, 800, font)
             bottom_text, bottom_font = format_text(bra_tekst, 800, font)
 
-            image = Image.open(f'./assets/egon.png').convert('RGBA')
+            image = Image.open(f'./assets/meme_templates/egon.png').convert('RGBA')
             color = (0, 0, 0, 255)
 
             top = Image.new('RGBA', (493, 423), (255, 255, 255, 255))
@@ -98,17 +94,17 @@ class Memes(commands.Cog):
             draw.multiline_text(font_size, bottom_text, font=bottom_font, fill=color, align='center')
             image.paste(bottom, (531, 432))
 
-            image.save(f'./assets/{ctx.author.id}_edit.png')
+            image.save(f'./assets/temp/{ctx.author.id}_edit.png')
 
-            f = discord.File(f'./assets/{ctx.author.id}_edit.png')
+            f = discord.File(f'./assets/temp/{ctx.author.id}_edit.png')
             embed = discord.Embed()
             embed.set_image(url=f'attachment://{ctx.author.id}_edit.png')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed, file=f)
 
             try:
-                remove(f'./assets/{ctx.author.id}_raw.png')
-                remove(f'./assets/{ctx.author.id}_edit.png')
+                remove(f'./assets/temp/{ctx.author.id}_raw.png')
+                remove(f'./assets/temp/{ctx.author.id}_edit.png')
             except:
                 pass
 

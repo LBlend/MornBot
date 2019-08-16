@@ -13,7 +13,7 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        status = {False: "✔", True: "❌"}
+        status = {False: "✔ ", True: "❌ "}
         print(f'{datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | ' +
               f'{ctx.command} {status[ctx.command_failed]} - ' +
               f'{ctx.author.name}#{ctx.author.discriminator} ({ctx.author.id}) | ' +
@@ -22,7 +22,10 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         
-        self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
+        try:
+            self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)
+        except AttributeError:
+            pass
         
         if hasattr(ctx.command, 'on_error'):
             return

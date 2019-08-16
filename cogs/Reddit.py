@@ -1,8 +1,6 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
 import locale
 
 import praw
@@ -10,11 +8,6 @@ from random import randint, choice
 from datetime import datetime
 
 from cogs.utils import Defaults
-
-with open('./config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    reddit_client_id = config['reddit_client_id']
-    reddit_secret = config['reddit_secret']
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -31,7 +24,9 @@ class Reddit(commands.Cog):
 
         async with ctx.channel.typing():
 
-            reddit = praw.Reddit(client_id=reddit_client_id, client_secret=reddit_secret, user_agent='MornBot')
+            reddit = praw.Reddit(client_id=self.bot.api_keys['reddit_client_id'],
+                                 client_secret=self.bot.api_keys['reddit_secret'],
+                                 user_agent='MornBot')
 
             sub = reddit.subreddit(subreddit)
 
@@ -65,7 +60,9 @@ class Reddit(commands.Cog):
 
         async with ctx.channel.typing():
 
-            reddit = praw.Reddit(client_id=reddit_client_id, client_secret=reddit_secret, user_agent='MornBot')
+            reddit = praw.Reddit(client_id=self.bot.api_keys['reddit_client_id'],
+                                 client_secret=self.bot.api_keys['reddit_secret'],
+                                 user_agent='MornBot')
 
             bruker = reddit.redditor(bruker)
 
@@ -111,7 +108,9 @@ class Reddit(commands.Cog):
 
         async with ctx.channel.typing():
 
-            reddit = praw.Reddit(client_id=reddit_client_id, client_secret=reddit_secret, user_agent='MornBot')
+            reddit = praw.Reddit(client_id=self.bot.api_keys['reddit_client_id'],
+                                 client_secret=self.bot.api_keys['reddit_secret'],
+                                 user_agent='MornBot')
 
             sub = reddit.subreddit(subreddit)
             try:
@@ -150,7 +149,9 @@ class Reddit(commands.Cog):
 
         async with ctx.channel.typing():
 
-            reddit = praw.Reddit(client_id=reddit_client_id, client_secret=reddit_secret, user_agent='MornBot')
+            reddit = praw.Reddit(client_id=self.bot.api_keys['reddit_client_id'],
+                                 client_secret=self.bot.api_keys['reddit_secret'],
+                                 user_agent='MornBot')
 
             sub = reddit.subreddit('copypasta')
 

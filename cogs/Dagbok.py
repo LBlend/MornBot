@@ -10,19 +10,11 @@ import asyncio
 
 from cogs.utils import Defaults
 
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    mongodb_url = config['mongodb_url']
-
-mongo = pymongo.MongoClient(mongodb_url)
-database = mongo['discord']
-database_col_dagbok = database['dagbok']
-
 
 class Dagbok(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.database_col_dagbok = pymongo.MongoClient(bot.database)['discord']['dagbok']
 
     async def react(self, message):
         if message.author.bot:
@@ -31,14 +23,14 @@ class Dagbok(commands.Cog):
         if message.content.lower().startswith('kjære dagbok:') or message.content.lower().startswith('kjære dagbok,'):
 
             database_find = {'_id': message.author.id}
-            database_user = database_col_dagbok.find_one(database_find)
+            database_user = self.database_col_dagbok.find_one(database_find)
 
             if database_user is None:
                 return
 
             date = message.created_at.strftime('%d-%m-%Y')
             
-            database_col_dagbok.update_one(database_find,
+            self.database_col_dagbok.update_one(database_find,
                                            {'$set': {f'data.{date}': message.clean_content}}, upsert=True)
 
             try:
@@ -51,6 +43,8 @@ class Dagbok(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.group()
     async def dagbok(self, ctx):
+        """Start meldingen din med 'Kjære dagbok,' og se en samling av meldingene dine her"""
+
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
@@ -59,14 +53,14 @@ class Dagbok(commands.Cog):
         """Legger deg inn i databasen"""
 
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_dagbok.find_one(database_find)
+        database_user = self.database_col_dagbok.find_one(database_find)
         if database_user is not None:
             embed = discord.Embed(description='Du ligger allerede i databasen')
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
 
-        database_col_dagbok.insert_one({'_id': ctx.author.id})
-        embed = discord.Embed(description=':white_check_mark: Du er nå i lagt inn i databasen')
+        self.database_col_dagbok.insert_one({'_id': ctx.author.id})
+        embed = discord.Embed(description='✅ Du er nå i lagt inn i databasen')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -75,7 +69,7 @@ class Dagbok(commands.Cog):
         """Sletter deg fra databasen"""
 
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_dagbok.find_one(database_find)
+        database_user = self.database_col_dagbok.find_one(database_find)
         if database_user is None:
             embed = discord.Embed(description='Du lå ikke i databasen fra før av')
             await Defaults.set_footer(ctx, embed)
@@ -99,8 +93,8 @@ class Dagbok(commands.Cog):
             await confirmation_msg.edit(embed=embed)
             await confirmation_msg.remove_reaction('✅', ctx.me)
         else:
-            database_col_dagbok.delete_one(database_user)
-            embed = discord.Embed(description=':white_check_mark: Dine data har blitt slettet!')
+            self.database_col_dagbok.delete_one(database_user)
+            embed = discord.Embed(description='✅ Dine data har blitt slettet!')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -109,7 +103,7 @@ class Dagbok(commands.Cog):
         """Se hvilke dager som ligger i dagboka"""
 
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_dagbok.find_one(database_find)
+        database_user = self.database_col_dagbok.find_one(database_find)
 
         if str(ctx.author.color) != '#000000':
             color = ctx.author.color
@@ -154,7 +148,7 @@ class Dagbok(commands.Cog):
         """Hent opp dagboka di fra en dato"""
 
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_dagbok.find_one(database_find)
+        database_user = self.database_col_dagbok.find_one(database_find)
 
         if str(ctx.author.color) != '#000000':
             color = ctx.author.color
@@ -179,7 +173,7 @@ class Dagbok(commands.Cog):
         """Sender deg dine data"""
 
         database_find = {'_id': ctx.author.id}
-        database_user = database_col_dagbok.find_one(database_find)
+        database_user = self.database_col_dagbok.find_one(database_find)
 
         if database_user is None:
             return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg')
@@ -189,19 +183,19 @@ class Dagbok(commands.Cog):
         except KeyError:
             return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg')
 
-        with open(f'./assets/{ctx.author.id}.json', 'w') as f:
+        with open(f'./assets/temp/{ctx.author.id}.json', 'w') as f:
             json.dump(database_user, f, indent=4)
 
         try:
-            await ctx.author.send(file=discord.File(f'./assets/{ctx.author.id}.json'))
-            embed = discord.Embed(color=0x0085ff, description=':white_check_mark: Dine data har ' +
+            await ctx.author.send(file=discord.File(f'./assets/temp/{ctx.author.id}.json'))
+            embed = discord.Embed(color=0x0085ff, description='✅ Dine data har ' +
                                                               'blitt sendt i DM!')
             await ctx.send(embed=embed)
         except:
             await Defaults.error_fatal_send(ctx, text='Sending av data feilet! Sjekk om du har blokkert meg')
 
         try:
-            remove(f'./assets/{ctx.author.id}.txt')
+            remove(f'./assets/temp/{ctx.author.id}.txt')
         except:
             pass
 

@@ -1,0 +1,38 @@
+# Bot settings
+bot:
+  token:
+  prefix: m!
+  presence: m!help
+  presence_activity: watching
+
+# API Keys
+api:
+  openweathermap_api_key:
+  osu_api_key:
+  twitch_api_key:
+  ksoft_authentication:
+  reddit_client_id:
+  reddit_secret:
+
+# Database
+database:
+
+# Emoji
+emoji:
+  online: <:online:516328785910431754>
+  idle: <:idle:516328783347843082>
+  dnd: <:dnd:516328782844395579>
+  offline: <:offline:516328785407246356>
+  osu_ss_silver: <:GradeSSSilver:609830030402387981>
+  osu_ss: <:GradeSS:609830028842237962>
+  osu_s_silver: <:GradeSSilver:609830028913672193>
+  osu_s: <:GradeS:609830028729122843>
+  osu_a: <:GradeA:609830029177913344>
+
+# Misc
+misc:
+  website: https://lblend.moe/
+  source_code: https://github.com/LBlend
+  
+  
+

@@ -4,18 +4,11 @@ import discord
 import pymongo
 from json import load as json_load
 
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    mongodb_url = config['mongodb_url']
-
-mongo = pymongo.MongoClient(mongodb_url)
-database = mongo['discord']
-database_col_funreplies = database['funreplies']
-
 
 class FunReplies(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.database_col_funreplies = pymongo.MongoClient(self.bot.database)['discord']['funreplies']
 
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -23,6 +16,8 @@ class FunReplies(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.group()
     async def funreplies(self, ctx):
+        """Skru av/på responser som ikke krever prefiks"""
+
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
@@ -35,7 +30,7 @@ class FunReplies(commands.Cog):
 
         database_find = {'_id': kanal.id}
         try:
-            database_funreplies = database_col_funreplies.find_one(database_find)
+            database_funreplies = self.database_col_funreplies.find_one(database_find)
         except:
             return await ctx.send(f'{ctx.author.mention} Jeg har ikke tilkobling til databasen. ' +
                                   f'Be boteier om å fikse dette')
@@ -43,7 +38,7 @@ class FunReplies(commands.Cog):
         try:
             database_funreplies[f'{kanal.id}']
         except TypeError:
-            database_col_funreplies.insert_one({'_id': kanal.id, 'funreplies': True})
+            self.database_col_funreplies.insert_one({'_id': kanal.id, 'funreplies': True})
 
         embed = discord.Embed(color=ctx.me.color, description=f'FunReplies er nå skrudd **på** for {kanal.mention}')
         await ctx.send(embed=embed)
@@ -57,12 +52,12 @@ class FunReplies(commands.Cog):
 
         database_find = {'_id': kanal.id}
         try:
-            database_funreplies = database_col_funreplies.find_one(database_find)
+            database_funreplies = self.database_col_funreplies.find_one(database_find)
         except:
             return await ctx.send(f'{ctx.author.mention} Jeg har ikke tilkobling til databasen. ' +
                                   'Be boteier om å fikse dette')
 
-        database_col_funreplies.delete_one(database_funreplies)
+        self.database_col_funreplies.delete_one(database_funreplies)
 
         embed = discord.Embed(color=ctx.me.color, description=f'FunReplies er nå skrudd **av** for {kanal.mention}')
         await ctx.send(embed=embed)
@@ -72,7 +67,7 @@ class FunReplies(commands.Cog):
             return
 
         database_find = {'_id': message.channel.id}
-        channel = database_col_funreplies.find_one(database_find)
+        channel = self.database_col_funreplies.find_one(database_find)
         try:
             if not channel['funreplies']:
                 return
