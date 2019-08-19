@@ -30,7 +30,7 @@ class Dagbok(commands.Cog):
             date = message.created_at.strftime('%d-%m-%Y')
             
             self.database_col_dagbok.update_one(database_find,
-                                           {'$set': {f'data.{date}': message.clean_content}}, upsert=True)
+                                                {'$set': {f'data.{date}': message.content}}, upsert=True)
 
             try:
                 await message.add_reaction('✅')
