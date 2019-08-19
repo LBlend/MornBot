@@ -431,6 +431,41 @@ class Misc(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.is_nsfw()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def wiki(self, ctx, *, søkeord: str):
+        """Få en kort beskrivelse om et tema"""
+
+        async with ctx.channel.typing():
+
+            søkeord = await LBlend_utils.input_sanitizer(søkeord)
+
+            url = 'https://no.wikipedia.org/w/api.php?format=json&action=query&prop=extracts' +\
+                  f'&exintro&exsentences=5&explaintext&redirects=1&titles={søkeord}'
+            data = get(url).json()
+
+            pages = data['query']['pages']
+            for i in pages.keys():
+                index = i
+                break
+
+            try:
+                wiki_extract = data['query']['pages'][index]['extract']
+            except KeyError:
+                return await Defaults.error_fatal_send(ctx, text='Kunne ikke finne noe info om dette :(')
+
+            wiki_title = data['query']['pages'][index]['title']
+            url_title = wiki_title.replace(' ', '_')
+            wiki_url = f'https://no.wikipedia.org/wiki/{url_title}'
+
+            embed = discord.Embed(title=wiki_title, color=ctx.me.color, url=wiki_url, description=wiki_extract)
+            embed.set_author(name='Wikipedia', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/' +
+                                                        'Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def match(self, ctx, *, bruker: discord.Member=None):
