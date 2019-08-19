@@ -2,7 +2,7 @@
 *.yaml
 *.pyc
 *.log
-temp/
+/assets/temp/
 __pycache__/
 .vscode/
 venv/
