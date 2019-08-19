@@ -41,7 +41,7 @@ class Ordsky(commands.Cog):
         """Generer en ordsky basert på meldingene dine"""
 
         if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+            await self.generer.invoke(ctx)
 
     @commands.cooldown(1, 2, commands.BucketType.user)
     @ordsky.command(aliases=['consent'])
