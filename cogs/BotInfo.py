@@ -1,21 +1,12 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
-
 from time import time
 import platform
 from os import getpid
 from psutil import Process
 
 from cogs.utils import Defaults
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    website = config['website']
-    github = config['github']
 
 
 class BotInfo(commands.Cog):
@@ -59,7 +50,7 @@ class BotInfo(commands.Cog):
                 elif str(member.status) == 'offline':
                     offline_members.append(member.id)
 
-        embed = discord.Embed(color=ctx.me.color, url=website)
+        embed = discord.Embed(color=ctx.me.color, url=self.bot.misc['website'])
         embed.set_author(name=dev.name, icon_url=dev.avatar_url)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name='Dev', value=f'{dev.mention}\n{dev.name}#{dev.discriminator}')
@@ -71,13 +62,14 @@ class BotInfo(commands.Cog):
         embed.add_field(name='Ressursbruk', value=f'RAM: {memory_usage} MB\nCPU: {cpu_percent}%')
         embed.add_field(name='Maskin', value=f'{platform.system()} {platform.release()}')
         embed.add_field(name=f'Brukere ({len(total_members)})',
-                        value=f'<:online:516328785910431754>{len(online_members)} ' +
-                              f'<:idle:516328783347843082>{len(idle_members)} ' +
-                              f'<:dnd:516328782844395579>{len(dnd_members)} ' +
-                              f'<:offline:516328785407246356>{len(offline_members)}')
+                        value=f'{self.bot.emoji["online"]}{len(online_members)} ' +
+                              f'{self.bot.emoji["idle"]}{len(idle_members)} ' +
+                              f'{self.bot.emoji["dnd"]}{len(dnd_members)} ' +
+                              f'{self.bot.emoji["offline"]}{len(offline_members)}')
         embed.add_field(name='Lenker', value='[Inviter](https://discordapp.com/oauth2/authorize?client_' +
                                              f'id={self.bot.user.id}&permissions=388174&scope=bot) ' +
-                                             f'| [Nettside]({website}) | [Kildekode]({github})')
+                                             f'| [Nettside]({self.bot.misc["website"]}) ' +
+                                             f'| [Kildekode]({self.bot.misc["source_code"]})')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -89,9 +81,8 @@ class BotInfo(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        embed.add_field(name='📩 Invitasjonslenke', value='[Klikk her](https://discordapp.com/oauth2/authorize?clien' +
-                                                      f't_id={self.bot.user.id}&permissions=388174&scope=bot) ' +
-                                                      'for å invitere meg til serveren din')
+        embed.add_field(name='📩 Invitasjonslenke', value='[Klikk her](https://discordapp.com/oauth2/authorize?client' +
+                        f'_id={self.bot.user.id}&permissions=388174&scope=bot) for å invitere meg til serveren din')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -132,7 +123,8 @@ class BotInfo(commands.Cog):
         embed = discord.Embed(color=ctx.me.color)
         embed.set_thumbnail(url='https://cdn2.iconfinder.com/data/icons/black-' +
                                 'white-social-media/64/social_media_logo_github-512.png')
-        embed.add_field(name='🔗 Github Repo', value=f'[Klikk her]({github}) for å se den dritt skrevne kildekoden min')
+        embed.add_field(name='🔗 Github Repo',
+                        value=f'[Klikk her]({self.bot.misc["source_code"]}) for å se den dritt skrevne kildekoden min')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 

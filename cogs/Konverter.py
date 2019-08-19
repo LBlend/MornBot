@@ -1,8 +1,6 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
 import locale
 
 from requests import get
@@ -10,11 +8,6 @@ from datetime import datetime
 from re import sub
 
 from cogs.utils import Defaults
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    ksoft_auth = config['ksoft_authentication']
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -36,7 +29,7 @@ class Konverter(commands.Cog):
             tall = float(tall)
         except ValueError:
             return await Defaults.error_warning_send(ctx, text='Det du har skrevet inn er ikke et tall\n\n' +
-                                                               f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                               f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
         if tall > 1000000000 or tall < -1000000000:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
@@ -63,7 +56,7 @@ class Konverter(commands.Cog):
             tall = float(tall)
         except ValueError:
             return await Defaults.error_warning_send(ctx, text='Det du har skrevet inn er ikke et tall\n\n' +
-                                                               f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                               f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
         if tall > 1000000000 or tall < -1000000000:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
@@ -92,12 +85,12 @@ class Konverter(commands.Cog):
             høyde_meter = float(høyde_meter)
         except ValueError:
             return await Defaults.error_warning_send(ctx, text='Det du har skrevet inn er ikke et tall\n\n'
-                                                               f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                               f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
-        if vekt_kg > 1000000000 or vekt_kg < -1000000000:
+        if vekt_kg > 1000000000 or vekt_kg < 0:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
-        if høyde_meter > 1000000000 or høyde_meter < -1000000000:
+        if høyde_meter > 1000000000 or høyde_meter < 0:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
         bmi = round(vekt_kg / (høyde_meter * høyde_meter))
@@ -122,6 +115,9 @@ class Konverter(commands.Cog):
 
         async with ctx.channel.typing():
 
+            if self.bot.api_keys['ksoft_authentication'] is None:
+                return await Defaults.error_fatal_send(ctx, text='Jeg mangler API-nøkkel. Be båtteier om å fikse dette')
+
             if ',' in verdi:
                 verdi = sub(',', '.', verdi)
 
@@ -129,33 +125,34 @@ class Konverter(commands.Cog):
                 verdi = float(verdi)
             except ValueError:
                 return await Defaults.error_warning_send(ctx, text='Sjekk om du har skrevet riktig tall\n\n' +
-                                                                f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                         f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
-            if verdi > 1000000000 or verdi < -1000000000:
+            if verdi > 1000000000 or verdi < 0:
                 return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
             fra_valuta = fra_valuta.upper()
             til_valuta = til_valuta.upper()
 
             try:
-                data = get('https://api.ksoft.si/kumo/currency', headers={'Authorization': 'Bearer ' + ksoft_auth},
-                        params={
-                            'from': fra_valuta,
-                            'to': til_valuta,
-                            'value': verdi}).json()
+                data = get('https://api.ksoft.si/kumo/currency',
+                           headers={'Authorization': 'Bearer ' + self.bot.api_keys['ksoft_authentication']},
+                           params={
+                               'from': fra_valuta,
+                               'to': til_valuta,
+                               'value': verdi}).json()
 
                 verdi = locale.format_string('%.2f', verdi, grouping=True)
                 value = locale.format_string('%.2f', data['value'], grouping=True)
 
                 embed = discord.Embed(color=ctx.me.color,
-                                    description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
-                                    timestamp=datetime.utcnow())
+                                      description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
+                                      timestamp=datetime.utcnow())
                 await Defaults.set_footer(ctx, embed)
                 await ctx.send(embed=embed)
 
             except KeyError:
                 return await Defaults.error_warning_send(ctx, text='Sjekk om du har satt gyldige valutaer\n\n' +
-                                                                f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                         f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -170,9 +167,9 @@ class Konverter(commands.Cog):
             tall = float(tall)
         except ValueError:
             return await Defaults.error_warning_send(ctx, text='Du må gi meg et tall\n\n' +
-                                                               f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                               f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
-        if tall > 1000000000 or tall < -1000000000:
+        if tall > 1000000000 or tall < 0:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt')
 
         meassurements = {
@@ -192,7 +189,7 @@ class Konverter(commands.Cog):
         meassurement_type = måleenhet
         try:
             måleenhet = meassurements[måleenhet]
-        except:
+        except KeyError:
             return await Defaults.error_warning_send(ctx, text='Ugyldig måleenhet. Prøv en av følgende ```\n' +
                                                                'mm\ncm\nm\nkm\n```')
 

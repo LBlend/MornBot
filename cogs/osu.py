@@ -1,20 +1,13 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
 import locale
 
 from requests import get
 import urllib.parse
+from datetime import datetime
 
 from cogs.utils import Defaults
-
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    osu_api_key = config['osu_api_key']
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -51,15 +44,15 @@ class Osu(commands.Cog):
                     {
                         'u': osu_user,
                         'm': gamemode,
-                        'k': osu_api_key
+                        'k': self.bot.api_keys['osu_api_key']
                      })
                 data = get(url).json()
 
                 osu_user_id = data[0]['user_id']
 
             except IndexError:
-                return await Defaults.error_fatal_send(ctx, text='Fant ikke bruker!\n\n ' +
-                                                                 f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                return await Defaults.error_fatal_send(ctx, text='Fant ikke bruker!\n\nSkriv ' +
+                                                                 f'`{self.bot.prefix}help {ctx.command}` for hjelp')
 
             user_url = f'https://osu.ppy.sh/users/{osu_user_id}'
             profile_pic = f'http://a.ppy.sh/{osu_user_id}'
@@ -84,15 +77,15 @@ class Osu(commands.Cog):
             a_ranks = data[0]['count_rank_a']
             playcount = int(data[0]['playcount'])
             playcount = locale.format_string('%d', playcount, grouping=True)
-            join_date = data[0]['join_date']
+            join_date = datetime.strptime(data[0]['join_date'], '%Y-%m-%d %H:%M:%S').strftime('%d.%m.%Y %H:%M:%S')
             hours_played = round((int(data[0]['total_seconds_played']) / 60) / 60)
 
             embed = discord.Embed(title=username, color=0xCC5288, url=user_url,
-                                  description=f'<:GradeSSSilver:609830030402387981>{ssh_ranks} ' +
-                                              f'<:GradeSS:609830028842237962>{ss_ranks} ' +
-                                              f'<:GradeSSilver:609830028913672193>{sh_ranks} ' +
-                                              f'<:GradeS:609830028729122843>{s_ranks} ' +
-                                              f'<:GradeA:609830029177913344>{a_ranks}')
+                                  description=f'{self.bot.emoji["osu_ss_silver"]}{ssh_ranks} ' +
+                                              f'{self.bot.emoji["osu_ss"]}{ss_ranks} ' +
+                                              f'{self.bot.emoji["osu_s_silver"]}{sh_ranks} ' +
+                                              f'{self.bot.emoji["osu_s"]}{s_ranks} ' +
+                                              f'{self.bot.emoji["osu_a"]}{a_ranks}')
             embed.set_author(name='osu!', icon_url='https://upload.wikimedia.org/wikipedia/commons/' +
                                                    'd/d3/Osu%21Logo_%282015%29.png')
             embed.set_thumbnail(url=profile_pic)
@@ -102,10 +95,7 @@ class Osu(commands.Cog):
             embed.add_field(name='Accuracy', value=f'{acc}%')
             embed.add_field(name='Level', value=level)
             embed.add_field(name='Play Count', value=playcount)
-
-            #   Ja, dette er ekte. Ikke klag, det funker
-            embed.set_footer(text=f'Joined: {join_date[8:10]}.{join_date[5:7]}.{join_date[:4]} ' +
-                                  f'{join_date[11:]} | Hours played: {hours_played}')
+            embed.set_footer(text=f'Joined: {join_date} UTC | Hours played: {hours_played}')
             await ctx.send(embed=embed)
 
 

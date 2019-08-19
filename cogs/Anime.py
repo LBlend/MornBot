@@ -1,16 +1,10 @@
-import discord
 from discord.ext import commands
+import discord
 
-from codecs import open
-from json import load as json_load
 from requests import post
 from re import sub
 
 from cogs.utils import Defaults
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
 
 
 async def set_color(color):
@@ -123,8 +117,7 @@ class Anime(commands.Cog):
             except TypeError:
                 return await Defaults.error_fatal_send(
                     ctx, text='Kunne ikke finne brukeren\n\n' +
-                        f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                        mention=False)
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
             user_name = data['name']
             profile_pic = data['avatar']['large']
@@ -200,7 +193,7 @@ class Anime(commands.Cog):
             except TypeError:
                 return await Defaults.error_fatal_send(
                     ctx, text='Kunne ikke finne brukeren\n\n' +
-                        f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
             user_name = data['name']
             profile_pic = data['avatar']['large']
@@ -305,8 +298,7 @@ class Anime(commands.Cog):
             except TypeError:
                 return await Defaults.error_fatal_send(
                     ctx, text='Kunne ikke finne animen\n\n' +
-                              f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                    mention=False)
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
             nsfw = data['isAdult']
             if nsfw:
@@ -482,8 +474,7 @@ class Anime(commands.Cog):
             except TypeError:
                 return await Defaults.error_fatal_send(
                     ctx, text='Kunne ikke finne mangaen\n\n' +
-                              f'Skriv `{prefix}help {ctx.command}` for hjelp',
-                    mention=False)
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
             nsfw = data['isAdult']
             if nsfw:

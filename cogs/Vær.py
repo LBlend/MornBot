@@ -1,19 +1,11 @@
 from discord.ext import commands
 import discord
 
-from codecs import open
-from json import load as json_load
-
 from requests import get
 import urllib.parse
 from datetime import datetime
 
 from cogs.utils import Defaults
-
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    openweathermap_api_key = config['openweathermap_api_key']
 
 
 class Vær(commands.Cog):
@@ -28,14 +20,13 @@ class Vær(commands.Cog):
 
         if not by:
             return await Defaults.error_warning_send(ctx, text='Du må gi meg en by\n\n' +
-                                                               f'Skriv `{prefix}help {ctx.command}` for hjelp')
+                                                               f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
         async with ctx.channel.typing():
 
             try:
                 url = 'http://api.openweathermap.org/data/2.5/weather?' + \
-                      urllib.parse.urlencode({
-                          'appid': openweathermap_api_key, 'q': by})
+                      urllib.parse.urlencode({'appid': self.bot.api_keys['openweathermap_api_key'], 'q': by})
                 data = get(url).json()
                 city_id = str(data['id'])
             except KeyError:

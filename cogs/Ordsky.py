@@ -1,16 +1,10 @@
-"""
-This cog does not use .utils
-This is in order to not further complicate things
-for people using this cog with other bot setups.
-"""
-
 import discord
 from discord.ext import commands
 
 import pymongo
 
 from codecs import open
-from json import load as json_load
+import json
 
 from PIL import Image
 from numpy import array
@@ -20,50 +14,19 @@ from os import remove
 import functools
 from io import BytesIO
 
-# Fetch prefix and mongodb url
-with open('config.json', 'r', encoding='utf8') as f:
-    config = json_load(f)
-    prefix = config['prefix']
-    mongodb_url = config['mongodb_url']
-
-# Connect to database
-mongo = pymongo.MongoClient(mongodb_url)
-database = mongo['discord']
-database_col_users = database['users']
-
-
-async def default_db_insert(ctx):
-    """Standard mongodb document"""
-
-    database_col_users.insert_one(
-        {'_id': ctx.author.id,
-         'ordsky_consent': False,})
-
-
-async def error_no_data(ctx):
-    """No data error message"""
-
-    embed = discord.Embed(
-        color=0xF1C40F,
-        description=':exclamation: Jeg har ingen data om deg å ' +
-                    'sende eller så kan jeg ikke sende meldinger til deg!')
-    embed.set_footer(icon_url=ctx.author.avatar_url,
-                     text=f'{ctx.author.name}#{ctx.author.discriminator}')
-    await ctx.send(embed=embed)
+from cogs.utils import Defaults
 
 
 class Ordsky(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.database_col_ordsky = pymongo.MongoClient(bot.database)['discord']['ordsky']
 
     @staticmethod
     def generate(text, mask, filtered_words):
         """Generate wordcloud"""
 
-        wc = WordCloud(max_words=4000,
-                       mask=mask,
-                       repeat=False,
-                       stopwords=filtered_words)
+        wc = WordCloud(max_words=4000, mask=mask, repeat=False, stopwords=filtered_words)
         wc.process_text(text)
         wc.generate(text)
         img = wc.to_image()
@@ -73,176 +36,136 @@ class Ordsky(commands.Cog):
         return b
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.group()
+    async def ordsky(self, ctx):
+        """Generer en ordsky basert på meldingene dine"""
+
+        if ctx.invoked_subcommand is None:
+            await self.generer.invoke(ctx)
+
     @commands.cooldown(1, 2, commands.BucketType.user)
-    @commands.command(aliases=['consent'])
+    @ordsky.command(aliases=['consent'])
     async def samtykke(self, ctx):
         """Gi samtykke til å samle meldingsdataen din"""
 
-        # Look up user in database
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = database_col_users.find_one(database_find)
+            database_user = self.database_col_ordsky.find_one(database_find)
         except:
-            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                                  'tilkobling til databasen. ' +
-                                  'Be boteier om å fikse dette')
+            return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
+                                                             'Be båtteier om å fikse dette')
 
-        # Set consent and insert missing data
         if database_user is None:
-            await default_db_insert(ctx)
-            database_user = database_col_users.find_one(database_find)
-            database_col_users.update_one(database_find,
-                                          {'$set':
-                                           {'ordsky_consent': True}})
+            self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
+            self.database_col_ordsky.find_one(database_find)
+            self.database_col_ordsky.update_one(database_find, {'$set': {'ordsky_consent': True}})
         else:
-            database_col_users.update_one(database_find,
-                                          {'$set':
-                                           {'ordsky_consent': True}})
+            self.database_col_ordsky.update_one(database_find, {'$set': {'ordsky_consent': True}})
 
-        # Confirmation message
-        embed = discord.Embed(
-            color=0x0085ff,
-            description=':white_check_mark: Samtykke registrert!')
-        embed.set_footer(icon_url=ctx.author.avatar_url,
-                         text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        embed = discord.Embed(color=ctx.me.color, description='✅ Samtykke registrert!')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
-    @commands.command(aliases=['ingensamtykke', 'noconsent', 'slettdata'])
+    @ordsky.command(aliases=['ingensamtykke', 'noconsent', 'slettdata'])
     async def tabort(self, ctx):
         """Fjern samtykke og slett meldingsdata"""
 
-        # Look up user in database
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = database_col_users.find_one(database_find)
+            database_user = self.database_col_ordsky.find_one(database_find)
         except:
-            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                                  'tilkobling til databasen. ' +
-                                  'Be boteier om å fikse dette')
+            return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
+                                                             'Be båtteier om å fikse dette')
 
-        # Remove consent & data, insert missing data
-        database_col_users.delete_one(database_user)
+        self.database_col_ordsky.delete_one(database_user)
 
-        # Confirmation message
-        embed = discord.Embed(
-            color=0x0085ff,
-            description=':white_check_mark: Meldingsdata er slettet!')
-        embed.set_footer(icon_url=ctx.author.avatar_url,
-                         text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        embed = discord.Embed(color=ctx.me.color, description='✅ Meldingsdata er slettet!')
+        await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 60, commands.BucketType.user)
-    @commands.command(aliases=['mydata'])
-    async def minedata(self, ctx):
+    @ordsky.command(aliases=['mydata'])
+    async def data(self, ctx):
         """Få tilsendt dine data"""
 
-        # Look up user in database
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = database_col_users.find_one(database_find)
+            database_user = self.database_col_ordsky.find_one(database_find)
         except:
-            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                                  'tilkobling til databasen. ' +
-                                  'Be boteier om å fikse dette')
+            return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
+                                                             'Be båtteier om å fikse dette')
 
-        # Return no data error, insert missing data
         if database_user is None:
-            await default_db_insert(ctx)
-            return await error_no_data(ctx)
+            self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
+            return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg å sende eller ' +
+                                                               'så kan jeg ikke sende meldinger til deg!')
 
-        # Fetch all user data & append to string
+        try:
+            database_user['ordsky_data']
+        except KeyError:
+            return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg å sende eller ' +
+                                                               'så kan jeg ikke sende meldinger til deg!')
+
         raw_data = ''
-        for key, value in database_user['ordsky_data'].items():
+        for value in database_user['ordsky_data'].values():
             if value is None:
                 continue
             else:
                 raw_data += value
 
-        # No data error message
         if raw_data == '':
-            return await error_no_data(ctx)
+            return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg å sende eller ' +
+                                                               'så kan jeg ikke sende meldinger til deg!')
 
-        # Insert data in .txt file
-        with open(f'./assets/ordsky/{ctx.author.id}.txt',
-                  'a+', encoding='utf-8') as f:
-            f.write(raw_data)
+        with open(f'./assets/temp/{ctx.author.id}_ordsky.json', 'w') as f:
+            json.dump(database_user, f, indent=4)
 
-        # DM .txt file
         try:
-            await ctx.author.send(
-                file=discord.File(f'./assets/ordsky/{ctx.author.id}.txt'))
-            embed = discord.Embed(
-                color=0x0085ff,
-                description=':white_check_mark: Meldingsdata har ' +
-                            'blitt sendt i DM!')
+            await ctx.author.send(file=discord.File(f'./assets/temp/{ctx.author.id}_ordsky.json'))
+            embed = discord.Embed(color=ctx.me.color, description='✅ Meldingsdata har blitt sendt i DM!')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
         except:
-            embed = discord.Embed(
-                color=0xFF0000,
-                description=':x: Sending av data feilet! ' +
-                            'Sjekk om du har blokkert meg')
-        embed.set_footer(
-            icon_url=ctx.author.avatar_url,
-            text=f'{ctx.author.name}#{ctx.author.discriminator}')
-        await ctx.send(embed=embed)
+            await Defaults.error_fatal_send(ctx, text='Sending av data feilet! Sjekk om du har blokkert meg')
 
-        # Remove .txt file
         try:
-            remove(f'./assets/ordsky/{ctx.author.id}.txt')
+            remove(f'./assets/temp/{ctx.author.id}_ordsky.json')
         except:
             pass
 
-    @commands.bot_has_permissions(
-        embed_links=True, read_message_history=True, attach_files=True)
+    @commands.bot_has_permissions(embed_links=True, read_message_history=True, attach_files=True)
     @commands.cooldown(1, 150, commands.BucketType.user)
-    @commands.command(aliases=['wordcloud', 'wc', 'sky'])
-    async def ordsky(self, ctx):
+    @ordsky.command(aliases=['generate', 'create', 'lag'])
+    async def generer(self, ctx):
         """Generer en ordsky"""
 
-        # Look up user in database
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = database_col_users.find_one(database_find)
+            database_user = self.database_col_ordsky.find_one(database_find)
         except:
-            return await ctx.send(f'{ctx.author.mention} Jeg har ikke ' +
-                                  'tilkobling til databasen. ' +
-                                  'Be boteier om å fikse dette')
+            return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
+                                                             'Be båtteier om å fikse dette')
 
-        # Insert missing data
         if database_user is None:
-            await default_db_insert(ctx)
-            database_user = database_col_users.find_one(database_find)
+            self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
+            self.database_col_ordsky.find_one(database_find)
 
-        # Refresh database
-        database_user = database_col_users.find_one(database_find)
+        database_user = self.database_col_ordsky.find_one(database_find)
 
-        # Check consent
         if database_user['ordsky_consent'] is False:
-            embed = discord.Embed(
-                color=0xF1C40F,
-                description=':exclamation: Du må gi meg tillatelse til å ' +
-                            'samle og beholde meldingsdataene dine.\n\n' +
-                            f'Skriv `{prefix}samtykke` for å gjøre dette')
-            embed.set_footer(
-                icon_url=ctx.author.avatar_url,
-                text=f'{ctx.author.name}#{ctx.author.discriminator}')
-            await ctx.send(ctx.author.mention, embed=embed)
+            await Defaults.error_warning_send(ctx, text='Du må gi meg tillatelse til å samle og beholde ' +
+                                                        'meldingsdataene dine.\n\n' +
+                                                        f'Skriv `{self.bot.prefix}ordsky samtykke` for å gjøre dette',
+                                              mention=True)
             return self.bot.get_command('ordsky').reset_cooldown(ctx)
 
-        # Send status message
-        embed = discord.Embed(
-            description='**Henter meldinger:** :hourglass:\n' +
-                        '**Generer ordsky:** -')
-        embed.set_footer(
-            icon_url=ctx.author.avatar_url,
-            text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        embed = discord.Embed(description='**Henter meldinger:** ⌛\n**Generer ordsky:** -')
+        await Defaults.set_footer(ctx, embed)
         status_msg = await ctx.send(embed=embed)
 
         command_prefixes = ['§', '!', '.', '-', '€', '|', '$', '=', '?', '<', ':', '#', ',']
 
-        # Fetch messages
         message_data = ''
         try:
             database_user['ordsky_data'][f'{ctx.guild.id}']
@@ -257,10 +180,9 @@ class Ordsky(commands.Cog):
                                 if prefixes in message.clean_content[:3]:
                                     has_prefixes = True
                             if has_prefixes is False:
-                                message_data += '[' + \
-                                    f'{str(message.created_at)[0:19]}] ' + \
-                                    f'({message.channel.id}-{message.id}) ' + \
-                                    f'{message.clean_content} '
+                                message_data += f'[{str(message.created_at)[0:19]}] ' +\
+                                                f'({message.channel.id}-{message.id}) ' +\
+                                                f'{message.clean_content} '
                 except:
                     continue
 
@@ -276,84 +198,53 @@ class Ordsky(commands.Cog):
                                 if prefixes in message.clean_content[:3]:
                                     has_prefixes = True
                             if has_prefixes is False:
-                                message_data += '[' + \
-                                    f'{str(message.created_at)[0:19]}] ' + \
-                                    f'({message.channel.id}-{message.id}) ' + \
-                                    f'{message.clean_content} '
+                                message_data += f'[{str(message.created_at)[0:19]}] ' +\
+                                                f'({message.channel.id}-{message.id}) ' +\
+                                                f'{message.clean_content} '
                 except:
                     continue
         if message_data != '':
-            database_col_users.update_one(
-                database_find,
-                {'$set':
-                {f'ordsky_data.{ctx.guild.id}': message_data}},
-                upsert=True)
+            self.database_col_ordsky.update_one(database_find, {'$set': {f'ordsky_data.{ctx.guild.id}': message_data}},
+                                          upsert=True)
 
-        database_user = database_col_users.find_one(database_find)
+        database_user = self.database_col_ordsky.find_one(database_find)
         try:
             message_data = database_user['ordsky_data'][f'{ctx.guild.id}']
         except KeyError:
-            embed = discord.Embed(
-                color=0xF1C40F,
-                description=':x: Har ikke nok meldingsdata ' +
-                            'for å generere ordsky')
-            embed.set_footer(
-                icon_url=ctx.author.avatar_url,
-                text=f'{ctx.author.name}#{ctx.author.discriminator}')
-            return await ctx.send(ctx.author.mention, embed=embed)
+            return await Defaults.error_fatal_edit(ctx, status_msg,
+                                                   text='Har ikke nok meldingsdata for å generere ordsky')
+
         database_message_data = message_data
 
-        # Update status message
-        embed = discord.Embed(
-            description='**Henter meldinger:** :white_check_mark:\n' +
-                        '**Generer ordsky:** :hourglass:')
-        embed.set_footer(
-            icon_url=ctx.author.avatar_url,
-            text=f'{ctx.author.name}#{ctx.author.discriminator}')
+        embed = discord.Embed(description='**Henter meldinger:** ✅\n**Generer ordsky:** ⌛')
+        await Defaults.set_footer(ctx, embed)
         await status_msg.edit(embed=embed)
 
-        # URL & emote filter
         text = sub(r'http\S+', '', database_message_data)
         text = sub(r':\S+', '', text)
         text = sub(r'#\S+', '', text)
         text = sub(r'@\S+', '', text)
 
-        # Fetch pre-defined word list
-        with open('./assets/ordsky/ordliste.txt',
-                  'r', encoding='utf-8') as f:
+        with open('./assets/ordsky/ordliste.txt', 'r', encoding='utf-8') as f:
             filtered_words = [line.split(',') for line in f.readlines()]
             filtered_words = filtered_words[0]
 
-        # Fetch mask
         mask = array(Image.open('./assets/ordsky/mask/skyform.png'))
 
-        task = functools.partial(
-            Ordsky.generate, text,
-            mask, filtered_words)
+        task = functools.partial(Ordsky.generate, text, mask, filtered_words)
         b = await self.bot.loop.run_in_executor(None, task)
 
-        # Set embed color
         if str(ctx.author.color) != '#000000':
             color = ctx.author.color
         else:
             color = discord.Colour(0x99AAB5)
 
-        # Create embed & send it
-        final_image = discord.File(
-            b, filename=f'{ctx.author.id}_{ctx.guild.id}.png')
-        embed = discord.Embed(
-            color=color,
-            description=':cloud: Her er ordskyen din! :cloud:')
+        final_image = discord.File(b, filename=f'{ctx.author.id}_{ctx.guild.id}.png')
+        embed = discord.Embed(color=color, description='☁️ Her er ordskyen din! ☁️')
         embed.set_image(url=f'attachment://{ctx.author.id}_{ctx.guild.id}.png')
-        embed.set_footer(
-            text=f'{ctx.author.name}#{ctx.author.discriminator}',
-            icon_url=ctx.author.avatar_url)
-        await ctx.send(
-            file=final_image,
-            content=ctx.author.mention,
-            embed=embed)
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(file=final_image, content=ctx.author.mention, embed=embed)
 
-        # Delete status message
         await status_msg.delete()
 
 

@@ -25,25 +25,25 @@ class Whatanime(commands.Cog):
         status_msg = await ctx.send(embed=embed)
 
         if not await LBlend_utils.download_photo(ctx, link=bilde, max_file_size=8, meassurement_type='MB',
-                                                 filepath=f'./assets/{ctx.author.id}_trace.png'):
+                                                 filepath=f'./assets/temp/{ctx.author.id}_trace.png'):
             return
 
-        filesize = os.path.getsize(f'./assets/{ctx.author.id}_trace.png')
+        filesize = os.path.getsize(f'./assets/temp/{ctx.author.id}_trace.png')
         if filesize > 1000000:
             base_width = 300
-            img = Image.open(f'./assets/{ctx.author.id}_trace.png')
+            img = Image.open(f'./assets/temp/{ctx.author.id}_trace.png')
             width_percent = (base_width / float(img.size[0]))
             height_size = int((float(img.size[1]) * float(width_percent)))
             img = img.resize((base_width, height_size), Image.ANTIALIAS)
-            img.save(f'./assets/{ctx.author.id}_trace.png')
+            img.save(f'./assets/temp/{ctx.author.id}_trace.png')
 
-            new_file_size = os.path.getsize(f'./assets/{ctx.author.id}_trace.png')
+            new_file_size = os.path.getsize(f'./assets/temp/{ctx.author.id}_trace.png')
             if await LBlend_utils.check_file_too_big(ctx, status_msg, file=new_file_size,
                                                      max_file_size=1, meassurement_type='MB'):
                 await status_msg.delete()
-                return os.remove(f'./assets/{ctx.author.id}_trace.png')
+                return os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
-        with open(f'./assets/{ctx.author.id}_trace.png', 'rb') as f:
+        with open(f'./assets/temp/{ctx.author.id}_trace.png', 'rb') as f:
             base = standard_b64encode(f.read())
             data = post('https://trace.moe/api/search', data={'image': base}).json()
 
@@ -53,7 +53,7 @@ class Whatanime(commands.Cog):
                                                         'lav likhetsprosent, er det høy sannsynlighet ' +
                                                         'for at dette ikke er riktig saus')
             await status_msg.delete()
-            return os.remove(f'./assets/{ctx.author.id}_trace.png')
+            return os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
         try:
             anilist_id = data['docs'][0]['anilist_id']
@@ -66,15 +66,14 @@ class Whatanime(commands.Cog):
         except KeyError:
             await Defaults.error_fatal_send(ctx, text='Fant ingen saus')
             await status_msg.delete()
-            return os.remove(f'./assets/{ctx.author.id}_trace.png')
+            return os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
         similarity_percent = round(similarity * 100, 2)
         formatted_time = timedelta(seconds=time)
         if episode is '':
             episode = '0 (Film)'
 
-        thumbnail_data = get(
-            f'https://api.jikan.moe/v3/anime/{mal_id}/pictures').json()
+        thumbnail_data = get(f'https://api.jikan.moe/v3/anime/{mal_id}/pictures').json()
 
         embed = discord.Embed(title=title_romaji, color=ctx.me.color, url=f'https://anilist.co/anime/{anilist_id}',
                               description=f'{title_native}\n{title_english}')
@@ -92,7 +91,7 @@ class Whatanime(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
         await status_msg.delete()
 
-        os.remove(f'./assets/{ctx.author.id}_trace.png')
+        os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()

@@ -41,6 +41,9 @@ async def download_photo(ctx, link, max_file_size: int, meassurement_type: str, 
             return False
 
         try:
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            urllib.request.install_opener(opener)
             urllib.request.urlretrieve(link, filepath)
         except:
             await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bilde!', mention=True)
