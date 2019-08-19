@@ -235,7 +235,7 @@ class Info(commands.Cog):
         for booster in premium_subscribers:
             date = booster.premium_since.strftime('%d.%m.%Y %H:%M')
             boosters.append(f'{booster.mention} - {date}')
-        boosters = ' '.join(boosters)
+        boosters = '\n'.join(boosters)
 
         embed = discord.Embed(color=ctx.me.color, description=boosters)
         embed.set_author(name=f'Boosters ({ctx.guild.premium_subscription_count})', icon_url=ctx.guild.icon_url)
