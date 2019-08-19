@@ -120,7 +120,7 @@ class ImageManipulation(commands.Cog):
                                                      filepath=f'./assets/temp/{ctx.author.id}_raw.png'):
                 return
 
-            raw_image = Image.open(f'./assets/{ctx.author.id}_raw.png')
+            raw_image = Image.open(f'./assets/temp/{ctx.author.id}_raw.png')
             image_edit = raw_image.convert('RGBA')
             image_edit = image_edit.rotate(180)
             image_edit.save(f'./assets/temp/{ctx.author.id}_edit.png')
