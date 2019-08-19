@@ -43,7 +43,7 @@ class Whatanime(commands.Cog):
                 await status_msg.delete()
                 return os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
-        with open(f'./assets/{ctx.author.id}_trace.png', 'rb') as f:
+        with open(f'./assets/temp/{ctx.author.id}_trace.png', 'rb') as f:
             base = standard_b64encode(f.read())
             data = post('https://trace.moe/api/search', data={'image': base}).json()
 
@@ -53,7 +53,7 @@ class Whatanime(commands.Cog):
                                                         'lav likhetsprosent, er det høy sannsynlighet ' +
                                                         'for at dette ikke er riktig saus')
             await status_msg.delete()
-            return os.remove(f'./assets/{ctx.author.id}_trace.png')
+            return os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
         try:
             anilist_id = data['docs'][0]['anilist_id']
@@ -91,7 +91,7 @@ class Whatanime(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
         await status_msg.delete()
 
-        os.remove(f'./assets/{ctx.author.id}_trace.png')
+        os.remove(f'./assets/temp/{ctx.author.id}_trace.png')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
