@@ -87,10 +87,10 @@ class Konverter(commands.Cog):
             return await Defaults.error_warning_send(ctx, text='Det du har skrevet inn er ikke et tall\n\n'
                                                                f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
-        if vekt_kg > 1000000000 or vekt_kg < -1000000000:
+        if vekt_kg > 1000000000 or vekt_kg < 0:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
-        if høyde_meter > 1000000000 or høyde_meter < -1000000000:
+        if høyde_meter > 1000000000 or høyde_meter < 0:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
         bmi = round(vekt_kg / (høyde_meter * høyde_meter))
@@ -127,7 +127,7 @@ class Konverter(commands.Cog):
                 return await Defaults.error_warning_send(ctx, text='Sjekk om du har skrevet riktig tall\n\n' +
                                                          f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
-            if verdi > 1000000000 or verdi < -1000000000:
+            if verdi > 1000000000 or verdi < 0:
                 return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
 
             fra_valuta = fra_valuta.upper()
@@ -145,8 +145,8 @@ class Konverter(commands.Cog):
                 value = locale.format_string('%.2f', data['value'], grouping=True)
 
                 embed = discord.Embed(color=ctx.me.color,
-                                    description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
-                                    timestamp=datetime.utcnow())
+                                      description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
+                                      timestamp=datetime.utcnow())
                 await Defaults.set_footer(ctx, embed)
                 await ctx.send(embed=embed)
 
@@ -169,7 +169,7 @@ class Konverter(commands.Cog):
             return await Defaults.error_warning_send(ctx, text='Du må gi meg et tall\n\n' +
                                                                f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
 
-        if tall > 1000000000 or tall < -1000000000:
+        if tall > 1000000000 or tall < 0:
             return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt')
 
         meassurements = {
