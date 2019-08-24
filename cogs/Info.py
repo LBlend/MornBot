@@ -726,7 +726,7 @@ class Info(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['whoplays'])
     async def hvemspiller(self, ctx, *, spill: str):
-        """Sjekk hvem spiller et spesifisert spik"""
+        """Sjekk hvem som spiller et spesifisert spill"""
 
         users = []
         for member in ctx.guild.members:
