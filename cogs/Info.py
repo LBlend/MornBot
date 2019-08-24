@@ -667,7 +667,7 @@ class Info(commands.Cog):
             bruker = ctx.guild.get_member(member.id)
             bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
-            formatted_string += f'#{bruker_index} {bruker.mention} - {bruker_joined_date}\n'
+            formatted_string += f'#{bruker_index} {bruker.name}#{bruker.discriminator} - {bruker_joined_date}\n'
 
         embed = discord.Embed(color=ctx.me.color)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
@@ -738,7 +738,7 @@ class Info(commands.Cog):
                 spill = member.activity.name
                 users.append(f'{member.name}#{member.discriminator}')
 
-        if users is []:
+        if users == []:
             embed = discord.Embed(color=ctx.me.color, description='Det er ingen som spiller dette spillet')
             return await ctx.send(embed=embed)
 
