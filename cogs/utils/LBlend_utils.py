@@ -20,23 +20,23 @@ async def download_photo(ctx, link, max_file_size: int, meassurement_type: str, 
 
     if ctx.message.attachments != [] and not link:
         if ctx.message.attachments[0].size > max_file_size:
-            return await Defaults.error_fatal_send(ctx, text='Filen er for stor. Prøv et bilde som er mindre ' +
+            return await Defaults.error_fatal_send(ctx, text='Filen er for stor. Prøv en fil som er mindre ' +
                                                              f'enn {max_file_size_actual} {meassurement}')
 
         try:
             await ctx.message.attachments[0].save(fp=filepath)
         except:
-            await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bilde!', mention=True)
+            await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bildet!', mention=True)
             return False
 
     elif not ctx.message.attachments and link is not None:
         try:
             linked_file = get(str(link))
         except:
-            await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bilde!', mention=True)
+            await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bildet!', mention=True)
             return False
         if len(linked_file.content) > max_file_size:
-            await Defaults.error_fatal_send(ctx, text='Filen er for stor. Prøv et bilde som er mindre enn ' +
+            await Defaults.error_fatal_send(ctx, text='Filen er for stor. Prøv en fil som er mindre enn ' +
                                                       f'{max_file_size_actual} {meassurement}', mention=True)
             return False
 
@@ -46,11 +46,11 @@ async def download_photo(ctx, link, max_file_size: int, meassurement_type: str, 
             urllib.request.install_opener(opener)
             urllib.request.urlretrieve(link, filepath)
         except:
-            await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bilde!', mention=True)
+            await Defaults.error_fatal_send(ctx, text='Kunne ikke hente bildet!', mention=True)
             return False
 
     else:
-        await Defaults.error_warning_send(ctx, text='Du må gi meg et bilde!', mention=True)
+        await Defaults.error_warning_send(ctx, text='Du må gi meg et bildet!', mention=True)
         return False
 
     return True
@@ -90,8 +90,8 @@ async def check_file_too_big(ctx, status_msg, file, max_file_size: int, meassure
     if file > max_file_size:
         await Defaults.error_fatal_edit(
             ctx, status_msg,
-            text='Filen er for stort. Prøv et bilde som er mindre enn ' +
-                 f'mer enn {max_file_size_actual} {meassurement}')
+            text='Filen er for stor. Prøv en fil som er mindre enn ' +
+                 f'{max_file_size_actual} {meassurement}')
         return True
     else:
         return False
