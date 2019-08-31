@@ -81,7 +81,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=activity_type, name=bot.presence),
                               status=discord.Status.online)
 
-database_col_cog_check = pymongo.MongoClient(bot.database)['discord']['cog_check']
+database_col_cog_check = pymongo.MongoClient(bot.database)['mornbot']['cog_check']
 
 
 @bot.check

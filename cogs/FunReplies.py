@@ -7,7 +7,7 @@ import pymongo
 class FunReplies(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_funreplies = pymongo.MongoClient(self.bot.database)['discord']['funreplies']
+        self.database_col_funreplies = pymongo.MongoClient(self.bot.database)['mornbot']['funreplies']
 
     @commands.guild_only()
     @commands.has_permissions(administrator=True)

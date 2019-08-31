@@ -13,7 +13,7 @@ from cogs.utils import Defaults
 class Dagbok(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_dagbok = pymongo.MongoClient(bot.database)['discord']['dagbok']
+        self.database_col_dagbok = pymongo.MongoClient(bot.database)['mornbot']['dagbok']
 
     async def react(self, message):
         if message.author.bot:

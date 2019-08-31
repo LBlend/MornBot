@@ -20,7 +20,7 @@ from cogs.utils import Defaults
 class Ordsky(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_ordsky = pymongo.MongoClient(bot.database)['discord']['ordsky']
+        self.database_col_ordsky = pymongo.MongoClient(bot.database)['mornbot']['ordsky']
 
     @staticmethod
     def generate(text, mask, filtered_words):

@@ -9,7 +9,7 @@ from cogs.utils import Defaults
 class ServerManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_cog_check = pymongo.MongoClient(self.bot.database)['discord']['cog_check']
+        self.database_col_cog_check = pymongo.MongoClient(self.bot.database)['mornbot']['cog_check']
 
     @commands.bot_has_permissions(kick_members=True)
     @commands.has_permissions(kick_members=True)
