@@ -545,7 +545,7 @@ class Info(commands.Cog):
         else:
             limit = f'{kanal.user_limit} personer'
 
-        embed = discord.Embed(color=ctx.me.color, description=f'ID: {kanal.id}')
+        embed = discord.Embed(color=ctx.me.color, description=f'**{kanal.name}**\nID: {kanal.id}')
         embed.set_author(name=kanal.guild.name, icon_url=kanal.guild.icon_url)
         embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
