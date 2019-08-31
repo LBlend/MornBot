@@ -59,7 +59,7 @@ class Info(commands.Cog):
         premium_subscribers = sorted(
             ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
         for booster in premium_subscribers:
-            boosters.append(booster.mention)
+            boosters.append(f'{booster.name}#{booster.discriminator}')
         boosters = ' '.join(boosters)
         if len(boosters) > 1024:
             boosters = f'Skriv `{self.bot.prefix}boosters` for å se boosters'
@@ -234,7 +234,7 @@ class Info(commands.Cog):
         premium_subscribers = sorted(ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
         for booster in premium_subscribers:
             date = booster.premium_since.strftime('%d.%m.%Y %H:%M')
-            boosters.append(f'{booster.mention} - {date}')
+            boosters.append(f'{booster.name}#{booster.discriminator} - {date}')
         boosters = '\n'.join(boosters)
 
         embed = discord.Embed(color=ctx.me.color, description=boosters)
@@ -474,7 +474,7 @@ class Info(commands.Cog):
 
         members = []
         for member in rolle.members:
-            members.append(member.mention)
+            members.append(f'{member.name}#{member.discriminator}')
         members = ' '.join(members)
 
         if len(members) > 1024:
@@ -516,7 +516,7 @@ class Info(commands.Cog):
 
         members = []
         for member in kanal.members:
-            members.append(member.mention)
+            members.append(f'{member.name}#{member.discriminator}')
         members = ' '.join(members)
         if len(members) > 1024:
             members = 'For mange for å vise her'
@@ -634,7 +634,7 @@ class Info(commands.Cog):
             bruker = ctx.guild.get_member(member.id)
             bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
-            formatted_string += f'#{bruker_index} {bruker.mention} - {bruker_created_date}\n'
+            formatted_string += f'**#{bruker_index}** {bruker.name}#{bruker.discriminator} - {bruker_created_date}\n'
 
         embed = discord.Embed(color=ctx.me.color)
         embed.add_field(name='Eldste Discordbrukerene på serveren', value=formatted_string)
@@ -667,7 +667,7 @@ class Info(commands.Cog):
             bruker = ctx.guild.get_member(member.id)
             bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
-            formatted_string += f'#{bruker_index} {bruker.name}#{bruker.discriminator} - {bruker_joined_date}\n'
+            formatted_string += f'**#{bruker_index}** {bruker.name}#{bruker.discriminator} - {bruker_joined_date}\n'
 
         embed = discord.Embed(color=ctx.me.color)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
