@@ -22,7 +22,7 @@ class ImageManipulation(commands.Cog):
 
         async with ctx.channel.typing():
 
-            await bruker.avatar_url_as(format='png').save(fp=f'./assetstemp//{bruker.id}_raw.png')
+            await bruker.avatar_url_as(format='png').save(fp=f'./assets/temp/{bruker.id}_raw.png')
 
             raw_image = Image.open(f'./assets/temp/{bruker.id}_raw.png')
             image_edit = raw_image.convert('RGBA')
