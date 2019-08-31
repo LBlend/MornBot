@@ -9,7 +9,6 @@ bot:
 api:
   openweathermap_api_key:
   osu_api_key:
-  twitch_api_key:
   ksoft_authentication:
   reddit_client_id:
   reddit_secret:

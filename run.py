@@ -48,7 +48,6 @@ requirements = {
     'Ordsky': bot.database,
     'osu': bot.api_keys['osu_api_key'],
     'Reddit': [bot.api_keys['reddit_client_id'], bot.api_keys['reddit_secret']],
-    'Twitch': bot.api_keys['twitch_api_key'],
     'Vær': bot.api_keys['openweathermap_api_key']
 }
 
