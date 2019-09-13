@@ -91,6 +91,10 @@ async def cog_blacklist(ctx):
         return ctx.cog.qualified_name not in cog_check['disabled']
     except TypeError:
         return True
+    except AttributeError:
+        return True
+    except KeyError:
+        return True
 
 
 bot.run(config['bot']['token'], bot=True, reconnect=True)
