@@ -60,7 +60,7 @@ class Info(commands.Cog):
             ctx.guild.premium_subscribers, key=lambda m: m.premium_since)
         for booster in premium_subscribers:
             boosters.append(f'{booster.name}#{booster.discriminator}')
-        boosters = ' '.join(boosters)
+        boosters = ', '.join(boosters)
         if len(boosters) > 1024:
             boosters = f'Skriv `{self.bot.prefix}boosters` for å se boosters'
         if boosters == '':
