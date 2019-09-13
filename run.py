@@ -89,10 +89,6 @@ async def cog_blacklist(ctx):
     cog_check = database_col_cog_check.find_one({'_id': ctx.guild.id})
     try:
         return ctx.cog.qualified_name not in cog_check['disabled']
-    except KeyError:
-        return True
-    except AttributeError:
-        return True
     except TypeError:
         return True
 
