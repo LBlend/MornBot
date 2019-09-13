@@ -1,11 +1,12 @@
 discord.py
 pymongo
+pyyaml
 requests
 asyncio
 BeautifulSoup4
 psutil
 pillow
+praw
 numpy
 matplotlib
 wordcloud
-praw
