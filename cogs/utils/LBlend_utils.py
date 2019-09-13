@@ -50,7 +50,7 @@ async def download_photo(ctx, link, max_file_size: int, meassurement_type: str, 
             return False
 
     else:
-        await Defaults.error_warning_send(ctx, text='Du må gi meg et bildet!', mention=True)
+        await Defaults.error_warning_send(ctx, text='Du må gi meg et bilde!', mention=True)
         return False
 
     return True
