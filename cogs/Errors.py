@@ -30,7 +30,7 @@ class Errors(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        ignored = (commands.CommandNotFound, commands.CheckFailure)
+        ignored = (commands.CommandNotFound)
         send_help = (commands.MissingRequiredArgument,
                      commands.TooManyArguments,
                      commands.BadArgument)
@@ -69,6 +69,9 @@ class Errors(commands.Cog):
                 return await Defaults.error_fatal_send(ctx, text=f'`{ctx.command}` kan ikke brukes i DMs')
             except:
                 pass
+
+        elif isinstance(error, commands.CheckFailure):
+            return
 
         print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
