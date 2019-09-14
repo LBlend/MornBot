@@ -475,7 +475,7 @@ class Info(commands.Cog):
         members = []
         for member in rolle.members:
             members.append(f'{member.name}#{member.discriminator}')
-        members = ' '.join(members)
+        members = ', '.join(members)
 
         if len(members) > 1024:
             members = 'For mange medlemmer for å vise her'
@@ -517,7 +517,7 @@ class Info(commands.Cog):
         members = []
         for member in kanal.members:
             members.append(f'{member.name}#{member.discriminator}')
-        members = ' '.join(members)
+        members = ', '.join(members)
         if len(members) > 1024:
             members = 'For mange for å vise her'
 
