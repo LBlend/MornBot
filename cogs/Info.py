@@ -571,7 +571,7 @@ class Info(commands.Cog):
         try:
             emoji_creator = f'{emoji.user.mention}\n{emoji.user.name}#{emoji.user.discriminator}'
         except AttributeError:
-            emoji_creator = 'Jeg trenger `manage_emojis`-tillatelsen for å hente dette'
+            emoji_creator = 'Jeg trenger `manage_emojis`-tillatelsen på serveren den er fra for å hente dette'
 
         embed = discord.Embed(color=ctx.me.color, description=f'**{emoji.name}**\nID: {emoji.id}')
         embed.set_author(name=emoji.guild.name, icon_url=emoji.guild.icon_url)
