@@ -566,10 +566,10 @@ class Info(commands.Cog):
         animated = 'Nei'
         if emoji.animated:
             animated = 'Ja'
-
-        emoji_2 = await emoji.guild.fetch_emoji(emoji.id)
+        
+        emoji = await emoji.guild.fetch_emoji(emoji.id)
         try:
-            emoji_creator = f'{emoji_2.mention}\n{emoji_2.user.name}#{emoji_2.user.discriminator}'
+            emoji_creator = f'{emoji.user.mention}\n{emoji.user.name}#{emoji.user.discriminator}'
         except AttributeError:
             emoji_creator = 'Jeg trenger `manage_emojis`-tillatelsen for å hente dette'
 
