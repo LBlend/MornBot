@@ -5,6 +5,7 @@ from time import time
 import platform
 from os import getpid
 from psutil import Process
+from git import Repo as repo
 
 from cogs.utils import Defaults
 
@@ -125,6 +126,18 @@ class BotInfo(commands.Cog):
                                 'white-social-media/64/social_media_logo_github-512.png')
         embed.add_field(name='🔗 Github Repo',
                         value=f'[Klikk her]({self.bot.misc["source_code"]}) for å se den dritt skrevne kildekoden min')
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(aliases=['gitcommit', 'githash', 'gitstatus', 'gitversion'])
+    async def version(self, ctx):
+        """Viser versjonen som båtten kjører på"""
+
+        githash = repo('.').head.commit
+        embed = discord.Embed(color=ctx.me.color, title='Git commit hash',
+                              description=f'[{githash}]({self.bot.misc["source_code"]}/commit/{githash})')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 

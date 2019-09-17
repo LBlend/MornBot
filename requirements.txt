@@ -5,6 +5,7 @@ requests
 asyncio
 BeautifulSoup4
 psutil
+gitpython
 pillow
 praw
 numpy
