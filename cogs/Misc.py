@@ -490,6 +490,8 @@ class Misc(commands.Cog):
                 match_percent = 100
             elif ctx.author.id == 142580278940925953 and bruker.id == 127934026467115008:
                 match_percent = 100
+            elif ctx.author.id == 202745416062599168 or bruker.id == 202745416062599168:
+                match_percent = 0
 
             await ctx.author.avatar_url_as(format='png').save(fp=f'./assets/temp/{ctx.author.id}_raw.png')
             await bruker.avatar_url_as(format='png').save(fp=f'./assets/temp/{bruker.id}_raw.png')
