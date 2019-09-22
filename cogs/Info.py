@@ -3,6 +3,7 @@ import discord
 
 from math import ceil
 from operator import itemgetter
+from re import sub
 
 from cogs.utils import Defaults
 
@@ -482,11 +483,14 @@ class Info(commands.Cog):
         if len(members) == 0:
             members = '**Ingen**'
 
-        embed = discord.Embed(description=f'{rolle.mention}\n**ID:** {rolle.id}', color=color)
+        permissions = sub('\D', '', str(rolle.permissions))
+
+        embed = discord.Embed(title=rolle.name, description=f'{rolle.mention}\n**ID:** {rolle.id}', color=color)
         embed.set_author(name=rolle.guild.name, icon_url=rolle.guild.icon_url)
         embed.add_field(name='Fargekode', value=str(rolle.color))
         embed.add_field(name='Opprettet', value=f'{rolle_created_date}\n{since_created_days} ' +
                                                 f'{since_created_days_string} siden')
+        embed.add_field(name='Tillatelser', value=permissions)
         embed.add_field(name='Posisjon', value=rolle.position)
         embed.add_field(name='Nevnbar', value=mentionable)
         embed.add_field(name='Vises separat i medlemsliste', value=hoisted)
@@ -521,7 +525,7 @@ class Info(commands.Cog):
         if len(members) > 1024:
             members = 'For mange for å vise her'
 
-        embed = discord.Embed(color=ctx.me.color, description=f'{kanal.mention}\nID: {kanal.id}')
+        embed = discord.Embed(color=ctx.me.color, title=kanal.name, description=f'{kanal.mention}\nID: {kanal.id}')
         embed.set_author(name=kanal.guild.name, icon_url=kanal.guild.icon_url)
         embed.add_field(name='Beskrivelse', value=description, inline=False)
         embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
@@ -545,7 +549,7 @@ class Info(commands.Cog):
         else:
             limit = f'{kanal.user_limit} personer'
 
-        embed = discord.Embed(color=ctx.me.color, description=f'**{kanal.name}**\nID: {kanal.id}')
+        embed = discord.Embed(color=ctx.me.color, title=kanal.name, description=f'ID: {kanal.id}')
         embed.set_author(name=kanal.guild.name, icon_url=kanal.guild.icon_url)
         embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
@@ -573,7 +577,7 @@ class Info(commands.Cog):
         except AttributeError:
             emoji_creator = 'Jeg trenger `manage_emojis`-tillatelsen på serveren den er fra for å hente dette'
 
-        embed = discord.Embed(color=ctx.me.color, description=f'**{emoji.name}**\nID: {emoji.id}')
+        embed = discord.Embed(color=ctx.me.color, title=emoji.name, description=f'ID: {emoji.id}')
         embed.set_author(name=emoji.guild.name, icon_url=emoji.guild.icon_url)
         embed.add_field(name=f'Opprettet', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
         embed.add_field(name='Animert', value=animated)
