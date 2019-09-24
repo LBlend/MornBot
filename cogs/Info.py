@@ -197,7 +197,7 @@ class Info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(aliases=['serverroller'])
+    @commands.command(aliases=['serverroller', 'guildroles', 'serverroles'])
     async def guildroller(self, ctx):
         """Viser rollene i en guild"""
 
