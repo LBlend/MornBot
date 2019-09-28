@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 
-from time import time
+from time import time, perf_counter
 import platform
 from os import getpid
 from psutil import Process
@@ -21,6 +21,11 @@ class BotInfo(commands.Cog):
         """Viser info om meg"""
 
         dev = await self.bot.fetch_user(170506717140877312)
+
+        start = perf_counter()
+        status_msg = await ctx.send('Beregner ping...')
+        end = perf_counter()
+        ping = int((end - start) * 1000)
 
         now = time()
         diff = int(now - self.bot.uptime)
@@ -56,7 +61,7 @@ class BotInfo(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name='Dev', value=f'{dev.mention}\n{dev.name}#{dev.discriminator}')
         embed.add_field(name='Oppetid', value=f'{days}d {hours}t {minutes}m {seconds}s')
-        embed.add_field(name='Ping', value=f'{int(self.bot.latency * 1000)} ms')
+        embed.add_field(name='Ping', value=f'Ekte ping: {ping} ms\nWebsocket ping: {int(self.bot.latency * 1000)} ms')
         embed.add_field(name='Servere', value=len(self.bot.guilds))
         embed.add_field(name='Discord.py Versjon', value=discord.__version__)
         embed.add_field(name='Python Versjon', value=platform.python_version())
@@ -72,7 +77,7 @@ class BotInfo(commands.Cog):
                                              f'| [Nettside]({self.bot.misc["website"]}) ' +
                                              f'| [Kildekode]({self.bot.misc["source_code"]})')
         await Defaults.set_footer(ctx, embed)
-        await ctx.send(embed=embed)
+        await status_msg.edit(embed=embed, content=None)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -110,10 +115,15 @@ class BotInfo(commands.Cog):
     async def ping(self, ctx):
         """Sjekk pingen til båtten"""
 
+        start = perf_counter()
+        status_msg = await ctx.send('Beregner ping...')
+        end = perf_counter()
+        ping = int((end - start) * 1000)
+
         embed = discord.Embed(color=ctx.me.color)
-        embed.add_field(name='📶 Ping', value=f'{int(self.bot.latency * 1000)} ms')
+        embed.add_field(name='📶 Ping', value=f'**Ekte ping:** {ping} ms\n**Websocket ping:** {int(self.bot.latency * 1000)} ms')
         await Defaults.set_footer(ctx, embed)
-        await ctx.send(embed=embed)
+        await status_msg.edit(embed=embed, content=None)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -136,7 +146,7 @@ class BotInfo(commands.Cog):
         """Viser versjonen som båtten kjører på"""
 
         githash = repo('.').head.commit
-        embed = discord.Embed(color=ctx.me.color, title='Git commit hash',
+        embed = discord.Embed(color=ctx.me.color, title='Git Commit Hash',
                               description=f'[{githash}]({self.bot.misc["source_code"]}/commit/{githash})')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
