@@ -2,7 +2,6 @@ from discord.ext import commands
 import discord
 
 from requests import post
-from re import sub
 
 from cogs.utils import Defaults
 
@@ -74,8 +73,8 @@ class Anime(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
-    @anilist.command(aliases=['anime', 'animeprofile'])
-    async def animeprofil(self, ctx, *, bruker: str):
+    @anilist.command(aliases=['anime'])
+    async def animestats(self, ctx, *, bruker: str):
         """Viser animeinformasjon til en Anilist-profil"""
 
         async with ctx.channel.typing():
@@ -83,7 +82,7 @@ class Anime(commands.Cog):
             # GraphQL 
             query = """
             query ($name: String) {
-                User (name: $name) {
+                User(name: $name) {
                     name
                     siteUrl
                     updatedAt
@@ -93,13 +92,25 @@ class Anime(commands.Cog):
                     options {
                         profileColor
                     }
-                    stats {
-                        watchedTime
-                        animeStatusDistribution {
-                            amount
-                        }
-                        animeListScores {
+                    statistics {
+                        anime {
+                            minutesWatched
+                            episodesWatched
                             meanScore
+                            statuses {
+                                count
+                                status
+                                minutesWatched
+                            }
+                            studios(limit: 3, sort: COUNT_DESC) {
+                                studio {
+                                    name
+                                    siteUrl
+                                }
+                            }
+                            genres(limit: 3, sort: COUNT_DESC) {
+                                genre
+                            }
                         }
                     }
                 }
@@ -121,36 +132,72 @@ class Anime(commands.Cog):
 
             user_name = data['name']
             profile_pic = data['avatar']['large']
-            days_watched = round(data['stats']['watchedTime'] / 1440, 1)
-            watching = data['stats']['animeStatusDistribution'][0]['amount']
-            planning = data['stats']['animeStatusDistribution'][1]['amount']
-            completed = data['stats']['animeStatusDistribution'][2]['amount']
-            dropped = data['stats']['animeStatusDistribution'][3]['amount']
-
-            try:
-                anime_mean_score = data['stats']['animeListScores']['meanScore']
-            except TypeError:
-                anime_mean_score = '**Ingen**'
-            if not anime_mean_score:
-                anime_mean_score = '**Ingen**'
-
+            days_watched = round(data['statistics']['anime']['minutesWatched'] / 1440, 1)
+            episodes_watched = data['statistics']['anime']['episodesWatched']
             color = data['options']['profileColor']
             color = await set_color(color)
+            
+            statuses = {}
+            for status in data['statistics']['anime']['statuses']:
+                status_name = status['status']
+                status_count = status['count']
+                status_minutes = status['minutesWatched']
+                statuses.update({f'{status_name}': {'count': status_count, 'minutes': status_minutes}})
+
+            try:
+                completed = statuses['COMPLETED']['count']
+            except KeyError:
+                completed = 0
+            try:
+                watching = statuses['CURRENT']['count']
+            except KeyError:
+                watching = 0
+            try:
+                planning = statuses['PLANNING']['count']
+                planning_days = round(statuses['PLANNING']['minutes'] / 1440, 1)
+            except KeyError:
+                planning = 0
+                planning_days = 0
+            try:
+                dropped = statuses['DROPPED']['count']
+            except KeyError:
+                dropped = 0
+            
+            anime_mean_score = data['statistics']['anime']['meanScore']
+            if anime_mean_score == 0:
+                anime_mean_score = '**Ingen**'
+
+            genres = []
+            for genre in data['statistics']['anime']['genres']:
+                genres.append(genre['genre'])
+            most_watched_genres = ', '.join(genres)
+
+            studios = []
+            for studio in data['statistics']['anime']['studios']:
+                studio_name = studio['studio']['name']
+                studio_url = studio['studio']['siteUrl']
+                studios.append(f'[{studio_name}]({studio_url})')
+            most_watched_studios = ' | '.join(studios)
 
             embed = discord.Embed(title=user_name, color=color, url=url)
             embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
             embed.set_thumbnail(url=profile_pic)
-            embed.add_field(name='Gj.snittlig vurdering', value=anime_mean_score)
+            embed.add_field(name='Gj.snittsvurdering gitt', value=anime_mean_score)
             embed.add_field(name='Antall dager sett', value=days_watched)
+            embed.add_field(name='Antall episoder sett', value=episodes_watched)
             embed.add_field(name='Antall animer sett', value=completed)
             embed.add_field(name='Ser på nå', value=watching)
-            embed.add_field(name='Planlegger å se', value=planning)
+            embed.add_field(name='Planlegger å se', value=f'{planning}\n({planning_days} dager)')
             embed.add_field(name='Droppet', value=dropped)
+            if most_watched_genres is not '':
+                embed.add_field(name='Mest sette sjangere', value=most_watched_genres, inline=False)
+            if most_watched_studios is not '':
+                embed.add_field(name='Mest sette studioer', value=most_watched_studios, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
-    @anilist.command()
-    async def mangaprofil(self, ctx, *, bruker: str):
+    @anilist.command(aliases=['manga'])
+    async def mangastats(self, ctx, *, bruker: str):
         """Viser mnagainformasjonen til en Anilist-profil"""
 
         async with ctx.channel.typing():
@@ -158,7 +205,7 @@ class Anime(commands.Cog):
             # GraphQL 
             query = """
             query ($name: String) {
-                User (name: $name) {
+                User(name: $name) {
                     name
                     siteUrl
                     updatedAt
@@ -168,13 +215,28 @@ class Anime(commands.Cog):
                     options {
                         profileColor
                     }
-                    stats {
-                        chaptersRead
-                        mangaStatusDistribution {
-                            amount
-                        }
-                        mangaListScores {
+                    statistics {
+                        manga {
+                            chaptersRead
+                            volumesRead
                             meanScore
+                            statuses {
+                                count
+                                status
+                                chaptersRead
+                            }
+                            staff(limit: 3, sort: COUNT_DESC) {
+                                staff {
+                                    name {
+                                        full
+                                        native
+                                    }
+                                    siteUrl
+                                }
+                            }
+                            genres(limit: 3, sort: COUNT_DESC) {
+                                genre
+                            }
                         }
                     }
                 }
@@ -197,31 +259,67 @@ class Anime(commands.Cog):
 
             user_name = data['name']
             profile_pic = data['avatar']['large']
-            chapters_read = data['stats']['chaptersRead']
-            reading = data['stats']['mangaStatusDistribution'][0]['amount']
-            planning = data['stats']['mangaStatusDistribution'][1]['amount']
-            completed = data['stats']['mangaStatusDistribution'][2]['amount']
-            dropped = data['stats']['mangaStatusDistribution'][3]['amount']
-
-            try:
-                manga_mean_score = data['stats']['mangaListScores']['meanScore']
-            except TypeError:
-                manga_mean_score = '**Ingen**'
-            if not manga_mean_score:
-                manga_mean_score = '**Ingen**'
-
+            chapters_read = round(data['statistics']['manga']['chaptersRead'] / 1440, 1)
+            volumes_read = data['statistics']['manga']['volumesRead']
             color = data['options']['profileColor']
             color = await set_color(color)
+            
+            statuses = {}
+            for status in data['statistics']['manga']['statuses']:
+                status_name = status['status']
+                status_count = status['count']
+                status_minutes = status['chaptersRead']
+                statuses.update({f'{status_name}': {'count': status_count, 'minutes': status_minutes}})
+
+            try:
+                completed = statuses['COMPLETED']['count']
+            except KeyError:
+                completed = 0
+            try:
+                reading = statuses['CURRENT']['count']
+            except KeyError:
+                reading = 0
+            try:
+                planning = statuses['PLANNING']['count']
+                planning_days = statuses['PLANNING']['chaptersRead']
+            except KeyError:
+                planning = 0
+                planning_days = 0
+            try:
+                dropped = statuses['DROPPED']['count']
+            except KeyError:
+                dropped = 0
+            
+            manga_mean_score = data['statistics']['manga']['meanScore']
+            if manga_mean_score == 0:
+                manga_mean_score = '**Ingen**'
+
+            genres = []
+            for genre in data['statistics']['manga']['genres']:
+                genres.append(genre['genre'])
+            most_read_genres = ', '.join(genres)
+
+            staff = []
+            for staffmember in data['statistics']['manga']['staff']:
+                staff_name = staffmember['staff']['name']['full'] + ' (' + staffmember['staff']['name']['native'] + ')'
+                staff_url = staffmember['staff']['siteUrl']
+                staff.append(f'[{staff_name}]({staff_url})')
+            most_read_staff = ' | '.join(staff)
 
             embed = discord.Embed(title=user_name, color=color, url=url)
             embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
             embed.set_thumbnail(url=profile_pic)
-            embed.add_field(name='Gj.snittlig vurdering', value=manga_mean_score)
+            embed.add_field(name='Gj.snittsvurdering gitt', value=manga_mean_score)
             embed.add_field(name='Antall kapitler lest', value=chapters_read)
+            embed.add_field(name='Antall volum lest', value=volumes_read)
             embed.add_field(name='Antall manga lest', value=completed)
             embed.add_field(name='Leser nå', value=reading)
-            embed.add_field(name='Planlegger å lese', value=planning)
+            embed.add_field(name='Planlegger å lese', value=f'{planning}\n({planning_days} kapitler)')
             embed.add_field(name='Droppet', value=dropped)
+            if most_read_genres is not '':
+                embed.add_field(name='Mest leste sjangere', value=most_read_genres, inline=False)
+            if most_read_staff is not '':
+                embed.add_field(name='Mest leste skapere', value=most_read_staff, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -239,7 +337,7 @@ class Anime(commands.Cog):
                     siteUrl
                     format
                     status
-                    description
+                    description(asHtml: false)
                     episodes
                     duration
                     genres
@@ -325,7 +423,7 @@ class Anime(commands.Cog):
                     titles[i] = ''
             title_romaji, title_native, title_english = titles
 
-            description = sub(r'<.*?>', '', data['description'])
+            description = data['description']
             genres = ', '.join(data['genres'])
 
             studios = data['studios']['nodes']
@@ -422,7 +520,7 @@ class Anime(commands.Cog):
                         siteUrl
                         format
                         status
-                        description
+                        description(asHtml: false)
                         volumes
                         chapters
                         genres
@@ -501,7 +599,7 @@ class Anime(commands.Cog):
                     titles[i] = ''
             title_romaji, title_native, title_english = titles
 
-            description = sub(r'<.*?>', '', data['description'])
+            description = data['description']
             genres = ', '.join(data['genres'])
 
             staff = data['staff']['edges']
