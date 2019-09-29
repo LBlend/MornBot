@@ -161,6 +161,17 @@ class Misc(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command(name='choose')
+    async def velg(self, ctx, *, valgmuligheter: str):
+        """For deg som ikke klarer å bestemme deg"""
+
+        valgmuligheter = split('\|', valgmuligheter)
+        embed = discord.Embed(color=ctx.me.color, description=choice(valgmuligheter))
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command(aliases=['reverse'])
     async def reverser(self, ctx, *, tekst):
         """Reverserer tekst"""
