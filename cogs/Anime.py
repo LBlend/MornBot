@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 
 from requests import post
+from re import sub
 
 from cogs.utils import Defaults
 
@@ -45,11 +46,33 @@ async def convert_media_format(media_format):
         return media_format
 
 
+async def convert_language_names(language_name):
+    """Translates language names into norwegian"""
+
+    languages = {
+                'JAPANESE': 'Japansk',
+                'ENGLISH': 'Engelsk',
+                'KOREAN': 'Koreansk',
+                'ITALIAN': 'Italiensk',
+                'SPANISH': 'Spansk',
+                'PORTUGUESE': 'Portugisisk',
+                'FRENCH': 'Fransk',
+                'GERMAN': 'Tysk',
+                'HEBREW': 'Hebraisk',
+                'HUNGARIAN': 'Ungarsk'
+    }
+    try:
+        return languages[language_name]
+    except KeyError:
+        return language_name
+
+
+
 async def convert_status(status):
     """Formats status names"""
 
     statuses = {
-        'FINISHED': 'Fullført',
+        'FINISHED': 'Ferdigsendt',
         'RELEASING': 'Pågående',
         'NOT_YET_RELEASED': 'Ikke utgitt enda',
         'CANCELLED': 'Kansellert'
@@ -73,6 +96,195 @@ class Anime(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
+    @anilist.command(aliases=['profile'])
+    async def profil(self, ctx, *, bruker: str):
+        """Viser informasjon om en Anilist-profil"""
+
+        async with ctx.channel.typing():
+
+            # GraphQL 
+            query = """
+            query ($name: String) {
+                User (name: $name) {
+                    name
+                    siteUrl
+                    avatar {
+                        large
+                    }
+                    options {
+                        profileColor
+                    }
+                    statistics {
+                        anime {
+                            minutesWatched
+                            statuses {
+                                count
+                                status
+                            }
+                        }
+                        manga {
+                            chaptersRead
+                            statuses {
+                                count
+                                status
+                            }
+                        }
+                    }
+                    favourites {
+                        anime (perPage: 3) {
+                            nodes {
+                                title {
+                                    romaji
+                                }
+                                siteUrl
+                            }
+                        }
+                        manga (perPage: 3) {
+                                nodes {
+                                title {
+                                    romaji
+                                }
+                                siteUrl
+                            }
+                        }
+                        studios (perPage: 3) {
+                            nodes {
+                                name
+                                siteUrl
+                            }
+                        }
+                        characters (perPage: 3) {
+                            nodes {
+                                name {
+                                    full
+                                }
+                                siteUrl
+                            }
+                        }
+                        staff (perPage: 3) {
+                            nodes {
+                                name {
+                                    full
+                                }
+                                siteUrl
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            variables = {
+                'name': bruker
+            }
+            try:
+                data = post(
+                    'https://graphql.anilist.co',
+                    json={'query': query, 'variables': variables}).json()
+                data = data['data']['User']
+                url = data['siteUrl']
+            except TypeError:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Kunne ikke finne brukeren\n\n' +
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+
+            user_name = data['name']
+            profile_pic = data['avatar']['large']
+            days_watched = round(data['statistics']['anime']['minutesWatched'] / 1440, 1)
+            chapters_read = data['statistics']['manga']['chaptersRead']
+            color = await set_color(data['options']['profileColor'])
+
+            anime_statuses = {}
+            for status in data['statistics']['anime']['statuses']:
+                status_name = status['status']
+                status_count = status['count']
+                anime_statuses.update({f'{status_name}': {'count': status_count}})
+
+            manga_statuses = {}
+            for status in data['statistics']['manga']['statuses']:
+                status_name = status['status']
+                status_count = status['count']
+                manga_statuses.update({f'{status_name}': {'count': status_count}})
+
+            try:
+                anime_completed = anime_statuses['COMPLETED']['count']
+            except KeyError:
+                anime_completed = 0
+            try:
+                manga_completed = manga_statuses['COMPLETED']['count']
+            except KeyError:
+                manga_completed = 0
+
+            favourite_anime = []
+            for anime in data['favourites']['anime']['nodes']:
+                try:
+                    anime_name = anime['title']['romaji']
+                    anime_url = anime['siteUrl']
+                    favourite_anime.append(f'[{anime_name}]({anime_url})')
+                except KeyError:
+                    pass
+            favourite_anime = ' | '.join(favourite_anime)
+
+            favourite_manga = []
+            for manga in data['favourites']['manga']['nodes']:
+                try:
+                    manga_name = manga['title']['romaji']
+                    manga_url = manga['siteUrl']
+                    favourite_manga.append(f'[{manga_name}]({manga_url})')
+                except KeyError:
+                    pass
+            favourite_manga = ' | '.join(favourite_manga)
+
+            favourite_character = []
+            for character in data['favourites']['characters']['nodes']:
+                try:
+                    character_name = character['name']['full']
+                    character_url = character['siteUrl']
+                    favourite_character.append(f'[{character_name}]({character_url})')
+                except KeyError:
+                    pass
+            favourite_character = ' | '.join(favourite_character)
+
+            favourite_staff = []
+            for staff in data['favourites']['staff']['nodes']:
+                try:
+                    staff_name = staff['name']['full']
+                    staff_url = staff['siteUrl']
+                    favourite_staff.append(f'[{staff_name}]({staff_url})')
+                except KeyError:
+                    pass
+            favourite_staff = ' | '.join(favourite_staff)
+
+            favourite_studio = []
+            for studio in data['favourites']['studios']['nodes']:
+                try:
+                    studio_name = studio['name']
+                    studio_url = studio['siteUrl']
+                    favourite_studio.append(f'[{studio_name}]({studio_url})')
+                except KeyError:
+                    pass
+            favourite_studio = ' | '.join(favourite_studio)
+
+            embed = discord.Embed(title=user_name, color=color, url=url)
+            embed.set_author(name='Anilist', icon_url='https://anilist.co/img/logo_al.png')
+            embed.set_thumbnail(url=profile_pic)
+            embed.add_field(name='Antall dager sett', value=days_watched)
+            embed.add_field(name='Antall anime sett', value=anime_completed)
+            embed.add_field(name='Antall kapitler lest', value=chapters_read)
+            embed.add_field(name='Antall manga lest', value=manga_completed)
+            if favourite_anime is not '':
+                embed.add_field(name='Noen favorittanime', value=favourite_anime, inline=False)
+            if favourite_manga is not '':
+                embed.add_field(name='Noen favorittmanga', value=favourite_manga, inline=False)
+            if favourite_character is not '':
+                embed.add_field(name='Noen favorittkarakterer', value=favourite_character, inline=False)
+            if favourite_studio is not '':
+                embed.add_field(name='Noen favorittstudioer', value=favourite_studio, inline=False)
+            if favourite_studio is not '':
+                embed.add_field(name='Noen favorittskapere', value=favourite_staff, inline=False)
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
+
     @anilist.command(aliases=['anime'])
     async def animestats(self, ctx, *, bruker: str):
         """Viser animeinformasjon til en Anilist-profil"""
@@ -82,10 +294,9 @@ class Anime(commands.Cog):
             # GraphQL 
             query = """
             query ($name: String) {
-                User(name: $name) {
+                User (name: $name) {
                     name
                     siteUrl
-                    updatedAt
                     avatar {
                         large
                     }
@@ -102,13 +313,13 @@ class Anime(commands.Cog):
                                 status
                                 minutesWatched
                             }
-                            studios(limit: 3, sort: COUNT_DESC) {
+                            studios (limit: 3, sort: COUNT_DESC) {
                                 studio {
                                     name
                                     siteUrl
                                 }
                             }
-                            genres(limit: 3, sort: COUNT_DESC) {
+                            genres (limit: 3, sort: COUNT_DESC) {
                                 genre
                             }
                         }
@@ -134,8 +345,7 @@ class Anime(commands.Cog):
             profile_pic = data['avatar']['large']
             days_watched = round(data['statistics']['anime']['minutesWatched'] / 1440, 1)
             episodes_watched = data['statistics']['anime']['episodesWatched']
-            color = data['options']['profileColor']
-            color = await set_color(color)
+            color = await set_color(data['options']['profileColor'])
             
             statuses = {}
             for status in data['statistics']['anime']['statuses']:
@@ -185,7 +395,7 @@ class Anime(commands.Cog):
             embed.add_field(name='Gj.snittsvurdering gitt', value=anime_mean_score)
             embed.add_field(name='Antall dager sett', value=days_watched)
             embed.add_field(name='Antall episoder sett', value=episodes_watched)
-            embed.add_field(name='Antall animer sett', value=completed)
+            embed.add_field(name='Antall anime sett', value=completed)
             embed.add_field(name='Ser på nå', value=watching)
             embed.add_field(name='Planlegger å se', value=f'{planning}\n({planning_days} dager)')
             embed.add_field(name='Droppet', value=dropped)
@@ -208,7 +418,6 @@ class Anime(commands.Cog):
                 User(name: $name) {
                     name
                     siteUrl
-                    updatedAt
                     avatar {
                         large
                     }
@@ -225,16 +434,15 @@ class Anime(commands.Cog):
                                 status
                                 chaptersRead
                             }
-                            staff(limit: 3, sort: COUNT_DESC) {
+                            staff (limit: 3, sort: COUNT_DESC) {
                                 staff {
                                     name {
                                         full
-                                        native
                                     }
                                     siteUrl
                                 }
                             }
-                            genres(limit: 3, sort: COUNT_DESC) {
+                            genres (limit: 3, sort: COUNT_DESC) {
                                 genre
                             }
                         }
@@ -261,8 +469,7 @@ class Anime(commands.Cog):
             profile_pic = data['avatar']['large']
             chapters_read = round(data['statistics']['manga']['chaptersRead'] / 1440, 1)
             volumes_read = data['statistics']['manga']['volumesRead']
-            color = data['options']['profileColor']
-            color = await set_color(color)
+            color = await set_color(data['options']['profileColor'])
             
             statuses = {}
             for status in data['statistics']['manga']['statuses']:
@@ -301,7 +508,7 @@ class Anime(commands.Cog):
 
             staff = []
             for staffmember in data['statistics']['manga']['staff']:
-                staff_name = staffmember['staff']['name']['full'] + ' (' + staffmember['staff']['name']['native'] + ')'
+                staff_name = staffmember['staff']['name']['full']
                 staff_url = staffmember['staff']['siteUrl']
                 staff.append(f'[{staff_name}]({staff_url})')
             most_read_staff = ' | '.join(staff)
@@ -337,7 +544,7 @@ class Anime(commands.Cog):
                     siteUrl
                     format
                     status
-                    description(asHtml: false)
+                    description (asHtml: false)
                     episodes
                     duration
                     genres
@@ -363,13 +570,13 @@ class Anime(commands.Cog):
                         english
                         native
                     }
-                    studios(isMain: $isMain) {
+                    studios (isMain: $isMain) {
                         nodes {
                             name
                             siteUrl
                         }
                     }
-                    staff(sort: ROLE) {
+                    staff (sort: ROLE) {
                         edges {
                             role
                             node {
@@ -424,6 +631,10 @@ class Anime(commands.Cog):
             title_romaji, title_native, title_english = titles
 
             description = data['description']
+            if description:
+                description = sub('<br>', '', data['description'])
+            else:
+                description = ''
             genres = ', '.join(data['genres'])
 
             studios = data['studios']['nodes']
@@ -499,7 +710,7 @@ class Anime(commands.Cog):
             if mean_score:
                 embed.add_field(name='Gj.snittsvurdering', value=f'{mean_score}/100')
             embed.add_field(name='Sjangere', value=genres)
-            if len(description) < 1024:
+            if len(description) < 1024 and description is not '':
                 embed.add_field(name='Sammendrag', value=description, inline=False)
             if banner_image:
                 embed.set_image(url=banner_image)
@@ -520,7 +731,7 @@ class Anime(commands.Cog):
                         siteUrl
                         format
                         status
-                        description(asHtml: false)
+                        description (asHtml: false)
                         volumes
                         chapters
                         genres
@@ -600,6 +811,10 @@ class Anime(commands.Cog):
             title_romaji, title_native, title_english = titles
 
             description = data['description']
+            if description:
+                description = sub('<br>', '', data['description'])
+            else:
+                description = ''
             genres = ', '.join(data['genres'])
 
             staff = data['staff']['edges']
@@ -649,7 +864,7 @@ class Anime(commands.Cog):
             if mean_score:
                 embed.add_field(name='Gj.snittsvurdering', value=f'{mean_score}/100')
             embed.add_field(name='Sjangere', value=genres)
-            if len(description) < 1024:
+            if len(description) < 1024 and description is not '':
                 embed.add_field(name='Sammendrag', value=description, inline=False)
             if banner_image:
                 embed.set_image(url=banner_image)
