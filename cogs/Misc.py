@@ -161,7 +161,7 @@ class Misc(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(name='choose')
+    @commands.command(aliases=['choose', 'valg'])
     async def velg(self, ctx, *, valgmuligheter: str):
         """For deg som ikke klarer å bestemme deg"""
 
