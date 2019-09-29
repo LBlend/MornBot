@@ -28,7 +28,7 @@ async def set_color(color):
 
 
 async def convert_media_format(media_format):
-    """Formats media format names"""
+    """Translates media format names into norwegian"""
 
     media_formats = {
         'TV': 'TV-Serie',
@@ -50,16 +50,16 @@ async def convert_language_names(language_name):
     """Translates language names into norwegian"""
 
     languages = {
-                'JAPANESE': 'Japansk',
-                'ENGLISH': 'Engelsk',
-                'KOREAN': 'Koreansk',
-                'ITALIAN': 'Italiensk',
-                'SPANISH': 'Spansk',
-                'PORTUGUESE': 'Portugisisk',
-                'FRENCH': 'Fransk',
-                'GERMAN': 'Tysk',
-                'HEBREW': 'Hebraisk',
-                'HUNGARIAN': 'Ungarsk'
+        'JAPANESE': 'Japansk',
+        'ENGLISH': 'Engelsk',
+        'KOREAN': 'Koreansk',
+        'ITALIAN': 'Italiensk',
+        'SPANISH': 'Spansk',
+        'PORTUGUESE': 'Portugisisk',
+        'FRENCH': 'Fransk',
+        'GERMAN': 'Tysk',
+        'HEBREW': 'Hebraisk',
+        'HUNGARIAN': 'Ungarsk'
     }
     try:
         return languages[language_name]
@@ -67,9 +67,22 @@ async def convert_language_names(language_name):
         return language_name
 
 
+async def convert_role_names(role_name):
+    """Translates role names into norwegian"""
+
+    roles = {
+        'MAIN': 'Hovedkarakter',
+        'SUPPORTING': 'Bikarakter/Biperson',
+        'BACKGROUND': 'Statist'
+    }
+    try:
+        return roles[role_name]
+    except KeyError:
+        return role_name
+
 
 async def convert_status(status):
-    """Formats status names"""
+    """Translates role names into norwegian"""
 
     statuses = {
         'FINISHED': 'Ferdigsendt',
@@ -633,6 +646,7 @@ class Anime(commands.Cog):
             description = data['description']
             if description:
                 description = sub('<br>', '', data['description'])
+                description = sub('~!|!~', '||', description)
             else:
                 description = ''
             genres = ', '.join(data['genres'])
@@ -813,6 +827,7 @@ class Anime(commands.Cog):
             description = data['description']
             if description:
                 description = sub('<br>', '', data['description'])
+                description = sub('~!|!~', '||', description)
             else:
                 description = ''
             genres = ', '.join(data['genres'])
@@ -868,6 +883,99 @@ class Anime(commands.Cog):
                 embed.add_field(name='Sammendrag', value=description, inline=False)
             if banner_image:
                 embed.set_image(url=banner_image)
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['character'])
+    async def karakter(self, ctx, *, karakternavn: str):
+        """Viser informasjon om en karakter"""
+
+        async with ctx.channel.typing():
+
+            query = '''
+                query ($search: String) {
+                    Character (search: $search) {
+                        name {
+                            full
+                            native
+                        }
+                        siteUrl
+                        favourites
+                        image {
+                            large
+                        }
+                        description (asHtml: false)
+                        media (sort: POPULARITY_DESC, perPage: 1) {
+                            edges {
+                                node {
+                                    siteUrl
+                                    title {
+                                        romaji
+                                    }
+                                }
+                                characterRole
+                                voiceActors {
+                                    siteUrl
+                                    language
+                                    name {
+                                        full
+                                        native
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                '''
+            variables = {
+                'search': karakternavn
+            }
+            try:
+                data = post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
+                data = data['data']['Character']
+                url = data['siteUrl']
+            except TypeError:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Kunne ikke finne karakteren\n\n' +
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+
+            name_romaji = data['name']['full']
+            name_native = data['name']['native']
+            image = data['image']['large']
+            favourites = data['favourites']
+
+            if data['description']:
+                description = sub('__|<br>', '', data['description'])
+                description = sub('~!|!~', '||', description)
+                if len(description) > 1500:
+                    description = description[0:1020] + '...'
+            else:
+                description = '*Ingen biografi funnet* 😔'
+
+            featured_in = []
+            voice_actors = []
+            for media in data['media']['edges']:
+                media_name = media['node']['title']['romaji']
+                media_url = media['node']['siteUrl']
+                media_role = await convert_role_names(media['characterRole'])
+                for voice_actor in media['voiceActors']:
+                    voice_actor_url = voice_actor['siteUrl']
+                    voice_actor_language = await convert_language_names(voice_actor['language'])
+                    voice_actor_name = voice_actor['name']['full']
+                    if voice_actor['name']['native'] is not ' ' and voice_actor['name']['native'] is not None:
+                        voice_actor_name += ' (' + voice_actor['name']['native'] + ')'
+                    voice_actors.append(f'{voice_actor_language} stemme: [{voice_actor_name}]({voice_actor_url})')
+                
+                voice_actors_string = '\n'.join(voice_actors)
+                featured_in.append(f'[{media_name}]({media_url}) som {media_role}\n{voice_actors_string}')
+
+            featured_in = '\n\n'.join(featured_in)
+
+            embed = discord.Embed(color=0x02A9FF, title=name_romaji, url=url,
+                                  description=f'{name_native}\n\n**Antall favoritter på Anilist**\n{favourites}\n\n**Biografi**\n{description}\n\n**Er med i bl.a.**\n{featured_in}')
+            embed.set_thumbnail(url=image)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
