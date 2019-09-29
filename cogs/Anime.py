@@ -979,6 +979,108 @@ class Anime(commands.Cog):
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['staff'])
+    async def skaper(self, ctx, *, skapernavn: str):
+        """Viser informasjon om en skaper"""
+
+        async with ctx.channel.typing():
+
+            query = '''
+                query ($search: String) {
+                    Staff(search: $search) {
+                        name {
+                            full
+                            native
+                        }
+                        siteUrl
+                        image {
+                            large
+                        }
+                        language
+                        favourites
+                        description(asHtml: false)
+                        staffMedia(sort: POPULARITY_DESC, perPage: 2) {
+                            edges {
+                                staffRole
+                                node {
+                                    siteUrl
+                                    title {
+                                        romaji
+                                    }
+                                }
+                            }
+                        }
+                        characters(sort: FAVOURITES_DESC, perPage: 2) {
+                            edges {
+                                node {
+                                    name {
+                                        full
+                                        native
+                                    }
+                                    siteUrl
+                                }
+                            }
+                        }
+                    }
+                }
+                '''
+            variables = {
+                'search': skapernavn
+            }
+            try:
+                data = post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
+                data = data['data']['Staff']
+                url = data['siteUrl']
+            except TypeError:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Kunne ikke finne skaperen\n\n' +
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+
+            name_romaji = data['name']['full']
+            name_native = data['name']['native']
+            image = data['image']['large']
+            language = data['language']
+            favourites = data['favourites']
+
+            if data['description']:
+                description = sub('__|<br>', '', data['description'])
+                description = sub('~!|!~', '||', description)
+                if len(description) > 1500:
+                    description = description[0:1020] + '...'
+            else:
+                description = '*Ingen biografi funnet* 😔'
+
+            featured_in = []
+            for media in data['staffMedia']['edges']:
+                media_name = media['node']['title']['romaji']
+                media_url = media['node']['siteUrl']
+                media_role = media['staffRole']
+                featured_in.append(f'[{media_name}]({media_url})\n{media_role}')
+            featured_in = '\n\n'.join(featured_in)
+
+            characters = []
+            for character in data['characters']['edges']:
+                character_url = character['node']['siteUrl']
+                character_name = character['node']['name']['full']
+                if character['node']['name']['native'] is not ' ' and character['node']['name']['native'] is not None:
+                    character_name += ' (' + character['node']['name']['native'] + ')'
+                characters.append(f'[{character_name}]({character_url})')
+            characters = '\n\n'.join(characters)
+
+            embed = discord.Embed(color=0x02A9FF, title=name_romaji, url=url, description=name_native)
+            embed.set_thumbnail(url=image)
+            embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
+            if len(description) < 1024 and description is not '':
+                embed.add_field(name='Biografi', value=description, inline=False)
+            if characters is not '':
+                embed.add_field(name='Har vært stemmen til bl.a.', value=characters)
+            if featured_in is not '':
+                embed.add_field(name='Har deltatt i produksjonen av bl.a.', value=featured_in)
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Anime(bot))
