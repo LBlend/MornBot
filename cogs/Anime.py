@@ -949,7 +949,7 @@ class Anime(commands.Cog):
             if data['description']:
                 description = sub('__|<br>', '', data['description'])
                 description = sub('~!|!~', '||', description)
-                if len(description) > 1500:
+                if len(description) > 1024:
                     description = description[0:1020] + '...'
             else:
                 description = '*Ingen biografi funnet* 😔'
@@ -973,9 +973,11 @@ class Anime(commands.Cog):
 
             featured_in = '\n\n'.join(featured_in)
 
-            embed = discord.Embed(color=0x02A9FF, title=name_romaji, url=url,
-                                  description=f'{name_native}\n\n**Antall favoritter på Anilist**\n{favourites}\n\n**Biografi**\n{description}\n\n**Er med i bl.a.**\n{featured_in}')
+            embed = discord.Embed(color=0x02A9FF, title=name_romaji, url=url, description=name_native)
             embed.set_thumbnail(url=image)
+            embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
+            embed.add_field(name='Biografi', value=description, inline=False)
+            embed.add_field(name='Er med i bl.a.', value=featured_in, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -1047,7 +1049,7 @@ class Anime(commands.Cog):
             if data['description']:
                 description = sub('__|<br>', '', data['description'])
                 description = sub('~!|!~', '||', description)
-                if len(description) > 1500:
+                if len(description) > 1024:
                     description = description[0:1020] + '...'
             else:
                 description = '*Ingen biografi funnet* 😔'
@@ -1072,8 +1074,7 @@ class Anime(commands.Cog):
             embed = discord.Embed(color=0x02A9FF, title=name_romaji, url=url, description=name_native)
             embed.set_thumbnail(url=image)
             embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
-            if len(description) < 1024 and description is not '':
-                embed.add_field(name='Biografi', value=description, inline=False)
+            embed.add_field(name='Biografi', value=description, inline=False)
             if characters is not '':
                 embed.add_field(name='Har vært stemmen til bl.a.', value=characters)
             if featured_in is not '':
