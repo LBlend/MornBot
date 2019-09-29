@@ -58,7 +58,7 @@ class Memes(commands.Cog):
         """Harald mem"""
 
         async with ctx.channel.typing():
-            new_f = await self.gen_bilde(self, dorli_tekst, bra_tekst, mem="desanti")
+            new_f = await self.gen_bilde(self, dorli_tekst, bra_tekst, mem="harald")
             f = discord.File(fp=new_f, filename=f"{ctx.author.id}.png")
             embed = discord.Embed()
             embed.set_image(url=f'attachment://{ctx.author.id}.png')
