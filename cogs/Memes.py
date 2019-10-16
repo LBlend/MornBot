@@ -3,7 +3,7 @@ import discord
 
 from io import BytesIO
 from os import remove
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 import textwrap
 
 from cogs.utils import Defaults
@@ -90,6 +90,40 @@ class Memes(commands.Cog):
         image.save(file, format="PNG")
         file.seek(0)
         return file
+
+
+    """
+    Quick fix solution. Improve the command below later
+    """
+    @commands.bot_has_permissions(embed_links=True, attach_files=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['kjempenepe'])
+    async def nepe(self, ctx, bruker: discord.Member=None):
+        """Kjempenepe"""
+
+        async with ctx.channel.typing():
+
+            await bruker.avatar_url_as(format='png').save(fp=f'./assets/temp/{bruker.id}.png')
+            avatar = Image.open(f'./assets/temp/{bruker.id}.png')
+            nepe = Image.open('./assets/misc/nepe.png')
+
+            mask = Image.open('./assets/misc/nepe_mask.png').convert('L')
+            masked_avatar = ImageOps.fit(avatar, mask.size, centering=(0.5, 0.5))
+            masked_avatar.putalpha(mask)
+            masked_avatar.save(f'./assets/temp/{bruker.id}.png')
+
+            avatar = Image.open(f'./assets/temp/{bruker.id}.png').rotate(30)
+            nepe.paste(avatar, (281, 422), avatar)
+            nepe.save(f'./assets/temp/{bruker.id}_edit.png')
+
+            f = discord.File(fp=f'./assets/temp/{bruker.id}_edit.png', filename=f"{ctx.author.id}.png")
+            embed = discord.Embed()
+            embed.set_image(url=f'attachment://{ctx.author.id}.png')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed, file=f)
+
+            remove(f'./assets/temp/{bruker.id}.png')
+            remove(f'./assets/temp/{bruker.id}_edit.png')
 
 
 def setup(bot):
