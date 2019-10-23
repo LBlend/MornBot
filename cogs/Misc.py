@@ -442,6 +442,52 @@ class Misc(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def cutters(self, ctx, *, sted: str):
+        """Sjekk hvilken cutters-salong som har minst kø"""
+
+        sted = sted.lower()
+
+        data = get('https://www.cutters.no/api/salons').json()
+        data = data['data']
+
+        places = []
+        for i in data:
+            if i['postalPlace'].lower() == sted:
+                places.append(i)
+
+        def sortsalons(x):
+            return x['details']['waittime']['total']
+        places.sort(key=sortsalons)
+
+        salons = []
+        for i in places:
+            if i['details']['isOpen'] is False:
+                continue
+            name = i['name']
+            wait_hours = i['details']['waittime']['hours']
+            wait_minutes = i['details']['waittime']['minutes']
+            queue = i['details']['numberOfWaiting']
+            in_service = i['details']['numberOfServing']
+            latitude = i['coordinates']['latitude']
+            longitude = i['coordinates']['longitude']
+            gmap_url = f'https://www.google.com/maps/search/{latitude}+{longitude}'
+
+            salons.append(f'**{name}**\nKlippes nå: {in_service}\nI køen: {queue}\n' +
+                          f'Ventetid: {wait_hours}t {wait_minutes}m\n[Kart]({gmap_url})')
+
+        if not salons:
+            return await Defaults.error_fatal_send(ctx, text='Fant ingen åpne salonger i dette området')
+
+        salons_string = '\n\n'.join(salons[0:5])
+
+        embed = discord.Embed(color=0xFFDD00, title='Salongene med minst ventetid', description=salons_string)
+        embed.set_author(name='Cutters', icon_url='https://i.imgur.com/YNgVCqN.png')
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.is_nsfw()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
