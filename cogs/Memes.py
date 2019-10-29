@@ -68,23 +68,23 @@ class Memes(commands.Cog):
     @staticmethod
     async def gen_bilde(self, dorli_tekst, bra_tekst, mem):
         font = './assets/fonts/Roboto_Mono/RobotoMono-Medium.ttf'
-        top_text, top_font = format_text(dorli_tekst, 800, font)
-        bottom_text, bottom_font = format_text(bra_tekst, 800, font)
+        top_text, top_font = format_text(dorli_tekst, 505, font)
+        bottom_text, bottom_font = format_text(bra_tekst, 505, font)
 
         image = Image.open(f'./assets/meme_templates/{mem}.png').convert('RGBA')
         color = (0, 0, 0, 255)
 
-        box = Image.new('RGBA', (505, 505), (255, 255, 255, 255))
+        box = Image.new('RGBA', (510, 510), (255, 255, 255, 255))
         draw = ImageDraw.Draw(box)
         font_size = draw.multiline_textsize(top_text, font=top_font)
         font_size = ((box.size[0] - font_size[0]) / 2, (box.size[1] - font_size[1]) / 2)
         draw.multiline_text(font_size, top_text, font=top_font, fill=color, align='center')
-        image.paste(box, (519, 4))
+        image.paste(box, (514, 0))
 
         box = Image.new('RGBA', (505, 505), (255, 255, 255, 255))
         draw = ImageDraw.Draw(box)
         draw.multiline_text(font_size, bottom_text, font=bottom_font, fill=color, align='center')
-        image.paste(box, (519, 517))
+        image.paste(box, (514, 514))
 
         file = BytesIO()
         image.save(file, format="PNG")
