@@ -4,6 +4,7 @@ import discord
 from math import ceil
 from operator import itemgetter
 from re import sub
+from os import remove
 
 from cogs.utils import Defaults
 
@@ -214,6 +215,21 @@ class Info(commands.Cog):
         roles = roles.replace(", --", "\n--")
         roles = roles.replace("--, ", "--\n")
 
+        if len(roles) > 2048:
+            with open(f'./assets/temp/{ctx.guild.id}_roles.txt', 'w') as f:
+                f.seek(0)
+                f.write(roles)
+
+            txt_file = discord.File(f'./assets/temp/{ctx.guild.id}_roles.txt')
+            await ctx.send(file=txt_file)
+
+            try:
+                remove(f'./assets/temp/{ctx.guild.id}_roles.txt')
+            except:
+                pass
+
+            return
+
         if roles == '':
             roles = '**Ingen roller**'
 
@@ -405,6 +421,17 @@ class Info(commands.Cog):
                 roles.append(role.name)
         roles.reverse()
         roles = ', '.join(roles)
+        
+        if len(roles) > 2048:
+            txt_file = discord.File(f'./assets/temp/{ctx.guild.id}_{ctx.author.id}_roles.txt')
+            await ctx.send(file=txt_file)
+
+            try:
+                remove(f'./assets/temp/{ctx.guild.id}_{ctx.author.id}_roles.txt')
+            except:
+                pass
+
+            return
 
         if roles == '':
             roles = '**Ingen roller**'
