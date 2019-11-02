@@ -73,6 +73,11 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             return
 
+        try:
+            await Defaults.error_fatal_send(ctx, text='En ukjent feil oppstod. Be båtteier om å sjekke feilen')
+        except:
+            pass
+
         print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
