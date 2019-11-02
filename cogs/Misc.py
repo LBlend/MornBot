@@ -442,6 +442,33 @@ class Misc(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    @commands.command()
+    async def uke(self, ctx, *, dato: str=None):
+        """Fordi folk liker å bruke uker av en eller annen grunn"""
+
+        if not dato:
+            dato = datetime.now().strftime('%V')
+            return_string = f'Det er uke **{dato}**'
+        else:
+            dato = dato.split('.')
+            try:
+                dato = datetime(int(dato[2]), int(dato[1]), int(dato[0]))
+            except IndexError:
+                return await Defaults.error_warning_send(ctx, text='Du må taste inn datoen i riktig format\n\n' +
+                                                                    f'`dd.mm.åååå`\nEksempel: `17.05.1814`')
+            except ValueError:
+                return await Defaults.error_warning_send(ctx, text='Ingen data tilgjengelig for den datoen')
+
+            week = dato.strftime('%V')
+            dato = dato.strftime('%d.%m.%Y')
+            return_string = f'`{dato}` er i uke **{week}**'
+
+        embed = discord.Embed(color=ctx.me.color, description=return_string)
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command()
     async def cutters(self, ctx, *, sted: str):
