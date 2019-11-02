@@ -102,6 +102,7 @@ class Info(commands.Cog):
         region_names = {
             'eu-central': 'Sentral-Europa',
             'eu-west': 'Vest-Europa',
+            'europe': 'Europa',
             'hongkong': 'Hong Kong',
             'russia': 'Russland',
             'southafrica': 'Sør-Afrika',
