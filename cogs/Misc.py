@@ -457,7 +457,7 @@ class Misc(commands.Cog):
             except IndexError:
                 return await Defaults.error_warning_send(ctx, text='Du må taste inn datoen i riktig format\n\n' +
                                                                     f'`dd.mm.åååå`\nEksempel: `17.05.1814`')
-            except ValueError:
+            except (ValueError, OverflowError):
                 return await Defaults.error_warning_send(ctx, text='Ingen data tilgjengelig for den datoen')
 
             week = dato.strftime('%V')
