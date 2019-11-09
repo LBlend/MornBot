@@ -23,7 +23,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/raphtalia').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -43,7 +43,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/megumin').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -63,7 +63,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/rem').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -83,7 +83,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/emilia').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -103,7 +103,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/kaguya').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -123,7 +123,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/chika').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -143,7 +143,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/kumiko').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -163,7 +163,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/vignette').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
@@ -183,7 +183,7 @@ class Weeb(commands.Cog):
                 data = get('https://api.lblend.moe/k-on').json()
                 returned_data = data['data']['image_url']
             except:
-                return Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet!')
 
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
