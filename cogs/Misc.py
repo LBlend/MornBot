@@ -5,7 +5,7 @@ import locale
 
 from requests import get
 from urllib import parse
-from random import randint, choice
+from random import randint, choice, shuffle
 from hashlib import md5
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -425,6 +425,52 @@ class Misc(commands.Cog):
             embed.add_field(name='💴 Valuta', value=f'{currency_name}\n{currency_abbreviation}')
             embed.add_field(name='👥 Befolkningstall', value=population)
             embed.add_field(name='📏 Størrelse', value=f'{area} km')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['luftforurensning'])
+    async def luftkvalitet(self, ctx, *, sted: str):
+        """Se luftkvaliteten på en plass i Norge"""
+
+        async with ctx.channel.typing():
+
+            try:
+                url = 'https://api.nilu.no/aq/utd?' + parse.urlencode({'areas': sted})
+                data = get(url).json()
+                municipality = data[0]['municipality']
+                shuffle(data)
+            except:
+                return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data for dette stedet')
+
+            air_pollution_levels = {
+                '6ee86e': 'Lav luftforurensning',
+                'ff9900': 'Moderat luftforurensning',
+                'ff0000': 'Høy luftforurensning',
+                '990099': 'Veldig høy luftforurensning'
+            }
+
+            index = 0
+            reports = []
+            for place in data:
+                if index == 3:
+                    break
+                station = place['station']
+                pollution_level = air_pollution_levels[place['color']]
+                component = place['component']
+                latitude = place['latitude']
+                longitude = place['longitude']
+                gmap_url = f'https://www.google.com/maps/search/{latitude}+{longitude}'
+                reports.append(f'**{station}**\n{pollution_level} ({component}) \n[Kart]({gmap_url})')
+                index += 1
+            
+            report_string = '*Viser tilfeldige stasjoner i området & nivåer for tilfeldige typer luftforurensning*\n\n'
+            reports = '\n\n'.join(reports)
+            report_string += reports
+
+            embed = discord.Embed(color=ctx.me.color, title=f'Luftkvalitet - {municipality}',
+                                  description=report_string)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
