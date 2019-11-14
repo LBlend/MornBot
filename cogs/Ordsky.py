@@ -158,7 +158,7 @@ class Ordsky(commands.Cog):
                                                         'meldingsdataene dine.\n\n' +
                                                         f'Skriv `{self.bot.prefix}ordsky samtykke` for å gjøre dette',
                                               mention=True)
-            self.bot.reset_cooldown(ctx)                                 
+            self.bot.get_command(f'{ctx.command}').reset_cooldown(ctx)            
             return 
 
         embed = discord.Embed(description='**Henter meldinger:** ⌛\n**Generer ordsky:** -')
