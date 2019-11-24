@@ -288,7 +288,7 @@ class Info(commands.Cog):
         url = ctx.guild.splash_url_as(format='png')
 
         embed = discord.Embed(color=ctx.me.color, description=f'[Lenke]({url})')
-        embed.set_author(name=ctx.guild.name, icon_url=url)
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         embed.set_image(url=url)
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
@@ -306,7 +306,7 @@ class Info(commands.Cog):
         url = ctx.guild.banner_url_as(format='png')
 
         embed = discord.Embed(color=ctx.me.color, description=f'[Lenke]({url})')
-        embed.set_author(name=ctx.guild.name, icon_url=url)
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon_url)
         embed.set_image(url=url)
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
