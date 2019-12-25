@@ -1084,6 +1084,108 @@ class Anime(commands.Cog):
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command()
+    async def studio(self, ctx, *, studionavn: str):
+        """Viser informasjon om et animestudio"""
+
+        async with ctx.channel.typing():
+
+            query = '''
+                query ($search: String) {
+                    Studio(search: $search) {
+                        name
+                        siteUrl
+                        favourites
+                        media(sort: POPULARITY_DESC, perPage: 3) {
+                        nodes {
+                            siteUrl
+                            coverImage {
+                                large
+                            }
+                            isAdult
+                            title {
+                            romaji
+                            }
+                        }
+                        }
+                    }
+                    }
+                '''
+            variables = {
+                'search': studionavn
+            }
+            try:
+                data = post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
+                data = data['data']['Studio']
+                url = data['siteUrl']
+            except TypeError:
+                return await Defaults.error_fatal_send(
+                    ctx, text='Kunne ikke finne studioet\n\n' +
+                              f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+
+            name = data['name']
+            favourites = data['favourites']
+
+            popular_media = []
+            for media in data['media']['nodes']:
+                if media['isAdult'] is True:
+                    nsfwtag = ' (NSFW)'
+                else:
+                    nsfwtag = ''
+                media_name = media['title']['romaji']
+                media_url = media['siteUrl']
+                popular_media.append(f'- [{media_name}]({media_url}){nsfwtag}')
+            popular_media = '\n'.join(popular_media)
+
+
+            query2 = '''
+                query ($search: String) {
+                    Studio(search: $search) {
+                        media(sort: START_DATE_DESC) {
+                        nodes {
+                            siteUrl
+                            status
+                            isAdult
+                            title {
+                            romaji
+                            }
+                        }
+                        }
+                    }
+                    }
+                '''
+            data = post('https://graphql.anilist.co', json={'query': query2, 'variables': variables}).json()
+            data = data['data']['Studio']
+
+            recent_media = []
+            upcoming_media = []
+            for media in data['media']['nodes']:
+                if media['isAdult'] is True:
+                    nsfwtag = ' (NSFW)'
+                else:
+                    nsfwtag = ''
+                media_name = media['title']['romaji']
+                media_url = media['siteUrl']
+                if media['status'] == 'NOT_YET_RELEASED':
+                    upcoming_media.append(f'- [{media_name}]({media_url}){nsfwtag}')
+                else:
+                    recent_media.append(f'- [{media_name}]({media_url}){nsfwtag}')
+            recent_media = '\n'.join(recent_media[0:3])
+            upcoming_media = '\n'.join(upcoming_media[0:3])
+
+            embed = discord.Embed(color=0x02A9FF, title=name, url=url)
+            embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
+            if popular_media is not '':
+                embed.add_field(name='Mest Populære Anime', value=popular_media, inline=False)
+            if recent_media is not '':
+                embed.add_field(name='Nyeste Utgitte Anime', value=recent_media, inline=False)
+            if upcoming_media is not '':
+                embed.add_field(name='Kommende Anime', value=upcoming_media, inline=False)
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Anime(bot))
