@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 
 from requests import post
-from re import sub
+from re import compile, sub
 
 from cogs.utils import Defaults
 
@@ -94,6 +94,12 @@ async def convert_status(status):
         return statuses[status]
     except KeyError:
         return status
+
+
+async def remove_html(text):
+    compiled = compile('<.*?>')
+    clean_text = sub(compiled, '', text)
+    return clean_text
 
 
 class Anime(commands.Cog):
@@ -645,8 +651,7 @@ class Anime(commands.Cog):
 
             description = data['description']
             if description:
-                description = sub('<br>', '', data['description'])
-                description = sub('~!|!~', '||', description)
+                description = await remove_html(data['description'])
             else:
                 description = ''
             genres = ', '.join(data['genres'])
@@ -826,8 +831,7 @@ class Anime(commands.Cog):
 
             description = data['description']
             if description:
-                description = sub('<br>', '', data['description'])
-                description = sub('~!|!~', '||', description)
+                description = await remove_html(data['description'])
             else:
                 description = ''
             genres = ', '.join(data['genres'])
@@ -947,8 +951,7 @@ class Anime(commands.Cog):
             favourites = data['favourites']
 
             if data['description']:
-                description = sub('__|<br>', '', data['description'])
-                description = sub('~!|!~', '||', description)
+                description = await remove_html(data['description'])
                 if len(description) > 1024:
                     description = description[0:1020] + '...'
             else:
@@ -1047,8 +1050,7 @@ class Anime(commands.Cog):
             favourites = data['favourites']
 
             if data['description']:
-                description = sub('__|<br>', '', data['description'])
-                description = sub('~!|!~', '||', description)
+                description = await remove_html(data['description'])
                 if len(description) > 1024:
                     description = description[0:1020] + '...'
             else:
