@@ -152,6 +152,7 @@ class Anime(commands.Cog):
                     favourites {
                         anime (perPage: 3) {
                             nodes {
+                                isAdult
                                 title {
                                     romaji
                                 }
@@ -160,6 +161,7 @@ class Anime(commands.Cog):
                         }
                         manga (perPage: 3) {
                                 nodes {
+                                isAdult
                                 title {
                                     romaji
                                 }
@@ -236,9 +238,13 @@ class Anime(commands.Cog):
             favourite_anime = []
             for anime in data['favourites']['anime']['nodes']:
                 try:
+                    if anime['isAdult'] is True:
+                        nsfwtag = ' (NSFW)'
+                    else:
+                        nsfwtag = ''
                     anime_name = anime['title']['romaji']
                     anime_url = anime['siteUrl']
-                    favourite_anime.append(f'[{anime_name}]({anime_url})')
+                    favourite_anime.append(f'[{anime_name}]({anime_url}){nsfwtag}')
                 except KeyError:
                     pass
             favourite_anime = ' | '.join(favourite_anime)
@@ -246,9 +252,13 @@ class Anime(commands.Cog):
             favourite_manga = []
             for manga in data['favourites']['manga']['nodes']:
                 try:
+                    if manga['isAdult'] is True:
+                        nsfwtag = ' (NSFW)'
+                    else:
+                        nsfwtag = ''
                     manga_name = manga['title']['romaji']
                     manga_url = manga['siteUrl']
-                    favourite_manga.append(f'[{manga_name}]({manga_url})')
+                    favourite_manga.append(f'[{manga_name}]({manga_url}){nsfwtag}')
                 except KeyError:
                     pass
             favourite_manga = ' | '.join(favourite_manga)
@@ -915,6 +925,7 @@ class Anime(commands.Cog):
                             edges {
                                 node {
                                     siteUrl
+                                    isAdult
                                     title {
                                         romaji
                                     }
@@ -960,6 +971,10 @@ class Anime(commands.Cog):
             featured_in = []
             voice_actors = []
             for media in data['media']['edges']:
+                if media['node']['isAdult'] is True:
+                    nsfwtag = ' (NSFW)'
+                else:
+                    nsfwtag = ''
                 media_name = media['node']['title']['romaji']
                 media_url = media['node']['siteUrl']
                 media_role = await convert_role_names(media['characterRole'])
@@ -972,7 +987,7 @@ class Anime(commands.Cog):
                     voice_actors.append(f'{voice_actor_language} stemme: [{voice_actor_name}]({voice_actor_url})')
                 
                 voice_actors_string = '\n'.join(voice_actors)
-                featured_in.append(f'[{media_name}]({media_url}) som {media_role}\n{voice_actors_string}')
+                featured_in.append(f'[{media_name}]({media_url}){nsfwtag} som {media_role}\n{voice_actors_string}')
 
             featured_in = '\n\n'.join(featured_in)
 
@@ -1011,6 +1026,7 @@ class Anime(commands.Cog):
                                 staffRole
                                 node {
                                     siteUrl
+                                    isAdult
                                     title {
                                         romaji
                                     }
@@ -1058,10 +1074,14 @@ class Anime(commands.Cog):
 
             featured_in = []
             for media in data['staffMedia']['edges']:
+                if media['node']['isAdult'] is True:
+                    nsfwtag = ' (NSFW)'
+                else:
+                    nsfwtag = ''
                 media_name = media['node']['title']['romaji']
                 media_url = media['node']['siteUrl']
                 media_role = media['staffRole']
-                featured_in.append(f'[{media_name}]({media_url})\n{media_role}')
+                featured_in.append(f'[{media_name}]({media_url}){nsfwtag}\n{media_role}')
             featured_in = '\n\n'.join(featured_in)
 
             characters = []
@@ -1078,9 +1098,9 @@ class Anime(commands.Cog):
             embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
             embed.add_field(name='Biografi', value=description, inline=False)
             if characters is not '':
-                embed.add_field(name='Har vært stemmen til bl.a.', value=characters)
+                embed.add_field(name='Har vært stemmen til bl.a.', value=characters, inline=False)
             if featured_in is not '':
-                embed.add_field(name='Har deltatt i produksjonen av bl.a.', value=featured_in)
+                embed.add_field(name='Har deltatt i produksjonen av bl.a.', value=featured_in, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
