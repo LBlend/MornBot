@@ -494,7 +494,7 @@ class Misc(commands.Cog):
         """Fordi folk liker å bruke uker av en eller annen grunn"""
 
         if not dato:
-            dato = datetime.now().strftime('%V')
+            dato = datetime.now().strftime('%W')
             return_string = f'Det er uke **{dato}**'
         else:
             dato = dato.split('.')
@@ -506,7 +506,7 @@ class Misc(commands.Cog):
             except (ValueError, OverflowError):
                 return await Defaults.error_warning_send(ctx, text='Ingen data tilgjengelig for den datoen')
 
-            week = dato.strftime('%V')
+            week = dato.strftime('%W')
             dato = dato.strftime('%d.%m.%Y')
             return_string = f'`{dato}` er i uke **{week}**'
 
