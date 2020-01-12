@@ -85,7 +85,7 @@ async def convert_status(status):
     """Translates role names into norwegian"""
 
     statuses = {
-        'FINISHED': 'Ferdigsendt',
+        'FINISHED': 'Fullt utgitt',
         'RELEASING': 'Pågående',
         'NOT_YET_RELEASED': 'Ikke utgitt enda',
         'CANCELLED': 'Kansellert'
