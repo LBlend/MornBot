@@ -61,7 +61,10 @@ class ReactRoles(commands.Cog):
     async def react_remove(self, payload):
         guild = self.bot.get_guild(payload.guild_id)
         user = guild.get_member(payload.user_id)
-        if user.bot or payload.message_id != self.message:
+        try:
+            if user.bot or payload.message_id != self.message:
+                return
+        except:
             return
         
         role = await emoji_role(payload.emoji)
