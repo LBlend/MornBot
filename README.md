@@ -32,7 +32,7 @@ It also has a lot of poorly written issues and weird commit messages but I can't
   python -m pip install -r requirements.txt
   ```
 
-* Rename [config.yaml.example](config.yaml.example) to `config.yaml` and replace the values within it with your own.
+* Rename [config.yaml.example](config.yaml.example) to `config.yaml` and replace the values within the file with your own.
 
 * Run the bot
   ```
