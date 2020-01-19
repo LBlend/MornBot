@@ -43,7 +43,6 @@ else:
     activity_type = 0
 
 requirements = {
-    'Dagbok': bot.database,
     'FunReplies': bot.database,
     'Ordsky': bot.database,
     'osu': bot.api_keys['osu_api_key'],

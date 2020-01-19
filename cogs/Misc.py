@@ -52,39 +52,7 @@ class Misc(commands.Cog):
             embed = discord.Embed(color=ctx.me.color)
             embed.set_image(url=returned_data)
             await Defaults.set_footer(ctx, embed)
-            if ctx.guild.id == 297798952538079233:
-                return await ctx.send(
-                    content='<@516234701221134346> er glad i katter',
-                    embed=embed)
             await ctx.send(embed=embed)
-
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(hidden=True)
-    async def drepmeg(self, ctx):
-        """Dreper deg"""
-
-        await ctx.send("Du er død nå")
-
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(hidden=True)
-    async def sql(self, ctx):
-        """Ber LBLend om å lære seg SQL"""
-
-        lblend = await self.bot.fetch_user(170506717140877312)
-        await ctx.send(f'{lblend.mention} LÆR DEG SQL NÅÅÅÅ!')
-
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(hidden=True)
-    async def pitbull(self, ctx):
-        
-        await ctx.send('https://imgur.com/RuS84tz\nPitbuller er grusomme dyr.\n' +
-                       f'Pitbuller spiser bl.a. `{self.bot.prefix}spedbarn.`')
-
-    @commands.cooldown(1, 2, commands.BucketType.guild)
-    @commands.command(hidden=True)
-    async def spedbarn(self, ctx):
-        
-        await ctx.send('https://imgur.com/Rbgxs0t\nSpedbarn er grusomme\nDe griner og driter overalt')
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -104,10 +72,6 @@ class Misc(commands.Cog):
         # Må jo gi meg selv en stor kuk
         if bruker.id == 170506717140877312:
             dick_size = 69
-        elif bruker.id == 202745416062599168:
-            dick_size = 0
-        elif bruker.id == 142580278940925953:
-            dick_size = 12
         else:
             dick_size = hash_dicksize(user_id, 25, 2)
 
@@ -117,10 +81,7 @@ class Misc(commands.Cog):
         embed.set_author(
             name=f'{bruker.name}#{bruker.discriminator}',
             icon_url=bruker.avatar_url)
-        if bruker.id == 209305971066011648:
-            embed.add_field(name='Kukstørrelse', value=f'18.1 cm lang\n16.5 cm girth')
-        else:
-            embed.add_field(name='Kukstørrelse', value=f'{dick_size} cm\n8{dick_drawing}D')
+        embed.add_field(name='Kukstørrelse', value=f'{dick_size} cm\n8{dick_drawing}D')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
 
@@ -620,14 +581,6 @@ class Misc(commands.Cog):
             match_percent = int((invoker_id + user_id) % 100)
 
             if bruker.id == self.bot.user.id:
-                match_percent = 100
-            elif ctx.author.id == 127934026467115008 and bruker.id == 142580278940925953:
-                match_percent = 100
-            elif ctx.author.id == 142580278940925953 and bruker.id == 127934026467115008:
-                match_percent = 100
-            elif ctx.author.id == 202745416062599168 or bruker.id == 202745416062599168:
-                match_percent = 0
-            elif ctx.author.id == 290579810613460992 or bruker.id == 290579810613460992:
                 match_percent = 100
 
             await ctx.author.avatar_url_as(format='png').save(fp=f'./assets/temp/{ctx.author.id}_raw.png')
