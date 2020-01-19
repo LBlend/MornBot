@@ -20,7 +20,7 @@ It also has a lot of poorly written issues and weird commit messages but I can't
 
 ### Prerequisites
 
-* [Python](https://github.com/python/cpython) 3.6 or newer
+* [Python](https://github.com/python/cpython) 3.6+
 * A [MongoDB](https://github.com/mongodb/mongo) database
 
 ### Setup
@@ -32,7 +32,7 @@ It also has a lot of poorly written issues and weird commit messages but I can't
   python -m pip install -r requirements.txt
   ```
 
-* Rename the [config.yaml.example](config.yaml.example) file to `config.yaml` and replace the values within it with your own.
+* Rename [config.yaml.example](config.yaml.example) to `config.yaml` and replace the values within it with your own.
 
 * Run the bot
   ```
@@ -51,7 +51,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - Please read [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
