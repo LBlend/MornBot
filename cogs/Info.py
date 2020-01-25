@@ -82,6 +82,7 @@ class Info(commands.Cog):
             'amsterdam': ':flag_nl:',
             'frankfurt': ':flag_de:',
             'brazil': ':flag_br:',
+            'dubai': ':flag_ae:',
             'japan': ':flag_jp:',
             'russia': ':flag_ru:',
             'southafrica': ':flag_za:',
