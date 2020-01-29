@@ -300,15 +300,15 @@ class Anime(commands.Cog):
             embed.add_field(name='Antall anime sett', value=anime_completed)
             embed.add_field(name='Antall kapitler lest', value=chapters_read)
             embed.add_field(name='Antall manga lest', value=manga_completed)
-            if favourite_anime is not '':
+            if favourite_anime != '':
                 embed.add_field(name='Noen favorittanime', value=favourite_anime, inline=False)
-            if favourite_manga is not '':
+            if favourite_manga != '':
                 embed.add_field(name='Noen favorittmanga', value=favourite_manga, inline=False)
-            if favourite_character is not '':
+            if favourite_character != '':
                 embed.add_field(name='Noen favorittkarakterer', value=favourite_character, inline=False)
-            if favourite_studio is not '':
+            if favourite_studio != '':
                 embed.add_field(name='Noen favorittstudioer', value=favourite_studio, inline=False)
-            if favourite_studio is not '':
+            if favourite_studio != '':
                 embed.add_field(name='Noen favorittskapere', value=favourite_staff, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
@@ -428,9 +428,9 @@ class Anime(commands.Cog):
             embed.add_field(name='Ser på nå', value=watching)
             embed.add_field(name='Planlegger å se', value=f'{planning}\n({planning_days} dager)')
             embed.add_field(name='Droppet', value=dropped)
-            if most_watched_genres is not '':
+            if most_watched_genres != '':
                 embed.add_field(name='Mest sette sjangere', value=most_watched_genres, inline=False)
-            if most_watched_studios is not '':
+            if most_watched_studios != '':
                 embed.add_field(name='Mest sette studioer', value=most_watched_studios, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
@@ -552,9 +552,9 @@ class Anime(commands.Cog):
             embed.add_field(name='Leser nå', value=reading)
             embed.add_field(name='Planlegger å lese', value=f'{planning}\n({planning_days} kapitler)')
             embed.add_field(name='Droppet', value=dropped)
-            if most_read_genres is not '':
+            if most_read_genres != '':
                 embed.add_field(name='Mest leste sjangere', value=most_read_genres, inline=False)
-            if most_read_staff is not '':
+            if most_read_staff != '':
                 embed.add_field(name='Mest leste skapere', value=most_read_staff, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
@@ -739,7 +739,7 @@ class Anime(commands.Cog):
             if mean_score:
                 embed.add_field(name='Gj.snittsvurdering', value=f'{mean_score}/100')
             embed.add_field(name='Sjangere', value=genres)
-            if len(description) < 1024 and description is not '':
+            if len(description) < 1024 and description != '':
                 embed.add_field(name='Sammendrag', value=description, inline=False)
             if banner_image:
                 embed.set_image(url=banner_image)
@@ -893,7 +893,7 @@ class Anime(commands.Cog):
             if mean_score:
                 embed.add_field(name='Gj.snittsvurdering', value=f'{mean_score}/100')
             embed.add_field(name='Sjangere', value=genres)
-            if len(description) < 1024 and description is not '':
+            if len(description) < 1024 and description != '':
                 embed.add_field(name='Sammendrag', value=description, inline=False)
             if banner_image:
                 embed.set_image(url=banner_image)
@@ -982,7 +982,7 @@ class Anime(commands.Cog):
                     voice_actor_url = voice_actor['siteUrl']
                     voice_actor_language = await convert_language_names(voice_actor['language'])
                     voice_actor_name = voice_actor['name']['full']
-                    if voice_actor['name']['native'] is not ' ' and voice_actor['name']['native'] is not None:
+                    if voice_actor['name']['native'] != ' ' and voice_actor['name']['native'] is not None:
                         voice_actor_name += ' (' + voice_actor['name']['native'] + ')'
                     voice_actors.append(f'{voice_actor_language} stemme: [{voice_actor_name}]({voice_actor_url})')
                 
@@ -1088,7 +1088,7 @@ class Anime(commands.Cog):
             for character in data['characters']['edges']:
                 character_url = character['node']['siteUrl']
                 character_name = character['node']['name']['full']
-                if character['node']['name']['native'] is not ' ' and character['node']['name']['native'] is not None:
+                if character['node']['name']['native'] != ' ' and character['node']['name']['native'] is not None:
                     character_name += ' (' + character['node']['name']['native'] + ')'
                 characters.append(f'[{character_name}]({character_url})')
             characters = '\n\n'.join(characters)
@@ -1097,9 +1097,9 @@ class Anime(commands.Cog):
             embed.set_thumbnail(url=image)
             embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
             embed.add_field(name='Biografi', value=description, inline=False)
-            if characters is not '':
+            if characters != '':
                 embed.add_field(name='Har vært stemmen til bl.a.', value=characters, inline=False)
-            if featured_in is not '':
+            if featured_in != '':
                 embed.add_field(name='Har deltatt i produksjonen av bl.a.', value=featured_in, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
@@ -1197,11 +1197,11 @@ class Anime(commands.Cog):
 
             embed = discord.Embed(color=0x02A9FF, title=name, url=url)
             embed.add_field(name='Antall favoritter på Anilist', value=favourites, inline=False)
-            if popular_media is not '':
+            if popular_media != '':
                 embed.add_field(name='Mest Populære Anime', value=popular_media, inline=False)
-            if recent_media is not '':
+            if recent_media != '':
                 embed.add_field(name='Nyeste Utgitte Anime', value=recent_media, inline=False)
-            if upcoming_media is not '':
+            if upcoming_media != '':
                 embed.add_field(name='Kommende Anime', value=upcoming_media, inline=False)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
