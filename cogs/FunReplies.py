@@ -1,13 +1,10 @@
 from discord.ext import commands
 import discord
 
-import pymongo
-
 
 class FunReplies(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_funreplies = pymongo.MongoClient(self.bot.database)['mornbot']['funreplies']
 
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -29,7 +26,7 @@ class FunReplies(commands.Cog):
 
         database_find = {'_id': kanal.id}
         try:
-            database_funreplies = self.database_col_funreplies.find_one(database_find)
+            database_funreplies = self.bot.database['funreplies'].find_one(database_find)
         except:
             return await ctx.send(f'{ctx.author.mention} Jeg har ikke tilkobling til databasen. ' +
                                   f'Be boteier om å fikse dette')
@@ -37,7 +34,7 @@ class FunReplies(commands.Cog):
         try:
             database_funreplies[f'{kanal.id}']
         except TypeError:
-            self.database_col_funreplies.insert_one({'_id': kanal.id, 'funreplies': True})
+            self.bot.database['funreplies'].insert_one({'_id': kanal.id, 'funreplies': True})
 
         embed = discord.Embed(color=ctx.me.color, description=f'FunReplies er nå skrudd **på** for {kanal.mention}')
         await ctx.send(embed=embed)
@@ -51,12 +48,12 @@ class FunReplies(commands.Cog):
 
         database_find = {'_id': kanal.id}
         try:
-            database_funreplies = self.database_col_funreplies.find_one(database_find)
+            database_funreplies = self.bot.database['funreplies'].find_one(database_find)
         except:
             return await ctx.send(f'{ctx.author.mention} Jeg har ikke tilkobling til databasen. ' +
                                   'Be boteier om å fikse dette')
 
-        self.database_col_funreplies.delete_one(database_funreplies)
+        self.bot.database['funreplies'].delete_one(database_funreplies)
 
         embed = discord.Embed(color=ctx.me.color, description=f'FunReplies er nå skrudd **av** for {kanal.mention}')
         await ctx.send(embed=embed)
@@ -66,7 +63,7 @@ class FunReplies(commands.Cog):
             return
 
         database_find = {'_id': message.channel.id}
-        channel = self.database_col_funreplies.find_one(database_find)
+        channel = self.bot.database['funreplies'].find_one(database_find)
         try:
             if not channel['funreplies']:
                 return

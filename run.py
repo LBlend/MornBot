@@ -26,7 +26,7 @@ class MornBot(commands.Bot):
         self.api_keys = config.get('api', {})
         self.emoji = config.get('emoji', {})
         self.misc = config.get('misc', {})
-        self.database = config['database']
+        self.database = pymongo.MongoClient(config['database'])['mornbot']
 
 
 bot = MornBot()
@@ -80,12 +80,10 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=activity_type, name=bot.presence),
                               status=discord.Status.online)
 
-database_col_cog_check = pymongo.MongoClient(bot.database)['mornbot']['cog_check']
-
 
 @bot.check
 async def cog_blacklist(ctx):
-    cog_check = database_col_cog_check.find_one({'_id': ctx.guild.id})
+    cog_check = bot.database['cog_check'].find_one({'_id': ctx.guild.id})
     try:
         return ctx.cog.qualified_name not in cog_check['disabled']
     except TypeError:

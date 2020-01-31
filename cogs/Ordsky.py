@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-import pymongo
-
 from codecs import open
 import json
 
@@ -20,7 +18,6 @@ from cogs.utils import Defaults
 class Ordsky(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_ordsky = pymongo.MongoClient(bot.database)['mornbot']['ordsky']
 
     @staticmethod
     def generate(text, mask, filtered_words):
@@ -50,17 +47,17 @@ class Ordsky(commands.Cog):
 
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = self.database_col_ordsky.find_one(database_find)
+            database_user = self.bot.database['ordsky'].find_one(database_find)
         except:
             return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
                                                              'Be båtteier om å fikse dette')
 
         if database_user is None:
-            self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
-            self.database_col_ordsky.find_one(database_find)
-            self.database_col_ordsky.update_one(database_find, {'$set': {'ordsky_consent': True}})
+            self.bot.database['ordsky'].insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
+            self.bot.database['ordsky'].find_one(database_find)
+            self.bot.database['ordsky'].update_one(database_find, {'$set': {'ordsky_consent': True}})
         else:
-            self.database_col_ordsky.update_one(database_find, {'$set': {'ordsky_consent': True}})
+            self.bot.database['ordsky'].update_one(database_find, {'$set': {'ordsky_consent': True}})
 
         embed = discord.Embed(color=ctx.me.color, description='✅ Samtykke registrert!')
         await Defaults.set_footer(ctx, embed)
@@ -73,12 +70,12 @@ class Ordsky(commands.Cog):
 
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = self.database_col_ordsky.find_one(database_find)
+            database_user = self.bot.database['ordsky'].find_one(database_find)
         except:
             return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
                                                              'Be båtteier om å fikse dette')
 
-        self.database_col_ordsky.delete_one(database_user)
+        self.bot.database['ordsky'].delete_one(database_user)
 
         embed = discord.Embed(color=ctx.me.color, description='✅ Meldingsdata er slettet!')
         await Defaults.set_footer(ctx, embed)
@@ -91,13 +88,13 @@ class Ordsky(commands.Cog):
 
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = self.database_col_ordsky.find_one(database_find)
+            database_user = self.bot.database['ordsky'].find_one(database_find)
         except:
             return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
                                                              'Be båtteier om å fikse dette')
 
         if database_user is None:
-            self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
+            self.bot.database['ordsky'].insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
             return await Defaults.error_warning_send(ctx, text='Jeg har ingen data om deg å sende eller ' +
                                                                'så kan jeg ikke sende meldinger til deg!')
 
@@ -142,16 +139,16 @@ class Ordsky(commands.Cog):
 
         database_find = {'_id': ctx.author.id}
         try:
-            database_user = self.database_col_ordsky.find_one(database_find)
+            database_user = self.bot.database['ordsky'].find_one(database_find)
         except:
             return await Defaults.error_fatal_send(ctx, text='Jeg har ikke tilkobling til databasen\n\n' +
                                                              'Be båtteier om å fikse dette')
 
         if database_user is None:
-            self.database_col_ordsky.insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
-            self.database_col_ordsky.find_one(database_find)
+            self.bot.database['ordsky'].insert_one({'_id': ctx.author.id, 'ordsky_consent': False})
+            self.bot.database['ordsky'].find_one(database_find)
 
-        database_user = self.database_col_ordsky.find_one(database_find)
+        database_user = self.bot.database['ordsky'].find_one(database_find)
 
         if database_user['ordsky_consent'] is False:
             await Defaults.error_warning_send(ctx, text='Du må gi meg tillatelse til å samle og beholde ' +
@@ -205,10 +202,10 @@ class Ordsky(commands.Cog):
                 except:
                     continue
         if message_data != '':
-            self.database_col_ordsky.update_one(database_find, {'$set': {f'ordsky_data.{ctx.guild.id}': message_data}},
-                                          upsert=True)
+            self.bot.database['ordsky'].update_one(database_find,
+            {'$set': {f'ordsky_data.{ctx.guild.id}': message_data}}, upsert=True)
 
-        database_user = self.database_col_ordsky.find_one(database_find)
+        database_user = self.bot.database['ordsky'].find_one(database_find)
         try:
             message_data = database_user['ordsky_data'][f'{ctx.guild.id}']
         except KeyError:

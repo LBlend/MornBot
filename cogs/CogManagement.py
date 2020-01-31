@@ -1,15 +1,12 @@
 from discord.ext import commands
 import discord
 
-import pymongo
-
 from cogs.utils import Defaults
 
 
 class CogManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.database_col_cog_check = pymongo.MongoClient(self.bot.database)['mornbot']['cog_check']
 
     @commands.guild_only()
     @commands.bot_has_permissions(embed_links=True)
@@ -30,11 +27,11 @@ class CogManagement(commands.Cog):
             return await Defaults.error_warning_send(ctx, text='Du kan ikke skru av den cogen 👀')
 
         database_find = {'_id': ctx.guild.id}
-        database_guild = self.database_col_cog_check.find_one(database_find)
+        database_guild = self.bot.database['cog_check'].find_one(database_find)
         try:
             disabled = database_guild['disabled']
         except TypeError:
-            self.database_col_cog_check.insert_one({'_id': ctx.guild.id, 'disabled': [cog]})
+            self.bot.database['cog_check'].insert_one({'_id': ctx.guild.id, 'disabled': [cog]})
             embed = discord.Embed(description=f'✅ `{cog}` er nå skrudd **av** for serveren')
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
@@ -45,7 +42,7 @@ class CogManagement(commands.Cog):
 
 
         disabled.append(cog)
-        self.database_col_cog_check.update_one(database_find, {'$set': {'disabled': disabled}})
+        self.bot.database['cog_check'].update_one(database_find, {'$set': {'disabled': disabled}})
         embed = discord.Embed(description=f'✅ `{cog}` er nå skrudd **av** for serveren')
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
@@ -56,18 +53,18 @@ class CogManagement(commands.Cog):
         """Skru på cogen for serveren"""
 
         database_find = {'_id': ctx.guild.id}
-        database_guild = self.database_col_cog_check.find_one(database_find)
+        database_guild = self.bot.database['cog_check'].find_one(database_find)
         try:
             disabled = database_guild['disabled']
         except TypeError:
-            self.database_col_cog_check.insert_one({'_id': ctx.guild.id, 'disabled': []})
+            self.bot.database['cog_check'].insert_one({'_id': ctx.guild.id, 'disabled': []})
             embed = discord.Embed(description=f'✅ `{cog}` er nå skrudd **på** for serveren')
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
 
         if cog in database_guild['disabled']:
             disabled.remove(cog)
-            self.database_col_cog_check.update_one(database_find, {'$set': {'disabled': disabled}})
+            self.bot.database['cog_check'].update_one(database_find, {'$set': {'disabled': disabled}})
             embed = discord.Embed(description=f'✅ `{cog}` er nå skrud **på** for serveren')
             await Defaults.set_footer(ctx, embed)
             return await ctx.send(embed=embed)
@@ -80,7 +77,7 @@ class CogManagement(commands.Cog):
         """Se listen over avskrudde cogs"""
 
         database_find = {'_id': ctx.guild.id}
-        database_guild = self.database_col_cog_check.find_one(database_find)
+        database_guild = self.bot.database['cog_check'].find_one(database_find)
         try:
             disabled = database_guild['disabled']
         except TypeError:
