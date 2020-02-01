@@ -56,7 +56,7 @@ class ReactRoles(commands.Cog):
         role = await emoji_role(payload.emoji)
         role = guild.get_role(role)
         await user.add_roles(role)
-        print('Reacion added')
+        print('Reaction added')
 
     async def react_remove(self, payload):
         guild = self.bot.get_guild(payload.guild_id)
@@ -70,7 +70,7 @@ class ReactRoles(commands.Cog):
         role = await emoji_role(payload.emoji)
         role = guild.get_role(role)
         await user.remove_roles(role)
-        print('Reacion removed')
+        print('Reaction removed')
 
     
     @commands.is_owner()
