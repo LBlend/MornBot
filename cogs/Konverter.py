@@ -9,6 +9,7 @@ from re import sub
 
 from cogs.utils import Defaults
 
+
 locale.setlocale(locale.LC_ALL, '')
 
 
@@ -110,49 +111,50 @@ class Konverter(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['penger', 'money', 'currency'])
-    async def valuta(self, ctx, til_valuta, verdi, fra_valuta):
+    async def valuta(self, ctx, til_valuta: str, verdi, fra_valuta: str):
         """Se hvor mye noe er verdt i en annen valuta"""
+
+        if ',' in verdi:
+                verdi = sub(',', '.', verdi)
+
+        try:
+            verdi = float(verdi)
+        except ValueError:
+            return await Defaults.error_warning_send(ctx, text='Sjekk om du har skrevet riktig tall\n\n' +
+                                                        f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+
+        if verdi > 1000000000 or verdi < 0:
+            return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
+
+        fra_valuta = fra_valuta.upper()
+        til_valuta = til_valuta.upper()
+
+        currencies = ['AED', 'ARS', 'AUD', 'BGN', 'BRL', 'BSD', 'CAD', 'CHF', 'CLP', 'CNY', 'COP', 'CZK',
+        'DKK', 'DOP', 'EGP', 'EUR', 'FJD', 'GBP', 'GTQ', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'ISK',
+        'JPY', 'KRW', 'KZT', 'MXN', 'MYR', 'NOK', 'NZD', 'PAB', 'PEN', 'PHP', 'PKR', 'PLN', 'PYG', 'RON',
+        'RUB', 'SAR', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'UAH', 'USD', 'UYU', 'ZAR']
+        if fra_valuta not in currencies:
+            return await Defaults.error_fatal_send(ctx, text=f'`{fra_valuta}` er ikke en gyldig valuta')
+        if til_valuta not in currencies:
+            return await Defaults.error_fatal_send(ctx, text=f'`{til_valuta}` er ikke en gyldig valuta')
 
         async with ctx.channel.typing():
 
-            if self.bot.api_keys['ksoft_authentication'] is None:
-                return await Defaults.error_fatal_send(ctx, text='Jeg mangler API-nøkkel. Be båtteier om å fikse dette')
-
-            if ',' in verdi:
-                verdi = sub(',', '.', verdi)
-
             try:
-                verdi = float(verdi)
-            except ValueError:
-                return await Defaults.error_warning_send(ctx, text='Sjekk om du har skrevet riktig tall\n\n' +
-                                                         f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+                data = get(f'https://api.exchangerate-api.com/v4/latest/{fra_valuta}').json()
+            except:
+                return await Defaults.error_warning_send(ctx, text='API-tilkobling feilet!')
 
-            if verdi > 1000000000 or verdi < 0:
-                return await Defaults.error_warning_send(ctx, text='Tallet du har skrevet er for lavt/høyt!')
+            value = verdi * data['rates'][til_valuta]
 
-            fra_valuta = fra_valuta.upper()
-            til_valuta = til_valuta.upper()
+            verdi = locale.format_string('%.2f', verdi, grouping=True)
+            value = locale.format_string('%.2f', value, grouping=True)
 
-            try:
-                data = get('https://api.ksoft.si/kumo/currency',
-                           headers={'Authorization': 'Bearer ' + self.bot.api_keys['ksoft_authentication']},
-                           params={
-                               'from': fra_valuta,
-                               'to': til_valuta,
-                               'value': verdi}).json()
-
-                verdi = locale.format_string('%.2f', verdi, grouping=True)
-                value = locale.format_string('%.2f', data['value'], grouping=True)
-
-                embed = discord.Embed(color=ctx.me.color,
-                                      description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
-                                      timestamp=datetime.utcnow())
-                await Defaults.set_footer(ctx, embed)
-                await ctx.send(embed=embed)
-
-            except KeyError:
-                return await Defaults.error_warning_send(ctx, text='Sjekk om du har satt gyldige valutaer\n\n' +
-                                                         f'Skriv `{self.bot.prefix}help {ctx.command}` for hjelp')
+            embed = discord.Embed(color=ctx.me.color,
+                                  description=f'`{verdi} {fra_valuta}` ➡️ `{value} {til_valuta}`',
+                                  timestamp=datetime.utcnow())
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 2, commands.BucketType.guild)
