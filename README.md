@@ -2,52 +2,9 @@
 
 Norwegian multi-purpose Discord bot written for personal use.
 
-This project is no longer being actively maintained. This means that it contains a lot of poorly written code. It is not recommended that you run this bot yourself, however if you want to for some god awful reason, you can keep reading :)
+This project is no longer being actively maintained. This means that it contains a lot of poorly written code. It is not recommended that you run this bot yourself, however if you want to for some god awful reason, you can. Though, I'm not going to show you how.
 
-It also has a lot of poorly written issues and weird commit messages but I can't be bothered to clean up the mess I've made.
-
-### Table of Contents
-
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Setup](#setup)
-* [Built With](#built-with)
-* [Contributing](#contributing)
-* [License](#license)
-* [Acknowledgments](#acknowledgments)
-
-## Getting Started
-
-### Prerequisites
-
-* [Python](https://github.com/python/cpython) 3.6+
-* A [MongoDB](https://github.com/mongodb/mongo) database
-
-### Setup
-
-*Assming that you have set your Python 3 path to `python` and you have set up a database.*
-
-* Install the required Python modules:
-  ```
-  python -m pip install -r requirements.txt
-  ```
-
-* Rename [config.yaml.example](config.yaml.example) to `config.yaml` and replace the values within the file with your own.
-
-* Run the bot
-  ```
-  python run.py
-  ```
-
-## Built With
-
-* [Discord.py](https://github.com/Rapptz/discord.py)
-
-...and all the other modules listed in the [requirements.txt](requirements.txt) file.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+It also has a lot of poorly written issues and weird commit messages but I can't be bothered to clean up the mess I've made. The only reason why this repo is still public is for transparency reasons.
 
 ## License
 
