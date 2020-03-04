@@ -13,6 +13,7 @@ from datetime import datetime
 from re import sub, split
 from PIL import Image, ImageDraw, ImageFont
 from os import remove
+from asyncio import sleep
 
 from cogs.utils import Defaults, LBlend_utils
 
@@ -589,6 +590,8 @@ class Misc(commands.Cog):
                         break
 
                 words = ', '.join(words)
+
+                await sleep(2)
             except:
                 return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet! Prøv igjen!')
             
