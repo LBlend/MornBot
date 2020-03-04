@@ -11,6 +11,7 @@ api:
   osu_api_key:
   reddit_client_id:
   reddit_secret:
+  clarifai:
 
 # Database
 database:

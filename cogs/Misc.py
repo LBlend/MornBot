@@ -3,8 +3,9 @@ import discord
 
 import locale
 
-from requests import get
+from requests import get, post
 from urllib import parse
+from json import dumps
 from random import randint, choice, shuffle
 from hashlib import md5
 from bs4 import BeautifulSoup
@@ -358,7 +359,7 @@ class Misc(commands.Cog):
                          main_language_natvive, main_language_natvive, flag]
 
             for i in data_list:
-                if not i or i is '':
+                if not i or i == '':
                     return await Defaults.error_warning_send(ctx, text='Kunne ikke finne landet')
 
             if main_language != main_language_natvive:
@@ -558,6 +559,43 @@ class Misc(commands.Cog):
             embed = discord.Embed(title=wiki_title, color=ctx.me.color, url=wiki_url, description=wiki_extract)
             embed.set_author(name='Wikipedia', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/' +
                                                         'Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['identify'])
+    async def identifiser(self, ctx, bilde=None):
+        """Beskriver hva som er på bildet"""
+
+        if ctx.message.attachments != []:
+            bilde = ctx.message.attachments[0].url
+        
+        if bilde is None:
+            return await Defaults.error_fatal_send(ctx, text='Du må gi meg et bilde!')
+
+        async with ctx.channel.typing():
+
+            try:
+                payload = {'inputs': [{'data': {'image': {'url': bilde}}}]}
+                header = {'Authorization': f'Key {self.bot.api_keys["clarifai"]}'}
+                url = 'https://api.clarifai.com/v2/models/aaa03c23b3724a16a56b629203edc62c/versions/aa7f35c01e0642fda5cf400f543e7c40/outputs'
+                data = post(url, data=dumps(payload), headers=header).json()
+
+                words = []
+                for i, concepts in enumerate(data['outputs'][0]['data']['concepts']):
+                    words.append(concepts['name'])
+                    if i >= 5:
+                        break
+
+                words = ', '.join(words)
+            except:
+                return await Defaults.error_fatal_send(ctx, text='API-forespørsel feilet! Prøv igjen!')
+            
+            embed = discord.Embed(color=ctx.me.color)
+            embed.set_author(name='Clarifai AI', icon_url='https://github.com/Clarifai.png')
+            embed.description = f'**Ord som beskriver dette bildet:**\n\n{words}'
+            embed.set_image(url=bilde)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
