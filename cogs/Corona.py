@@ -77,11 +77,20 @@ class Corona(commands.Cog):
             try:
                 url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
                 data = get(url).json()
+                counties = []
                 for i in data['cases']:
-                    infected_str += f'**{data["cases"][i]["county"]}**: {data["cases"][i]["confirmed"]}\n'
+                    counties.append(data['cases'][i])
+
+                def sortcounties(x):
+                    return x['confirmed']
+                counties.sort(key=sortcounties)
+                counties.reverse()
+                
+                for i in counties:
+                    infected_str += f'**{i["county"]}**: {i["confirmed"]}\n'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
-        
+
             embed = discord.Embed(color=0xFF9C00, title='Corona-viruset', description=infected_str)
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             await Defaults.set_footer(ctx, embed)
