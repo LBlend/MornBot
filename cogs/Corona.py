@@ -87,6 +87,44 @@ class Corona(commands.Cog):
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @corona.command(aliases=['municipality'])
+    async def kommune(self, ctx, kommune: str):
+        """Viser antall smittede/døde/friskmeldte i en kommune"""
+
+        async with ctx.channel.typing():
+
+            try:
+                url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
+                data = get(url).json()
+                municipality_name = None
+                for county in data['cases']:
+                    case = data['cases'][county]
+                    for municipality in case['municipalities']:
+                        if case['municipalities'][municipality]['kommunenavn'] is None:
+                            continue
+                        if case['municipalities'][municipality]['kommunenavn'].lower() == kommune.lower():
+                            municipality_name = case['municipalities'][municipality]['kommunenavn']
+                            infected = case['municipalities'][municipality]['confirmed']
+                            dead = case['municipalities'][municipality]['dead']
+                            recovered = case['municipalities'][municipality]['recovered']
+                            break
+                    if municipality_name is None:
+                        municipality_name = kommune.title()
+                        infected = 0
+                        dead = 0
+                        recovered = 0
+            except:
+                return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
+        
+            embed = discord.Embed(color=0xFF9C00, title=f'Corona-viruset - {municipality_name}', description='*Dataene oppdaters omtrent 1 gang om dagen.*')
+            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
+            embed.add_field(name='Smittede', value=infected)
+            embed.add_field(name='Døde', value=dead)
+            embed.add_field(name='Friskmeldte', value=recovered)
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Corona(bot))
