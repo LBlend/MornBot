@@ -1,3 +1,8 @@
+"""
+Spaghetti <3
+"""
+
+
 from discord.ext import commands
 import discord
 
@@ -17,9 +22,16 @@ class Corona(commands.Cog):
         self.bot = bot
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.command(aliases=['coronavirus'])
+    @commands.group(aliases=['korona', 'coronavirus', 'koronavirus'])
     async def corona(self, ctx):
+        """Viser status på corona-viruset"""
+
+        if ctx.invoked_subcommand is None:
+            await self.verden.invoke(ctx)
+
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @corona.command(aliases=['global'])
+    async def verden(self, ctx):
         """Viser antall døde/smittede/friskmeldte av corona-virsuet"""
 
         async with ctx.channel.typing():
@@ -54,6 +66,26 @@ class Corona(commands.Cog):
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @corona.command(aliases=['noreg', 'norway'])
+    async def norge(self, ctx):
+        """Viser smittede i Norge fordelt på fylker"""
+
+        async with ctx.channel.typing():
+
+            infected_str = '*Smittede i Norge fordelt på fylker.\nDataene oppdaters omtrent 1 gang om dagen.*\n\n'
+            try:
+                url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
+                data = get(url).json()
+                for i in data['cases']:
+                    infected_str += f'**{data["cases"][i]["county"]}**: {data["cases"][i]["confirmed"]}\n'
+            except:
+                return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
+        
+            embed = discord.Embed(color=0xFF9C00, title='Corona-viruset', description=infected_str)
+            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):
