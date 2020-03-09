@@ -24,7 +24,7 @@ class Corona(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(aliases=['korona', 'coronavirus', 'koronavirus'])
     async def corona(self, ctx):
-        """Viser status på corona-viruset"""
+        """Viser status på Koronaviruset"""
 
         if ctx.invoked_subcommand is None:
             await self.verden.invoke(ctx)
@@ -55,7 +55,7 @@ class Corona(commands.Cog):
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
-            embed = discord.Embed(color=0xFF9C00, title='Corona-viruset', url='https://github.com/CSSEGISandData/COVID-19')
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset', url='https://github.com/CSSEGISandData/COVID-19')
             embed.description = f'Sist oppdatert (Norsk statistikk): {norway_updated} UTC'
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
@@ -73,7 +73,7 @@ class Corona(commands.Cog):
 
         async with ctx.channel.typing():
 
-            infected_str = '*Smittede i Norge fordelt på fylker.\nDataene oppdaters omtrent 1 gang om dagen.*\n\n'
+            infected_str = '*Smittede i Norge fordelt på fylker.\nDataene oppdateres omtrent én gang om dagen.*\n\n'
             try:
                 url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
                 data = get(url).json()
@@ -91,7 +91,7 @@ class Corona(commands.Cog):
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
-            embed = discord.Embed(color=0xFF9C00, title='Corona-viruset', description=infected_str)
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset', description=infected_str)
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
@@ -126,7 +126,7 @@ class Corona(commands.Cog):
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
         
-            embed = discord.Embed(color=0xFF9C00, title=f'Corona-viruset - {municipality_name}', description='*Dataene oppdaters omtrent 1 gang om dagen.*')
+            embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}', description='*Dataene oppdateres omtrent én gang om dagen.*')
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
