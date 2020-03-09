@@ -50,13 +50,13 @@ class Corona(commands.Cog):
                         norway_infected = locale.format_string('%d', i['Confirmed'], grouping=True)
                         norway_dead = locale.format_string('%d', i['Deaths'], grouping=True)
                         norway_recovered = locale.format_string('%d', i['Recovered'], grouping=True)
-                        norway_updated = datetime.utcfromtimestamp(i['Last_Update'] / 1000).strftime('%d.%m.%Y %H:%M')
+                        norway_updated = datetime.utcfromtimestamp(i['Last_Update'] / 1000).strftime('%H:%M - %d.%m.%Y')
                         break
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
-            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset', url='https://github.com/CSSEGISandData/COVID-19')
-            embed.description = f'Sist oppdatert (Norsk statistikk): {norway_updated} UTC'
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset')
+            embed.description = f'Norsk statistikk sist oppdatert: {norway_updated} UTC'
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
             embed.add_field(name='Friskmeldte', value=recovered)
@@ -85,14 +85,15 @@ class Corona(commands.Cog):
                     return x['confirmed']
                 counties.sort(key=sortcounties)
                 counties.reverse()
-                
+
                 for i in counties:
-                    infected_str += f'**{i["county"]}**: {i["confirmed"]}\n'
+                    infected_str += f'**{i["county"]}**: {locale.format_string("%d", i["confirmed"], grouping=True)}\n'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
             embed = discord.Embed(color=0xFF9C00, title='Koronaviruset', description=infected_str)
-            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
+            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
+                                                 '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
@@ -125,9 +126,15 @@ class Corona(commands.Cog):
                         recovered = 0
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
-        
-            embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}', description='*Dataene oppdateres omtrent én gang om dagen.*')
-            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
+
+            infected = locale.format_string('%d', infected, grouping=True)
+            dead = locale.format_string('%d', dead, grouping=True)
+            recovered = locale.format_string('%d', recovered, grouping=True)
+
+            embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}')
+            embed.description = '*Dataene oppdateres omtrent én gang om dagen.*'
+            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
+                                                 '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
             embed.add_field(name='Friskmeldte', value=recovered)
