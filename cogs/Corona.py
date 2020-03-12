@@ -22,52 +22,45 @@ class Corona(commands.Cog):
         self.bot = bot
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.group(aliases=['korona', 'coronavirus', 'koronavirus'])
+    @commands.group(aliases=['korona'])
     async def corona(self, ctx):
-        """Viser status på Koronaviruset"""
+        """Viser status for Koronaviruset"""
 
         if ctx.invoked_subcommand is None:
-            await self.verden.invoke(ctx)
+            await ctx.send_help(ctx.command)
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @corona.command(aliases=['global'])
     async def verden(self, ctx):
-        """Viser antall døde/smittede/friskmeldte av corona-virsuet"""
+        """Viser antall døde/smittede/friskmeldte globalt"""
 
         async with ctx.channel.typing():
+
             try:
-                url = 'https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer/1/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outStatistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22Confirmed%22%2C%22outStatisticFieldName%22%3A%22confirmed%22%7D%2C%20%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22Deaths%22%2C%22outStatisticFieldName%22%3A%22deaths%22%7D%2C%20%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22Recovered%22%2C%22outStatisticFieldName%22%3A%22recovered%22%7D%5D&outSR=102100&cacheHint=false'
+                url = 'https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer' +\
+                      '/1/query?f=json&where=1%3D1&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outSta' +\
+                      'tistics=%5B%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22Confirmed%22%2C' +\
+                      '%22outStatisticFieldName%22%3A%22confirmed%22%7D%2C%20%7B%22statisticType%22%3A%22sum%22%2C' +\
+                      '%22onStatisticField%22%3A%22Deaths%22%2C%22outStatisticFieldName%22%3A%22deaths%22%7D%2C%20' +\
+                      '%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22Recovered%22%2C%22outStati' +\
+                      'sticFieldName%22%3A%22recovered%22%7D%5D&outSR=102100&cacheHint=false'
                 data = get(url).json()
                 infected = locale.format_string('%d', data['features'][0]['attributes']['confirmed'], grouping=True)
                 dead = locale.format_string('%d', data['features'][0]['attributes']['deaths'], grouping=True)
                 recovered = locale.format_string('%d', data['features'][0]['attributes']['recovered'], grouping=True)
-
-                url = 'https://services1.arcgis.com/0MSEUqKaxRlEPj5g/arcgis/rest/services/ncov_cases/FeatureServer/2/query?f=json&where=Confirmed%20%3E%200&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc&resultOffset=0&resultRecordCount=100&cacheHint=false'
-                data = get(url).json()
-                for i in data['features']:
-                    i = i['attributes']
-                    if i['Country_Region'] == 'Norway':
-                        norway_infected = locale.format_string('%d', i['Confirmed'], grouping=True)
-                        norway_dead = locale.format_string('%d', i['Deaths'], grouping=True)
-                        norway_recovered = locale.format_string('%d', i['Recovered'], grouping=True)
-                        norway_updated = datetime.utcfromtimestamp(i['Last_Update'] / 1000).strftime('%H:%M - %d.%m.%Y')
-                        break
             except:
-                return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
+                return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data\nAPIen er trash\n\nSkriv ' +
+                                                                 f'`{self.bot.prefix}help corona` for mer statistikk')
 
             embed = discord.Embed(color=0xFF9C00, title='Koronaviruset')
-            embed.description = f'Norsk statistikk sist oppdatert: {norway_updated} (UTC)'
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
             embed.add_field(name='Friskmeldte', value=recovered)
-            embed.add_field(name='Smittede i Norge', value=norway_infected)
-            embed.add_field(name='Døde i Norge', value=norway_dead)
-            embed.add_field(name='Friskmeldte i Norge', value=norway_recovered)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @corona.command(aliases=['noreg', 'norway'])
+    @corona.command(aliases=['noreg', 'norway', 'fylker', 'counties'])
     async def norge(self, ctx, *, tilstand: str=None):
         """Viser status i Norge fordelt på fylker"""
 
@@ -82,8 +75,9 @@ class Corona(commands.Cog):
             tilstand = conditions[tilstand]
         else:
             return await Defaults.error_warning_send(ctx, text='Du må velge en av følgende\n\n' +
-            f'• `{self.bot.prefix}corona norge smittede`\n• `{self.bot.prefix}corona norge døde`\n' +
-            f'• `{self.bot.prefix}corona norge friskmeldte`')
+                                                               f'• `{self.bot.prefix}corona norge smittede`\n' +
+                                                               f'• `{self.bot.prefix}corona norge døde`\n' +
+                                                               f'• `{self.bot.prefix}corona norge friskmeldte`')
 
         async with ctx.channel.typing():
 
@@ -96,10 +90,13 @@ class Corona(commands.Cog):
 
                 def sortinfected(x):
                     return x['confirmed']
+
                 def sortdead(x):
                     return x['dead']
+
                 def sortrecovered(x):
                     return x['recovered']
+
                 if tilstand == 'confirmed':
                     counties.sort(key=sortinfected)
                 elif tilstand == 'dead':
@@ -143,9 +140,10 @@ class Corona(commands.Cog):
                             dead = case['municipalities'][municipality]['dead']
                             recovered = case['municipalities'][municipality]['recovered']
                             break
-                    if municipality_name is None:
-                        return await Defaults.error_warning_send(ctx,
-                        text='Enten så eksisterer ikke kommunen, eller så er det ingen smittede/døde/friskemldete der.')
+                if municipality_name is None:
+                    return await Defaults.error_warning_send(ctx, text='Enten eksisterer ikke kommunen, eller ' +
+                                                                        'så er det ingen smittede/døde' +
+                                                                        '/friskemldete der.')
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
