@@ -112,7 +112,10 @@ class Corona(commands.Cog):
                 counties.reverse()
 
                 for i in counties:
-                    infected_str += f'**{i["county"]}**: {locale.format_string("%d", i[tilstand], grouping=True)}\n'
+                    if i['county'] == '00':
+                        infected_str += f'**UKJENT**: {locale.format_string("%d", i[tilstand], grouping=True)}\n'
+                    else:
+                        infected_str += f'**{i["county"]}**: {locale.format_string("%d", i[tilstand], grouping=True)}\n'
 
                 infected_str += f'\n\n**TOTALT**: {locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
             except:
