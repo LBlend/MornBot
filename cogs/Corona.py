@@ -144,10 +144,8 @@ class Corona(commands.Cog):
                             recovered = case['municipalities'][municipality]['recovered']
                             break
                     if municipality_name is None:
-                        municipality_name = kommune.title()
-                        infected = 0
-                        dead = 0
-                        recovered = 0
+                        return await Defaults.error_warning_send(ctx,
+                        text='Enten så eksisterer ikke kommunen, eller så er det ingen smittede/døde/friskemldete der.')
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
