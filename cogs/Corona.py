@@ -56,7 +56,7 @@ class Corona(commands.Cog):
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
             embed = discord.Embed(color=0xFF9C00, title='Koronaviruset')
-            embed.description = f'Norsk statistikk sist oppdatert: {norway_updated} UTC'
+            embed.description = f'Norsk statistikk sist oppdatert: {norway_updated} (UTC)'
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
             embed.add_field(name='Friskmeldte', value=recovered)
@@ -68,12 +68,25 @@ class Corona(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @corona.command(aliases=['noreg', 'norway'])
-    async def norge(self, ctx):
-        """Viser smittede i Norge fordelt på fylker"""
+    async def norge(self, ctx, *, tilstand: str=None):
+        """Viser status i Norge fordelt på fylker"""
+
+        conditions = {
+            'smittede': 'confirmed',
+            'døde': 'dead',
+            'friskmeldte': 'recovered'
+        }
+        if tilstand is not None and tilstand.lower() in conditions:
+            infected_str = f'*{tilstand.title()} i Norge fordelt på fylker.\n' +\
+                            'Dataene oppdateres omtrent én gang om dagen.*\n\n'
+            tilstand = conditions[tilstand]
+        else:
+            return await Defaults.error_warning_send(ctx, text='Du må velge en av følgende\n\n' +
+            f'• `{self.bot.prefix}corona norge smittede`\n• `{self.bot.prefix}corona norge døde`\n' +
+            f'• `{self.bot.prefix}corona norge friskmeldte`')
 
         async with ctx.channel.typing():
 
-            infected_str = '*Smittede i Norge fordelt på fylker.\nDataene oppdateres omtrent én gang om dagen.*\n\n'
             try:
                 url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
                 data = get(url).json()
@@ -81,13 +94,24 @@ class Corona(commands.Cog):
                 for i in data['cases']:
                     counties.append(data['cases'][i])
 
-                def sortcounties(x):
+                def sortinfected(x):
                     return x['confirmed']
-                counties.sort(key=sortcounties)
+                def sortdead(x):
+                    return x['dead']
+                def sortrecovered(x):
+                    return x['recovered']
+                if tilstand == 'confirmed':
+                    counties.sort(key=sortinfected)
+                elif tilstand == 'dead':
+                    counties.sort(key=sortdead)
+                elif tilstand == 'recovered':
+                    counties.sort(key=sortrecovered)
                 counties.reverse()
 
                 for i in counties:
-                    infected_str += f'**{i["county"]}**: {locale.format_string("%d", i["confirmed"], grouping=True)}\n'
+                    infected_str += f'**{i["county"]}**: {locale.format_string("%d", i[tilstand], grouping=True)}\n'
+
+                infected_str += f'\n\n**TOTALT**: {locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
