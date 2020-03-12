@@ -27,7 +27,14 @@ class Corona(commands.Cog):
         """Viser status for Koronaviruset"""
 
         if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
+            embed = discord.Embed(color=0xFF9C00)
+            embed.description = 'Grunnet en scuffed API for globale data så har denne kommandoen blitt dedikert til' +\
+                                ' å vise alle de andre kommandoene.\n\nOm du likevel vil ha global statistikk så ' +\
+                                f'kan du skrive:\n`{self.bot.prefix}corona verden`\n\nAndre kommandoer:\n' +\
+                                f'`{self.bot.prefix}corona norge <smittede/døde/friskmeldte>`\n' +\
+                                f'`{self.bot.prefix}corona kommune <kommunenavn>`'
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @corona.command(aliases=['global'])
