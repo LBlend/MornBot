@@ -52,7 +52,12 @@ class Corona(commands.Cog):
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data\nAPIen er trash\n\nSkriv ' +
                                                                  f'`{self.bot.prefix}help corona` for mer statistikk')
 
-            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset')
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Globalt')
+            embed.set_author(name='Johns Hopkins University', icon_url='https://i.forbesimg.com/media/lists/' +
+                                                                       'colleges/johns-hopkins-university_41' +
+                                                                       '6x416.jpg')
+            embed.description = '*Dataene er samlet inn av [Johns Hopkins University]' +\
+                                '(https://github.com/CSSEGISandData/COVID-19)*\n'
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
             embed.add_field(name='Friskmeldte', value=recovered)
@@ -70,11 +75,12 @@ class Corona(commands.Cog):
             'friskmeldte': 'recovered'
         }
         if tilstand is not None and tilstand.lower() in conditions:
-            infected_str = f'*{tilstand.title()} i Norge fordelt på fylker.\n' +\
-                            'Dataene oppdateres omtrent én gang om dagen.*\n\n'
+            infected_str = f'***{tilstand.title()}** i Norge fordelt på fylker.\n' +\
+                            'Dataene oppdateres fortløpende og er hentet fra ' +\
+                            '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n\n'
             tilstand = conditions[tilstand]
         else:
-            return await Defaults.error_warning_send(ctx, text='Du må velge en av følgende\n\n' +
+            return await Defaults.error_warning_send(ctx, text='Du må velge en av følgende:\n\n' +
                                                                f'• `{self.bot.prefix}corona norge smittede`\n' +
                                                                f'• `{self.bot.prefix}corona norge døde`\n' +
                                                                f'• `{self.bot.prefix}corona norge friskmeldte`')
@@ -112,7 +118,7 @@ class Corona(commands.Cog):
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
-            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset', description=infected_str)
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Norge', description=infected_str)
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             await Defaults.set_footer(ctx, embed)
@@ -152,7 +158,8 @@ class Corona(commands.Cog):
             recovered = locale.format_string('%d', recovered, grouping=True)
 
             embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}')
-            embed.description = '*Dataene oppdateres omtrent én gang om dagen.*'
+            embed.description = '*Dataene oppdateres fortløpende og er hentet fra ' +\
+                                '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*'
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             embed.add_field(name='Smittede', value=infected)
