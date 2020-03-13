@@ -136,7 +136,7 @@ class Corona(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @corona.command(aliases=['municipality'])
-    async def kommune(self, ctx, kommune: str):
+    async def kommune(self, ctx, *, kommune: str):
         """Viser antall smittede/døde/friskmeldte i en kommune"""
 
         async with ctx.channel.typing():
