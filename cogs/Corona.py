@@ -128,9 +128,11 @@ class Corona(commands.Cog):
                 counties.reverse()
 
                 for county in counties:
-                    description_str += f'**{county["name"]}**: {locale.format_string("%d", county[tilstand], grouping=True)}\n'
+                    description_str += f'**{county["name"]}**: ' +\
+                                       f'{locale.format_string("%d", county[tilstand], grouping=True)}\n'
 
-                description_str += f'\n\n**TOTALT**: {locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
+                description_str += '\n\n**TOTALT**: ' +\
+                                   f'{locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
@@ -168,8 +170,8 @@ class Corona(commands.Cog):
                         break
                 if municipality_name is None:
                     return await Defaults.error_warning_send(ctx, text='Enten eksisterer ikke kommunen, eller ' +
-                                                                        'så er det ingen smittede/døde' +
-                                                                        '/friskemldete der.')
+                                                                       'så er det ingen smittede/døde' +
+                                                                       '/friskemldete der.')
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
@@ -206,18 +208,20 @@ class Corona(commands.Cog):
                 timestamp = timestamp.strftime('%H:%M %d.%m.%Y')
 
                 description_str = '***Smittede** i Norge fordelt på alder.\n' +\
-                                    'Dataene er hentet fra ' +\
-                                    '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n' +\
-                                    f'Sist oppdatert: {timestamp}\n\n'
+                                  'Dataene er hentet fra ' +\
+                                  '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n' +\
+                                  f'Sist oppdatert: {timestamp}\n\n'
                 for agegroup in data['ageData']:
                     if agegroup["ageHigh"] is None:
                         description_str += f'**{agegroup["ageLow"]}+ år**: {agegroup["confirmedCases"]}\n'
                     else:
-                        description_str += f'**{agegroup["ageLow"]}-{agegroup["ageHigh"]} år**: {agegroup["confirmedCases"]}\n'
+                        description_str += f'**{agegroup["ageLow"]}-{agegroup["ageHigh"]} år**: ' +\
+                                           f'{agegroup["confirmedCases"]}\n'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
-            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Aldersgrupper, Norge', description=description_str)
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Aldersgrupper, Norge',
+                                  description=description_str)
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             await Defaults.set_footer(ctx, embed)
