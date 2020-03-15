@@ -83,8 +83,9 @@ class Corona(commands.Cog):
         }
         if tilstand is not None and tilstand.lower() in conditions:
             infected_str = f'***{tilstand.title()}** i Norge fordelt på fylker.\n' +\
-                            'Dataene oppdateres fortløpende og er hentet fra ' +\
-                            '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n\n'
+                            'Dataene er hentet fra ' +\
+                            '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n' +\
+                            f'Sist oppdatert: '
             tilstand = conditions[tilstand]
         else:
             return await Defaults.error_warning_send(ctx, text='Du må velge en av følgende:\n\n' +
@@ -98,6 +99,13 @@ class Corona(commands.Cog):
                 url = 'https://redutv-api.vg.no/corona/v1/sheets/norway-table-overview/?region=county'
                 data = get(url).json()
                 counties = []
+
+                # Too lazy to do it any other way rn
+                timestamp = data['updated']['ts'].replace('T', '')[:-6]
+                timestamp = datetime.strptime(timestamp, '%Y-%m-%d%H:%M:%S')
+                timestamp = timestamp.strftime('%H:%M:%S %d.%m.%Y')
+
+                infected_str = infected_str + timestamp + '\n\n'
                 for county in data['cases']:
                     counties.append(county)
 
@@ -142,6 +150,12 @@ class Corona(commands.Cog):
                 url = 'https://redutv-api.vg.no/corona/v1/sheets/norway-table-overview/?region=municipality'
                 data = get(url).json()
                 municipality_name = None
+
+                # Too lazy to do it any other way rn
+                timestamp = data['updated']['ts'].replace('T', '')[:-6]
+                timestamp = datetime.strptime(timestamp, '%Y-%m-%d%H:%M:%S')
+                timestamp = timestamp.strftime('%H:%M:%S %d.%m.%Y')
+
                 for municipality in data['cases']:
                     if municipality['name'] is None:
                         continue
@@ -163,8 +177,9 @@ class Corona(commands.Cog):
             recovered = locale.format_string('%d', recovered, grouping=True)
 
             embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}')
-            embed.description = '*Dataene oppdateres fortløpende og er hentet fra ' +\
-                                '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*'
+            embed.description = '*Dataene er hentet fra ' +\
+                                '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n' +\
+                                f'Sist oppdatert: {timestamp}'
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             embed.add_field(name='Smittede', value=infected)
