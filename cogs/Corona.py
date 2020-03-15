@@ -142,20 +142,18 @@ class Corona(commands.Cog):
         async with ctx.channel.typing():
 
             try:
-                url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
+                url = 'https://redutv-api.vg.no/corona/v1/sheets/norway-table-overview/?region=municipality'
                 data = get(url).json()
                 municipality_name = None
-                for county in data['cases']:
-                    case = data['cases'][county]
-                    for municipality in case['municipalities']:
-                        if case['municipalities'][municipality]['kommunenavn'] is None:
-                            continue
-                        if case['municipalities'][municipality]['kommunenavn'].lower() == kommune.lower():
-                            municipality_name = case['municipalities'][municipality]['kommunenavn']
-                            infected = case['municipalities'][municipality]['confirmed']
-                            dead = case['municipalities'][municipality]['dead']
-                            recovered = case['municipalities'][municipality]['recovered']
-                            break
+                for municipality in data['cases']:
+                    if municipality['name'] is None:
+                        continue
+                    if municipality['name'].lower() == kommune.lower():
+                        municipality_name = municipality['name']
+                        infected = municipality['confirmed']
+                        dead = municipality['dead']
+                        recovered = municipality['recovered']
+                        break
                 if municipality_name is None:
                     return await Defaults.error_warning_send(ctx, text='Enten eksisterer ikke kommunen, eller ' +
                                                                         'så er det ingen smittede/døde' +
