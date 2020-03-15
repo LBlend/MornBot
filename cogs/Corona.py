@@ -104,7 +104,7 @@ class Corona(commands.Cog):
                 # Too lazy to do it any other way rn
                 timestamp = data['updated']['ts'].replace('T', '')[:-6]
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d%H:%M:%S')
-                timestamp = timestamp.strftime('%H:%M:%S %d.%m.%Y')
+                timestamp = timestamp.strftime('%H:%M %d.%m.%Y')
 
                 description_str = description_str + timestamp + '\n\n'
                 for county in data['cases']:
@@ -155,7 +155,7 @@ class Corona(commands.Cog):
                 # Too lazy to do it any other way rn
                 timestamp = data['updated']['ts'].replace('T', '')[:-6]
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d%H:%M:%S')
-                timestamp = timestamp.strftime('%H:%M:%S %d.%m.%Y')
+                timestamp = timestamp.strftime('%H:%M %d.%m.%Y')
 
                 for municipality in data['cases']:
                     if municipality['name'] is None:
@@ -203,7 +203,7 @@ class Corona(commands.Cog):
                 # Too lazy to do it any other way rn
                 timestamp = data['changes']['updated'].replace('T', '')[:-6]
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d%H:%M:%S')
-                timestamp = timestamp.strftime('%H:%M:%S %d.%m.%Y')
+                timestamp = timestamp.strftime('%H:%M %d.%m.%Y')
 
                 description_str = '***Smittede** i Norge fordelt på alder.\n' +\
                                     'Dataene er hentet fra ' +\
