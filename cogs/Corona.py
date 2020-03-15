@@ -146,7 +146,7 @@ class Corona(commands.Cog):
                     if municipality['name'] is None:
                         continue
                     if municipality['name'].lower() == kommune.lower():
-                        municipality_name = municipality['name']
+                        municipality_name = f'{municipality["name"]}, {municipality["parent"]}'
                         infected = municipality['confirmed']
                         dead = municipality['dead']
                         recovered = municipality['recovered']
