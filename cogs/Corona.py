@@ -83,7 +83,7 @@ class Corona(commands.Cog):
             'friskmeldte': 'recovered'
         }
         if tilstand is not None and tilstand.lower() in conditions:
-            infected_str = f'***{tilstand.title()}** i Norge fordelt på fylker.\n' +\
+            description_str = f'***{tilstand.title()}** i Norge fordelt på fylker.\n' +\
                             'Dataene er hentet fra ' +\
                             '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n' +\
                             f'Sist oppdatert: '
@@ -106,7 +106,7 @@ class Corona(commands.Cog):
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d%H:%M:%S')
                 timestamp = timestamp.strftime('%H:%M:%S %d.%m.%Y')
 
-                infected_str = infected_str + timestamp + '\n\n'
+                description_str = description_str + timestamp + '\n\n'
                 for county in data['cases']:
                     counties.append(county)
 
@@ -128,13 +128,13 @@ class Corona(commands.Cog):
                 counties.reverse()
 
                 for county in counties:
-                    infected_str += f'**{county["name"]}**: {locale.format_string("%d", county[tilstand], grouping=True)}\n'
+                    description_str += f'**{county["name"]}**: {locale.format_string("%d", county[tilstand], grouping=True)}\n'
 
-                infected_str += f'\n\n**TOTALT**: {locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
+                description_str += f'\n\n**TOTALT**: {locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
-            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Norge', description=infected_str)
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Norge', description=description_str)
             embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             await Defaults.set_footer(ctx, embed)
