@@ -95,11 +95,11 @@ class Corona(commands.Cog):
         async with ctx.channel.typing():
 
             try:
-                url = 'https://www.vg.no/spesial/2020/corona-viruset/data/norway/'
+                url = 'https://redutv-api.vg.no/corona/v1/sheets/norway-table-overview/?region=county'
                 data = get(url).json()
                 counties = []
-                for i in data['cases']:
-                    counties.append(data['cases'][i])
+                for county in data['cases']:
+                    counties.append(county)
 
                 def sortinfected(x):
                     return x['confirmed']
@@ -118,11 +118,8 @@ class Corona(commands.Cog):
                     counties.sort(key=sortrecovered)
                 counties.reverse()
 
-                for i in counties:
-                    if i['county'] == '00':
-                        infected_str += f'**UKJENT**: {locale.format_string("%d", i[tilstand], grouping=True)}\n'
-                    else:
-                        infected_str += f'**{i["county"]}**: {locale.format_string("%d", i[tilstand], grouping=True)}\n'
+                for county in counties:
+                    infected_str += f'**{county["name"]}**: {locale.format_string("%d", county[tilstand], grouping=True)}\n'
 
                 infected_str += f'\n\n**TOTALT**: {locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
             except:
