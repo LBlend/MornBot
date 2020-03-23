@@ -187,6 +187,36 @@ class Corona(commands.Cog):
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @corona.command(aliases=['aldersfordeling', 'age'])
+    async def alder(self, ctx):
+        """Viser aldersfordelingen blant de smittede"""
+
+        async with ctx.channel.typing():
+
+            try:
+                url = 'https://redutv-api.vg.no/corona/v1/sheets/fhi/age'
+                data = get(url).json()
+
+                timestamp = data['current']['date']
+                timestamp = datetime.strptime(timestamp, '%Y-%m-%d').strftime('%d.%m.%Y')
+
+                description_str = '***Smittede** i Norge fordelt på alder.\n' +\
+                                    'Dataene er hentet fra ' +\
+                                    '[VG](https://www.vg.no/spesial/2020/corona-viruset/)*\n' +\
+                                    f'Sist oppdatert: {timestamp}\n\n'
+                for agegroup, infected in data['current']['bins'].items():
+                    description_str += f'**{agegroup} år**: {infected}\n'
+            except:
+                return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
+
+            embed = discord.Embed(color=0xFF9C00, title='Koronaviruset - Aldersgrupper, Norge',
+                                  description=description_str)
+            embed.set_author(name='VG', icon_url='https://pbs.twimg.com/profile_images/3077886704' +
+                                                 '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
+            await Defaults.set_footer(ctx, embed)
+            await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Corona(bot))
