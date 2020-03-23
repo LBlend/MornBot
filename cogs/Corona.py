@@ -126,11 +126,16 @@ class Corona(commands.Cog):
                     description_str += f'**{county["name"]}**: ' +\
                                        f'{locale.format_string("%d", county[tilstand], grouping=True)}\n'
 
-                description_str += '\n\n**TOTALT**: ' +\
+                description_str += '\n**TOTALT**: ' +\
                                    f'{locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
 
-                description_str += '\n\n**I dag**: ' +\
+                description_str += '\n**I dag**: ' +\
                                    f'{locale.format_string("%d", today, grouping=True)}'
+                if tilstand == 'confirmed':
+                    data = get('https://redutv-api.vg.no/corona/v1/sheets/fhi/gender').json()
+                    male = f'{data["current"]["male"]}%'.replace('.', ',')
+                    female = f'{data["current"]["female"]}%'.replace('.', ',')
+                    description_str += f'\n\n**Menn**: {male}\n**Kvinner**: {female}'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
