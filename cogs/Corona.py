@@ -115,8 +115,10 @@ class Corona(commands.Cog):
 
                 if tilstand == 'confirmed':
                     counties.sort(key=sortinfected)
+                    today = data['totals']['changes']['newToday']
                 elif tilstand == 'dead':
                     counties.sort(key=sortdead)
+                    today = data['totals']['changes']['deathsToday']
                 counties.reverse()
 
                 for county in counties:
@@ -125,6 +127,9 @@ class Corona(commands.Cog):
 
                 description_str += '\n\n**TOTALT**: ' +\
                                    f'{locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
+
+                description_str += '\n\n**I dag**: ' +\
+                                   f'{locale.format_string("%d", today, grouping=True)}'
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
