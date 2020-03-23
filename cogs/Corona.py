@@ -31,7 +31,7 @@ class Corona(commands.Cog):
             embed.description = 'Grunnet en scuffed API for globale data så har denne kommandoen blitt dedikert til' +\
                                 ' å vise alle de andre kommandoene.\n\nOm du likevel vil ha global statistikk så ' +\
                                 f'kan du skrive:\n`{self.bot.prefix}corona verden`\n\nAndre kommandoer:\n' +\
-                                f'`{self.bot.prefix}corona norge <smittede/døde>`\n' +\
+                                f'`{self.bot.prefix}corona norge [døde]`\n' +\
                                 f'`{self.bot.prefix}corona kommune <kommunenavn>`\n' +\
                                 f'`{self.bot.prefix}corona alder`'
             await Defaults.set_footer(ctx, embed)
@@ -74,7 +74,7 @@ class Corona(commands.Cog):
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @corona.command(aliases=['noreg', 'norway', 'fylker', 'counties'])
-    async def norge(self, ctx, *, tilstand: str=None):
+    async def norge(self, ctx, *, tilstand: str='smittede'):
         """Viser status i Norge fordelt på fylker"""
 
         conditions = {
@@ -124,13 +124,21 @@ class Corona(commands.Cog):
 
                 for county in counties:
                     description_str += f'**{county["name"]}**: ' +\
-                                       f'{locale.format_string("%d", county[tilstand], grouping=True)}\n'
+                                        f'{locale.format_string("%d", county[tilstand], grouping=True)}\n'
 
                 description_str += '\n**TOTALT**: ' +\
-                                   f'{locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
+                                    f'{locale.format_string("%d", data["totals"][tilstand], grouping=True)}'
+                description_str += '\n\n**I dag**: ' +\
+                                    f'{locale.format_string("%d", today, grouping=True)}'
 
-                description_str += '\n**I dag**: ' +\
-                                   f'{locale.format_string("%d", today, grouping=True)}'
+                data = get('https://redutv-api.vg.no/corona/v1/areas/country/reports?include=hospitals').json()
+                hospitalized = data['hospitals']['total']['hospitalized']
+                respiratory = data['hospitals']['total']['respiratory']
+                description_str += '\n**Innlagte**: ' +\
+                                    f'{locale.format_string("%d", hospitalized, grouping=True)}'
+                description_str += '\n**I respirator**: ' +\
+                                    f'{locale.format_string("%d", respiratory, grouping=True)}'
+
                 if tilstand == 'confirmed':
                     data = get('https://redutv-api.vg.no/corona/v1/sheets/fhi/gender').json()
                     male = f'{data["current"]["male"]}%'.replace('.', ',')
