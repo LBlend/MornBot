@@ -163,6 +163,7 @@ class Corona(commands.Cog):
                         municipality_name = f'{municipality["name"]}, {municipality["parent"]}'
                         infected = municipality['confirmed']
                         dead = municipality['dead']
+                        infected_per_capita = municipality['confirmedPer1kCapita']
                         break
                 if municipality_name is None:
                     return await Defaults.error_warning_send(ctx, text='Enten eksisterer ikke kommunen, eller ' +
@@ -172,6 +173,7 @@ class Corona(commands.Cog):
 
             infected = locale.format_string('%d', infected, grouping=True)
             dead = locale.format_string('%d', dead, grouping=True)
+            infected_per_capita = str(round(infected_per_capita, 2)).replace('.', ',')
 
             embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}')
             embed.description = '*Dataene er hentet fra ' +\
@@ -181,6 +183,7 @@ class Corona(commands.Cog):
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
+            embed.add_field(name='Smittede per tusen', value=infected_per_capita)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
