@@ -31,7 +31,7 @@ class Corona(commands.Cog):
             embed.description = 'Grunnet en scuffed API for globale data så har denne kommandoen blitt dedikert til' +\
                                 ' å vise alle de andre kommandoene.\n\nOm du likevel vil ha global statistikk så ' +\
                                 f'kan du skrive:\n`{self.bot.prefix}corona verden`\n\nAndre kommandoer:\n' +\
-                                f'`{self.bot.prefix}corona norge <smittede/døde/friskmeldte>`\n' +\
+                                f'`{self.bot.prefix}corona norge <smittede/døde>`\n' +\
                                 f'`{self.bot.prefix}corona kommune <kommunenavn>`\n' +\
                                 f'`{self.bot.prefix}corona alder`'
             await Defaults.set_footer(ctx, embed)
@@ -80,7 +80,6 @@ class Corona(commands.Cog):
         conditions = {
             'smittede': 'confirmed',
             'døde': 'dead',
-            'friskmeldte': 'recovered'
         }
         if tilstand is not None and tilstand.lower() in conditions:
             description_str = f'***{tilstand.title()}** i Norge fordelt på fylker.\n' +\
@@ -91,8 +90,7 @@ class Corona(commands.Cog):
         else:
             return await Defaults.error_warning_send(ctx, text='Du må velge en av følgende:\n\n' +
                                                                f'• `{self.bot.prefix}corona norge smittede`\n' +
-                                                               f'• `{self.bot.prefix}corona norge døde`\n' +
-                                                               f'• `{self.bot.prefix}corona norge friskmeldte`')
+                                                               f'• `{self.bot.prefix}corona norge døde`\n')
 
         async with ctx.channel.typing():
 
@@ -116,15 +114,10 @@ class Corona(commands.Cog):
                 def sortdead(x):
                     return x['dead']
 
-                def sortrecovered(x):
-                    return x['recovered']
-
                 if tilstand == 'confirmed':
                     counties.sort(key=sortinfected)
                 elif tilstand == 'dead':
                     counties.sort(key=sortdead)
-                elif tilstand == 'recovered':
-                    counties.sort(key=sortrecovered)
                 counties.reverse()
 
                 for county in counties:
@@ -145,7 +138,7 @@ class Corona(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @corona.command(aliases=['municipality'])
     async def kommune(self, ctx, *, kommune: str):
-        """Viser antall smittede/døde/friskmeldte i en kommune"""
+        """Viser antall smittede/døde i en kommune"""
 
         async with ctx.channel.typing():
 
@@ -166,18 +159,15 @@ class Corona(commands.Cog):
                         municipality_name = f'{municipality["name"]}, {municipality["parent"]}'
                         infected = municipality['confirmed']
                         dead = municipality['dead']
-                        recovered = municipality['recovered']
                         break
                 if municipality_name is None:
                     return await Defaults.error_warning_send(ctx, text='Enten eksisterer ikke kommunen, eller ' +
-                                                                       'så er det ingen smittede/døde' +
-                                                                       '/friskemldete der.')
+                                                                       'så er det ingen smittede/døde der')
             except:
                 return await Defaults.error_fatal_send(ctx, text='Kunne ikke hente data')
 
             infected = locale.format_string('%d', infected, grouping=True)
             dead = locale.format_string('%d', dead, grouping=True)
-            recovered = locale.format_string('%d', recovered, grouping=True)
 
             embed = discord.Embed(color=0xFF9C00, title=f'Koronaviruset - {municipality_name}')
             embed.description = '*Dataene er hentet fra ' +\
@@ -187,7 +177,6 @@ class Corona(commands.Cog):
                                                  '/4be85226137dc5e1eadbaa5526fe5f9e.jpeg')
             embed.add_field(name='Smittede', value=infected)
             embed.add_field(name='Døde', value=dead)
-            embed.add_field(name='Friskmeldte', value=recovered)
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
