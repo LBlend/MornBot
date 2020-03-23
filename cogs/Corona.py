@@ -32,7 +32,8 @@ class Corona(commands.Cog):
                                 ' å vise alle de andre kommandoene.\n\nOm du likevel vil ha global statistikk så ' +\
                                 f'kan du skrive:\n`{self.bot.prefix}corona verden`\n\nAndre kommandoer:\n' +\
                                 f'`{self.bot.prefix}corona norge <smittede/døde>`\n' +\
-                                f'`{self.bot.prefix}corona kommune <kommunenavn>`\n'
+                                f'`{self.bot.prefix}corona kommune <kommunenavn>`\n' +\
+                                f'`{self.bot.prefix}corona alder`'
             await Defaults.set_footer(ctx, embed)
             await ctx.send(embed=embed)
 
