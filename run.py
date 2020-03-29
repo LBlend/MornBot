@@ -26,6 +26,7 @@ class MornBot(commands.Bot):
         self.api_keys = config.get('api', {})
         self.emoji = config.get('emoji', {})
         self.misc = config.get('misc', {})
+        self.hue = config.get('hue', {})
         self.database = pymongo.MongoClient(config['database'])['mornbot']
 
 
@@ -44,6 +45,7 @@ else:
 
 requirements = {
     'FunReplies': bot.database,
+    'HueLights': [bot.database, bot.hue['ip'], bot.hue['identifier']],
     'Ordsky': bot.database,
     'osu': bot.api_keys['osu_api_key'],
     'Reddit': [bot.api_keys['reddit_client_id'], bot.api_keys['reddit_secret']],

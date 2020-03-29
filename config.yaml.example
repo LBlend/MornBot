@@ -29,6 +29,10 @@ emoji:
   osu_a: <:GradeA:609830029177913344>
 
 # Misc
+hue:
+  ip: 
+  identifier: 
+
 misc:
   website: https://lblend.moe/
   source_code: https://github.com/LBlend

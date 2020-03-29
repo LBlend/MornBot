@@ -11,3 +11,4 @@ praw
 numpy
 matplotlib
 wordcloud
+opencv-python
