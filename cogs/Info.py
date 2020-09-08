@@ -20,10 +20,10 @@ class Info(commands.Cog):
     async def guild(self, ctx):
         """Viser info om guilden"""
 
-        guild_created_date = ctx.guild.created_at.strftime('%d %b %Y %H:%M')
+        guild_created_date = ctx.guild.created_at.strftime('%d. %b. %Y - %H:%M')
         since_created_days = (ctx.message.created_at - ctx.guild.created_at).days
 
-        if since_created_days is 1:
+        if since_created_days == 1:
             since_created_days_string = 'dag'
         else:
             since_created_days_string = 'dager'
@@ -78,7 +78,7 @@ class Info(commands.Cog):
             'eu': ':flag_eu:',
             'singapore': ':flag_sg:',
             'london': ':flag_gb:',
-            'sydeny': ':flag_au:',
+            'sydney': ':flag_au:',
             'amsterdam': ':flag_nl:',
             'frankfurt': ':flag_de:',
             'brazil': ':flag_br:',
@@ -88,7 +88,7 @@ class Info(commands.Cog):
             'southafrica': ':flag_za:',
             'hongkong': ':flag_hk:',
             'india': ':flag_in:'
-            }
+        }
         region = str(ctx.guild.region)
         if region.startswith('us'):
             region = 'us'
@@ -131,11 +131,15 @@ class Info(commands.Cog):
                 'PARTNERED': 'Discord Partner',
                 'MORE_EMOJI': 'Ekstra emoji',
                 'DISCOVERABLE': 'Fremhevet',
+                'FEATURABLE': 'Kan fremheves',
+                'COMMUNITY': 'Sammfunsguild',
                 'COMMERCE': 'Butikkanaler',
-                'LURKABLE': 'Kan ses uten join',
+                'PUBLIC': 'Offentlig guild',
                 'NEWS': 'Nyhetskanaler',
                 'BANNER': 'Banner',
                 'ANIMATED_ICON': 'Animert ikon',
+                'PUBLIC_DISABLED': 'Ikke offentlig',
+                'WELCOME_SCREEN_ENABLED': 'Velkomstvindu'
             }
             for feature in ctx.guild.features:
                 features_string += f'{features[feature]}\n'
@@ -213,8 +217,8 @@ class Info(commands.Cog):
         roles.reverse()
         roles = ', '.join(roles)
         
-        roles = roles.replace(", --", "\n--")
-        roles = roles.replace("--, ", "--\n")
+        roles = roles.replace(', --', '\n--')
+        roles = roles.replace('--, ', '--\n')
 
         if len(roles) > 2048:
             with open(f'./assets/temp/{ctx.guild.id}_roles.txt', 'w') as f:
@@ -335,23 +339,23 @@ class Info(commands.Cog):
         if bruker.premium_since:
             premium_index = sorted(ctx.guild.premium_subscribers, key=lambda m: m.premium_since).index(bruker) + 1
 
-        bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
-        bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
+        bruker_joined_date = bruker.joined_at.strftime('%d. %b. %Y - %H:%M')
+        bruker_created_date = bruker.created_at.strftime('%d. %b. %Y - %H:%M')
         since_joined_days = (ctx.message.created_at - bruker.joined_at).days
         since_created_days = (ctx.message.created_at - bruker.created_at).days
-        if since_created_days is 1:
+        if since_created_days == 1:
             since_created_days_string = 'dag'
         else:
             since_created_days_string = 'dager'
-        if since_joined_days is 1:
+        if since_joined_days == 1:
             since_joined_days_string = 'dag'
         else:
             since_joined_days_string = 'dager'
 
         if bruker.premium_since:
-            premium_since = bruker.premium_since.strftime('%d %b %Y %H:%M')
+            premium_since = bruker.premium_since.strftime('%d. %b. %Y - %H:%M')
             premium_since_days = (ctx.message.created_at - bruker.premium_since).days
-            if since_joined_days is 1:
+            if since_joined_days == 1:
                 premium_since_days_string = 'dag'
             else:
                 premium_since_days_string = 'dager'
@@ -374,10 +378,10 @@ class Info(commands.Cog):
             color = discord.Colour(0x99AAB5)
 
         statuses = {
-            'online': '<:online:516328785910431754> Pålogget',
-            'idle': '<:idle:516328783347843082> Inaktiv',
-            'dnd': '<:dnd:516328782844395579> Ikke forstyrr',
-            'offline': '<:offline:516328785407246356> Frakoblet'
+            'online': f'{self.bot.emoji["online"]} Pålogget',
+            'idle': f'{self.bot.emoji["idle"]} Inaktiv',
+            'dnd': f'{self.bot.emoji["dnd"]} Ikke forstyrr',
+            'offline': f'{self.bot.emoji["offline"]} Frakoblet'
         }
         status = statuses[str(bruker.status)]
 
@@ -403,7 +407,8 @@ class Info(commands.Cog):
             games = ''
             for activity in bruker.activities:
                 games += f'{activity.name}\n'
-            embed.add_field(name='Spiller', value=games, inline=False)
+            if games:
+                embed.add_field(name='Spiller', value=games, inline=False)
         await ctx.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -494,7 +499,7 @@ class Info(commands.Cog):
         else:
             hoisted = 'Nei'
 
-        rolle_created_date = rolle.created_at.strftime('%d %b %Y %H:%M')
+        rolle_created_date = rolle.created_at.strftime('%d. %b. %Y - %H:%M')
         since_created_days = (ctx.message.created_at - rolle.created_at).days
 
         if since_created_days is 1:
@@ -512,17 +517,17 @@ class Info(commands.Cog):
         if len(members) == 0:
             members = '**Ingen**'
 
-        permissions = sub('\D', '', str(rolle.permissions))
+        permissions = ', '.join([permission for permission, value in iter(rolle.permissions) if value is True])
 
         embed = discord.Embed(title=rolle.name, description=f'{rolle.mention}\n**ID:** {rolle.id}', color=color)
         embed.set_author(name=rolle.guild.name, icon_url=rolle.guild.icon_url)
         embed.add_field(name='Fargekode', value=str(rolle.color))
         embed.add_field(name='Opprettet', value=f'{rolle_created_date}\n{since_created_days} ' +
                                                 f'{since_created_days_string} siden')
-        embed.add_field(name='Tillatelser', value=permissions)
         embed.add_field(name='Posisjon', value=rolle.position)
         embed.add_field(name='Nevnbar', value=mentionable)
         embed.add_field(name='Vises separat i medlemsliste', value=hoisted)
+        embed.add_field(name='Tillatelser', value=permissions, inline=False)
         embed.add_field(name=f'Brukere med rollen ({len(rolle.members)})', value=members, inline=False)
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
@@ -557,7 +562,7 @@ class Info(commands.Cog):
         embed = discord.Embed(color=ctx.me.color, title=kanal.name, description=f'{kanal.mention}\nID: {kanal.id}')
         embed.set_author(name=kanal.guild.name, icon_url=kanal.guild.icon_url)
         embed.add_field(name='Beskrivelse', value=description, inline=False)
-        embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d. %b. %Y - %H:%M'))
         embed.add_field(name='NSFW', value=nsfw)
         embed.add_field(name='Saktemodus', value=saktemodus)
         if kanal.category:
@@ -580,7 +585,7 @@ class Info(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color, title=kanal.name, description=f'ID: {kanal.id}')
         embed.set_author(name=kanal.guild.name, icon_url=kanal.guild.icon_url)
-        embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name='Opprettet', value=kanal.created_at.strftime('%d. %b. %Y - %H:%M'))
         embed.add_field(name='Bitrate', value=f'{int(kanal.bitrate / 1000)}kbps')
         embed.add_field(name='Maksgrense', value=limit)
         if kanal.category:
@@ -608,7 +613,7 @@ class Info(commands.Cog):
 
         embed = discord.Embed(color=ctx.me.color, title=emoji.name, description=f'ID: {emoji.id}')
         embed.set_author(name=emoji.guild.name, icon_url=emoji.guild.icon_url)
-        embed.add_field(name=f'Opprettet', value=emoji.created_at.strftime('%d %b %Y %H:%M'))
+        embed.add_field(name=f'Opprettet', value=emoji.created_at.strftime('%d. %b. %Y - %H:%M'))
         embed.add_field(name='Animert', value=animated)
         embed.add_field(name='Lagt til av', value=emoji_creator)
         embed.set_image(url=emoji.url)
@@ -665,7 +670,7 @@ class Info(commands.Cog):
             key=lambda m: m.created_at)[start_index:end_index]
         for member in members:
             bruker = ctx.guild.get_member(member.id)
-            bruker_created_date = bruker.created_at.strftime('%d %b %Y %H:%M')
+            bruker_created_date = bruker.created_at.strftime('%d. %b. %Y - %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
             formatted_string += f'**#{bruker_index}** {bruker.name}#{bruker.discriminator} - {bruker_created_date}\n'
 
@@ -698,7 +703,7 @@ class Info(commands.Cog):
         members = sorted(ctx.guild.members, key=lambda m: m.joined_at)[start_index:end_index]
         for member in members:
             bruker = ctx.guild.get_member(member.id)
-            bruker_joined_date = bruker.joined_at.strftime('%d %b %Y %H:%M')
+            bruker_joined_date = bruker.joined_at.strftime('%d. %b. %Y - %H:%M')
             bruker_index = (members.index(member) + 1) + start_index
             formatted_string += f'**#{bruker_index}** {bruker.name}#{bruker.discriminator} - {bruker_joined_date}\n'
 
