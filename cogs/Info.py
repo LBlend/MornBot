@@ -527,7 +527,8 @@ class Info(commands.Cog):
         embed.add_field(name='Posisjon', value=rolle.position)
         embed.add_field(name='Nevnbar', value=mentionable)
         embed.add_field(name='Vises separat i medlemsliste', value=hoisted)
-        embed.add_field(name='Tillatelser', value=permissions, inline=False)
+        if permissions:
+            embed.add_field(name='Tillatelser', value=permissions, inline=False)
         embed.add_field(name=f'Brukere med rollen ({len(rolle.members)})', value=members, inline=False)
         await Defaults.set_footer(ctx, embed)
         await ctx.send(embed=embed)
