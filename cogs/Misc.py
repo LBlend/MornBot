@@ -393,6 +393,40 @@ class Misc(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.command(aliases=['holidays', 'fridager', 'ferie'])
+    async def helligdager(self, ctx, land=None, aar=None):
+        """Se hellidagene i et land"""
+
+        if not land:
+            land = 'NO'
+        else:
+            land = land.upper()
+
+        if not aar:
+            aar = datetime.now().year
+        else:
+            int(aar)
+
+        try:
+            data = get(f'https://date.nager.at/api/v2/publicholidays/{aar}/{land}').json()
+        except:
+            return await Defaults.error_fatal_send(ctx, text='Ugyldig land\nHusk å bruke landskoder\n' +
+                                                             'For eksempel: `NO`')
+        
+        country = data[0]['countryCode'].lower()
+        holiday_str = ''
+        for day in data:
+            date = day['date']
+            date = datetime.strptime(date, '%Y-%m-%d').strftime('%d. %B')
+            holiday_str += f'**{date}**: {day["localName"]}\n'
+
+        embed = discord.Embed(color=ctx.me.color, title=f':flag_{country}: Helligdager {aar} :flag_{country}:')
+        embed.description = holiday_str
+        await Defaults.set_footer(ctx, embed)
+        await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.command(aliases=['luftforurensning'])
     async def luftkvalitet(self, ctx, *, sted: str):
         """Se luftkvaliteten på en plass i Norge"""
