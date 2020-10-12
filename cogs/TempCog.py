@@ -5,18 +5,22 @@ This spaghetti code is a quick fix solution built to suit our needs
 """
 
 from discord.ext import commands
-import discord
+
+import re
 
 
 class TempCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     async def on_message(self, message):
         if message.channel.id != 696776618525589574 or message.author.bot:
             return
-        await message.add_reaction('👍')
-        await message.add_reaction('👎')
+
+        pattern = r'[S|s]piller:\s\w+\n[M|m]ap:\shttps:\/\/osu\.ppy\.sh\/beatmapsets\/\d+#\w+\/\d+'
+        if re.search(pattern, message.clean_content):
+            await message.add_reaction('👍')
+            await message.add_reaction('👎')
 
 
 def setup(bot):
