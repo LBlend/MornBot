@@ -8,7 +8,7 @@ class Fun(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def norskeuniversiteter(self, ctx):
-        await ctx.send('https://imgur.com/a/uGopaSq')
+        await ctx.send('<https://imgur.com/a/uGopaSq>')
 
     @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
