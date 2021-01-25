@@ -139,7 +139,8 @@ class Info(commands.Cog):
                 'BANNER': 'Banner',
                 'ANIMATED_ICON': 'Animert ikon',
                 'PUBLIC_DISABLED': 'Ikke offentlig',
-                'WELCOME_SCREEN_ENABLED': 'Velkomstvindu'
+                'WELCOME_SCREEN_ENABLED': 'Velkomstvindu',
+                'PREVIEW_ENABLED': 'Forhåndsvisning'
             }
             for feature in ctx.guild.features:
                 features_string += f'{features[feature]}\n'
